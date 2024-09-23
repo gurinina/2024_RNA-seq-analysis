@@ -128,9 +128,9 @@ The steps for DESeq2 median of ratios method:
 
 Manually compute the size factors for our count matrix, then normalize the matrix.
 
-Formula for geometric mean:
+Formula for geometric mean: multiply all values in a vector and take the nth root of the product
 ```{r}
-# Geometric mean function: multiply all values in a vector and take the nth root of the product
+# Geometric mean function: 
 geomean <- function(x, na.rm = TRUE){
     geo <- prod(x, na.rm = na.rm)^(1/length(x))
     
@@ -139,15 +139,16 @@ geomean <- function(x, na.rm = TRUE){
 # OR the equivalent
 
 geomean <- function(x, na.rm = TRUE){
+
     geo = exp(log(prod(x)^(1/length(x))))
-    # (1/length(x)) * log(prod(x)) is the same as   log(prod(x)^(1/length(x)))
-    # sum(log(x)) is the same as log(prod(x))
     # which is the same as:
+    geo = exp((1/length(x))*sum(log(x)))
     # which is the same as:
-    # mean(log(x), na.rm = na.rm) is the same as (1/length(x)) * sum(log(x))
+
     geo = exp(mean(log(x), na.rm = na.rm))
     geo
 }
+
 
 ```
 
