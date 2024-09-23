@@ -97,15 +97,50 @@ We find that the samples separate by `treatment` on PC3, and are optimistic abou
 
 ***
 
-**Exercise**
+**Exercise** points = +5
 
 The figure below was generated from a time course experiment with sample groups 'Ctrl' and 'Sci' and the following timepoints: 0h, 2h, 8h, and 16h. 
 
-- Determine the sources explaining the variation represented by PC1 and PC2.
-- Do the sample groups separate well?
-- Do the replicates cluster together for each sample group?
-- Are there any outliers in the data?
-- Should we have any other concerns regarding the samples in the dataset?
+**Determine the sources explaining the variation represented by PC1 and PC2.** 
+
+- Ans: 
+
+```{r, results = "asis", echo = FALSE}
+solutions("The sample groups 'Ctrl' and 'Sci' separate well on PC1 and PC2")
+```
+
+**Do the sample groups separate well?**
+
+  - Ans: 
+  
+```{r, results = "asis", echo = FALSE}
+solutions("Yes")
+```
+
+**Do the replicates cluster together for each sample group?**
+
+  - Ans:
+
+```{r, results = "asis", echo = FALSE}
+solutions("For the most part")
+```
+
+**Are there any outliers in the data?**
+
+  - Ans: 
+```{r, results = "asis", echo = FALSE}
+solutions("Yes, sci8_rep2, ctrl_rep3 cluster away from their replicates")
+```
+
+**Should we have any other concerns regarding the samples in the dataset?**
+
+  - Ans: 
+  
+```{r, results = "asis", echo = FALSE}
+solutions("Yes, sci8 and sci16 don't separate well, the ctrls show big variations among replicates")
+```
+
+
 
 ![Alt text](img/PCA_example3.png){ width=600 }
 
@@ -144,7 +179,7 @@ Now that we have a good understanding of the QC steps normally employed for RNA-
 
 > The rlog transformation of the normalized counts is only necessary for these visualization methods during this quality assessment. We will not be using these tranformed counts downstream.
 
-```r
+```{r}
 ### Transform counts for data visualization
 rld <- rlog(dds, blind=TRUE)
 ```
@@ -158,7 +193,7 @@ DESeq2 has a built-in function for plotting PCA plots, that uses `ggplot2` under
 
 The function `plotPCA()` requires two arguments as input: an `rlog` object and the `intgroup` (the column in our metadata that we are interested in). 
 
-```r
+```{r}
 ### Plot PCA 
 plotPCA(rld, intgroup="sampletype")
 ```
@@ -175,14 +210,14 @@ plotPCA(rld, intgroup="sampletype")
 
 Since there is no built-in function for heatmaps in DESeq2 we will be using the `pheatmap()` function from the `pheatmap` package. This function requires a matrix/dataframe of numeric values as input, and so the first thing we need to is retrieve that information from the `rld` object:
 
-```r
+```{r}
 ### Extract the rlog matrix from the object
 rld_mat <- assay(rld)    ## assay() is function from the "SummarizedExperiment" package that was loaded when you loaded DESeq2
 ```
 
 Then we need to compute the pairwise correlation values for samples. We can do this using the `cor()` function:
 
-```r
+```{r}
 ### Compute pairwise correlation values
 rld_cor <- cor(rld_mat)    ## cor() is a base R function
 
@@ -191,7 +226,7 @@ head(rld_cor)   ## check the output of cor(), make note of the rownames and coln
 
 And now to plot the correlation values as a heatmap:
 
-```r
+```{r}
 ### Plot heatmap
 pheatmap(rld_cor)
 ```
@@ -200,16 +235,37 @@ pheatmap(rld_cor)
 
 Overall, we observe pretty high correlations across the board ( > 0.999) suggesting no outlying sample(s). Also, similar to the PCA plot you see the samples clustering together by sample group. Together, these plots suggest to us that the data are of good quality and we have the green light to proceed to differential expression analysis.
 
+**Exercise** points = +3
 
-> NOTE: The `pheatmap` function has a number of different arguments that we can alter from default values to enhance the aesthetics of the plot. If you are curious and want to explore more, try running the code below. *How does your plot change?* Take a look through the help pages (`?pheatmap`) and identify what each of the added arguments is contributing to the plot.
->
-> ```r
-> heat.colors <- brewer.pal(6, "Blues")
-> pheatmap(rld_cor, color = heat.colors, border_color=NA, fontsize = 10, 
->			fontsize_row = 10, height=20)
-> ```       
-> Curious on all of the available [color palettes offered by the RColorBrewer package](http://www.r-graph-gallery.com/38-rcolorbrewers-palettes/)? Try typing in your console `display.brewer.all()` and see what happens!
-> 
+The pheatmap function has a number of different arguments that we can alter from default values to enhance the aesthetics of the plot. Try adding the arguments `color`, `border_color`, `fontsize_row`, `fontsize_col`, `show_rownames` and `show_colnames` How does your plot change? Take a look through the help pages (?pheatmap) and identify what each of the added arguments is contributing to the plot.
+
+First run:
+```{r}
+display.brewer.all()
+
+# The color palette "Blues" is a good choice for this heatmap
+heat.colors <- brewer.pal(9, "Blues")
+# Your code here
+```
+
+```{r, results = "asis", echo = FALSE}
+
+solutions(
+  'display.brewer.all()\n
+  
+   heat.colors <- brewer.pal(9, "Blues")\n
+   
+   pheatmap(rld_cor, color = heat.colors, border_color = "black", 
+   fontsize = 10, fontsize_row = 12, show_rownames = T, show_colnames = T)\n
+   
+   "It changes the color palette, adds a border color, changes the font size 
+    of the heatmap, row names, and column names, and shows the row and 
+    column names."'
+)
+
+```
+
+
 
 ***
 *This lesson has been developed by members of the teaching team at the [Harvard Chan Bioinformatics Core (HBC)](http://bioinformatics.sph.harvard.edu/). These are open access materials distributed under the terms of the [Creative Commons Attribution license](https://creativecommons.org/licenses/by/4.0/) (CC BY 4.0), which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.*

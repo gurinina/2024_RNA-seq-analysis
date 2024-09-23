@@ -145,7 +145,7 @@ Determine the normalized counts for your gene of interest, PD1, given the raw co
 
 NOTE: You will need to run the code below to generate the raw counts dataframe (PD1) and the size factor vector (size_factors), then use these objects to determine the normalized counts values:
 
-```r
+```{r}
 
 # Raw counts for PD1
 PD1 <- c(21, 58, 17, 97, 83, 10)
@@ -156,6 +156,16 @@ PD1 <- t(PD1)
 # Size factors for each sample
 size_factors <- c(1.32, 0.70, 1.04, 1.27, 1.11, 0.85)
 
+```
+
+```{r, results = "asis", echo = FALSE}
+solutions(
+    'PD1_normalized <- PD1 / size_factors 
+
+    # OR
+    
+    PD1_normalized <- sweep(PD1,2,size_factors,FUN = "/")'
+)
 ```
 
 ***
@@ -172,17 +182,41 @@ Now that we know the theory of count normalization, we will normalize the counts
 
 We should always make sure that we have sample names that match between the two files, and that the samples are in the right order. DESeq2 will output an error if this is not the case.
 
-```r
+```{r}
 ### Check that sample names match in both files
 all(colnames(data) %in% rownames(meta))
 all(colnames(data) == rownames(meta))
 ```
 
 The colnames of our data don't match the rownames of our metadata so we need to reorder them. We can use the `match` function:
-```r
-# write the code to match the colnames of data to the rownames of meta
+```{r}
+
+
+idx <- match(rownames(meta),colnames(data))
+data <- data[,idx]
+
+all(colnames(data) == rownames(meta))
+
+```
+
+**Exercise** points = +2
+
+Suppose we had sample names matching in the counts matrix and metadata file, but they were out of order. Write the line(s) of code required to create a new matrix with columns ordered such that they were identical to the row names of the metadata.
+```{r, eval=FALSE}
+
+# write the code to reorder the columns of the data matrix to match the rownames of the metadata
 
 # check that the rownames of the metadata match the colnames of the data
+
+
+```
+```{r, results = "asis", echo = FALSE}
+
+solutions(
+  'idx <- match(rownames(metadata), colnames(data))\n
+   data <- data[, idx]\n
+   all(colnames(data) == rownames(metadata))'
+)
 
 ```
 
@@ -194,9 +228,9 @@ Bioconductor software packages often define and use a custom class within R for 
 
 Let's start by creating the `DESeqDataSet` object and then we can talk a bit more about what is stored inside it. To create the object we will need the **count matrix** and the **metadata** table as input. We will also need to specify a **design formula**. The design formula specifies the column(s) in the metadata table and how they should be used in the analysis. For our dataset we only have one column we are interested in, that is `~sampletype`. This column has three factor levels, which tells DESeq2 that for each gene we want to evaluate gene expression change with respect to these different levels.
 
-```r
+```{r}
 ## Create DESeq2Dataset object
-dds <- DESeqDataSetFromMatrix(countData = data, colData = meta, design = ~ sampletype)
+cdds <- DESeqDataSetFromMatrix(countData = data, colData = meta, design = ~ sampletype)
 ```
 
 ![deseq1](img/deseq_obj1.png)
@@ -204,13 +238,13 @@ dds <- DESeqDataSetFromMatrix(countData = data, colData = meta, design = ~ sampl
 
 You can use DESeq-specific functions to access the different slots and retrieve information, if you wish. For example, suppose we wanted the original count matrix we would use `counts()`:
 
-```r
+```{r}
 head(counts(dds[,1:5]))
 ```
 
 As we go through the workflow we will use the relevant functions to check what information gets stored inside our object. We can also run:
 
-```r
+```{r}
 slotNames(dds)
 ```
 
@@ -222,24 +256,24 @@ The next step is to normalize the count data in order to be able to make fair ge
 
 To perform the **median of ratios method** of normalization, DESeq2 has a single `estimateSizeFactors()` function that will generate size factors for us. We will use the function in the example below, but **in a typical RNA-seq analysis this step is automatically performed by the `DESeq()` function**, which we will see later. 
 
-```r
+```{r}
 dds <- estimateSizeFactors(dds)
 ```
 
 By assigning the results back to the `dds` object we are filling in the slots of the `DESeqDataSet` object with the appropriate information. We can take a look at the normalization factor applied to each sample using:
 
-```r
+```{r}
 sizeFactors(dds)
 ```
 
 Now, to retrieve the normalized counts matrix from `dds`, we use the `counts()` function and add the argument `normalized=TRUE`.
 
-```r
+```{r}
 normalized_counts <- counts(dds, normalized=TRUE)
 ```
 
 We can save this normalized data matrix to file for later use:
 
-```r
+```{r}
 write.table(normalized_counts, file="data/normalized_counts.txt", sep="\t", quote=F, col.names=NA)
 ```
