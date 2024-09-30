@@ -125,7 +125,7 @@ sig <- res_shrunken_tb %>%
 	
 ```{r}
 
-res_tableOE <-  readRDS("data/res_tableOE.rds")
+res_tableOE <-  readRDS("data/res_tableOE.RDS")
 
 res_tableOE_tb <- res_tableOE %>%
   data.frame() %>%
@@ -172,13 +172,13 @@ normalized_counts <- normalized_counts %>%
   as_tibble()
 
 
-meta <- read.table("meta/Mov10_full_meta.txt", header=T, row.names=1)
+meta <- read.table("data/Mov10_full_meta.txt", header=T, row.names=1)
 
 mov10_meta <- meta %>% 
   rownames_to_column(var="samplename") %>% 
   as_tibble()
 
-sigKD <- readRDS("data/sigKD.rds")
+sigKD <- readRDS("data/sigKD.RDS")
 
 colnames(normalized_counts)
 
@@ -262,7 +262,7 @@ down_OE <- rownames(res_tableOE)[w]
 points = +2	
 ```{r}
 
-res_tableKD <- readRDS("data/res_tableKD.rds")
+res_tableKD <- readRDS("data/res_tableKD.RDS")
 w <-  which(res_tableKD$log2FoldChange > lfc.cutoff)
 up_KD <- rownames(res_tableKD)[w]
 

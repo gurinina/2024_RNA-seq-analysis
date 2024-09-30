@@ -6,9 +6,9 @@ _epub
 epub
 render_all.R
 09-DGE1_codebook.Rmd
-data/res_tableKD.rds
-data/res_tableOE.rds
-data/sigKD.rds
+data/res_tableKD.RDS
+data/res_tableOE.RDS
+data/sigKD.RDS
 RNA-seq-analysis.Rmd
 
 

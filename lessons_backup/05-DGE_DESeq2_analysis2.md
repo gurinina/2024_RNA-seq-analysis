@@ -224,7 +224,7 @@ res_tableKD <- lfcShrink(dds, coef = 2, res=res_tableKD_unshrunken)
 
 # We will save these results for later use in the data directory using the following command:
 
-saveRDS(res_tableKD, file = "data/res_tableKD.rds")
+saveRDS(res_tableKD, file = "data/res_tableKD.RDS")
 
 # just for security, save all our objects in ".RData" again:
 save.image()

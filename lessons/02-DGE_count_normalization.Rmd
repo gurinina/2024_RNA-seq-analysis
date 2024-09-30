@@ -159,13 +159,12 @@ size_factors <- c(1.32, 0.70, 1.04, 1.27, 1.11, 0.85)
 ```
 
 ```{r, results = "asis", echo = FALSE}
-solutions(
-    'PD1_normalized <- PD1 / size_factors 
 
-    # OR
-    
-    PD1_normalized <- sweep(PD1,2,size_factors,FUN = "/")'
-)
+solutions('PD1_normalized <- PD1 / size_factors 
+
+# OR
+
+PD1_normalized <- sweep(PD1,2,size_factors,FUN = "/")')
 ```
 
 ***
@@ -204,18 +203,18 @@ all(colnames(data) == rownames(meta))
 Suppose we had sample names matching in the counts matrix and metadata file, but they were out of order. Write the line(s) of code required to create a new matrix with columns ordered such that they were identical to the row names of the metadata.
 ```{r, eval=FALSE}
 
-# write the code to reorder the columns of the data matrix to match the rownames of the metadata
+# write the code to reorder the columns of the 'counts' matrix to match the rownames of the metadata
 
-# check that the rownames of the metadata match the colnames of the data
+# check that the rownames of the metadata match the colnames of the 'counts' matrix
 
 
 ```
 ```{r, results = "asis", echo = FALSE}
 
 solutions(
-  'idx <- match(rownames(metadata), colnames(data))\n
-   data <- data[, idx]\n
-   all(colnames(data) == rownames(metadata))'
+  'idx <- match(rownames(metadata), colnames(counts))\n
+   counts <- counts[, idx]\n
+   all(colnames(counts) == rownames(metadata))'
 )
 
 ```
@@ -230,7 +229,7 @@ Let's start by creating the `DESeqDataSet` object and then we can talk a bit mor
 
 ```{r}
 ## Create DESeq2Dataset object
-cdds <- DESeqDataSetFromMatrix(countData = data, colData = meta, design = ~ sampletype)
+dds <- DESeqDataSetFromMatrix(countData = data, colData = meta, design = ~ sampletype)
 ```
 
 ![deseq1](img/deseq_obj1.png)

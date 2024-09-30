@@ -33,7 +33,7 @@ library(ggrepel)
 
 data <- read.delim("data/Mov10_full_counts.txt", row.names = 1)
 
-meta <- read.delim("meta/Mov10_full_meta.txt", row.names = 1)
+meta <- read.delim("data/Mov10_full_meta.txt", row.names = 1)
 ```
 
 Use class() to inspect our data and make sure we are working with data frames:
@@ -47,9 +47,9 @@ class(data)
 
 ```{r}
 
-head(meta)
+meta
 
-head(data[,1:5])
+head(data)
 
 ```
 
@@ -128,7 +128,7 @@ The steps for DESeq2 median of ratios method:
 
 Manually compute the size factors for our count matrix, then normalize the matrix.
 
-Formula for geometric mean: multiply all values in a vector and take the nth root of the product
+Formula for geometric mean: multiply all n values of vector x and take the nth root of the product. The advantage of the geometric mean is that it is less affected by very large or very small values.
 ```{r}
 # Geometric mean function: 
 geomean <- function(x, na.rm = TRUE){
@@ -153,33 +153,42 @@ geomean <- function(x, na.rm = TRUE){
 ```
 
 
-Hint: use the `apply` function; you can combine it with the `sweep` function but you don't need to
+Hint: use the `apply` function.
 
 1. Calculate the geometric mean for each row in the count matrix
 ```{r}
 
 geo <- apply(as.matrix(data),1,geomean)
 ```
-2. Divide each row by the row's geometric mean
+
+2. Calculates ratio of each sample to the reference
+
+Divide each row by the row's geometric mean:
 ```{r}
 
 div <- apply(data,2,"/",geo)
 
 ```
 
-3. Take the median value for each column -- these are your size factors, one for each sample
+3. Calculate the normalization factor for each sample (size factor)
+
+Take the median value for each column -- these are your size factors, one for each sample, you need to remove the `NA` values before calculating the median:
 ```{r}
 
-sf <- apply(div,2,function(x){m = median(x[is.finite(x)])})
+sf <- apply(div, 2, function(x){m = median(x[is.finite(x)])})
 
 ```
 
-4. Divide each sample by its size factor.
+4. Calculate the normalized count values using the normalization factor
+
+Divide each sample by its size factor.
+
+This is performed by dividing each raw count value in a given sample by that sample’s normalization factor to generate normalized count values. This is the final step in the normalization process.
 
 Sweep is a function that allows you to apply a function to a margin of an array. In this case, we are dividing each column by the size factor for that column. The `sweep` function takes the array, the margin to apply the function to (2 = columns), the size factor, and the function to apply (`/`).
 ```{r}
 
-norm <- sweep(data,2,sf,FUN = "/")
+norm <- sweep(data, 2, sf, FUN = "/")
 
 ```
 
@@ -219,7 +228,7 @@ all(colnames(data) %in% rownames(meta))
 all(colnames(data) == rownames(meta))
 ```
 
-The colnames of our data don't match the rownames of our metadata so we need to reorder them. We can use the `match` function:
+The colnames of our data don't match the rownames of our metadata so we need to reorder them. We can use the `match` function. Because the order of the columns in the count matrix and the rows in the metadata file don't match, we need to reorder the columns in the count matrix to match the rows in the metadata file. We can use the `match` function to do this. The `match` function returns a vector of the positions of (first) matches of its first argument in its second.
 ```{r}
 
 idx <- match(rownames(meta),colnames(data))
@@ -247,7 +256,7 @@ dds <- DESeqDataSetFromMatrix(countData = data, colData = meta, design = ~ sampl
 You can use DESeq-specific functions to access the different slots and retrieve information, if you wish. For example, suppose we wanted the original count matrix we would use counts():
 ```{r}
 
-head(counts(dds[,1:5]))
+head(counts(dds))
 
 colData(dds)
 
@@ -286,7 +295,7 @@ write.table(normalized_counts, file = "data/normalized_counts.txt", sep = "\t")
 
 # it's always good to save our results, in case we forget to save objects
 save.image()
-# saves all objects in session/eenvironment
+# saves all objects in session/environment
 ```
 
 ## DGE QC analysis
@@ -473,10 +482,11 @@ colSums(counts(dds, normalized = FALSE))
 
 **How do the numbers correlate with the size factor?**
 ```{r}
-cor(colSums(counts(dds, normalized = FALSE)),sizeFactors(dds))
+
+# Your code here
 ```
 
-- Ans: they are highly correlated
+- Ans: 
 
 #### Step 2: Estimate gene-wise dispersion**
 
@@ -550,7 +560,7 @@ To address this problem, DESeq2 shares information across genes to generate more
 
 Estimating the dispersion for each gene separately:
 
-To model the dispersion based on expression level (mean counts of replicates), the dispersion for each gene is estimated using maximum likelihood estimation. In statistics, maximum likelihood estimation (MLE) is a method of estimating the parameters of an assumed probability distribution, given some observed data. This is achieved by maximizing a likelihood function so that, under the assumed statistical model, the observed data is most probable. In other words, given the count values of the replicates, the most likely estimate of dispersion is calculated.
+To model the dispersion based on expression level (mean counts of replicates), the dispersion for each gene is estimated using maximum likelihood estimation. In statistics, maximum likelihood estimation (MLE) is a method of estimating the parameters of an assumed probability distribution, given some observed data. This is achieved by maximizing a likelihood function so that, under the assumed statistical model, the observed data is most probable. **In other words, given the count values of the replicates, the most likely estimate of dispersion is calculated.**
 
 #### Step 3: Fit curve to gene-wise dispersion estimates
 
@@ -627,7 +637,7 @@ res_tableOE <- lfcShrink(dds, coef = "sampletype_MOV10_overexpression_vs_control
 
 # We will save these results for later use in the data directory using the following command:
 
-saveRDS(res_tableOE, file = "data/res_tableOE.rds")
+saveRDS(res_tableOE, file = "data/res_tableOE.RDS")
 ```
 
 **The order of the names determines the direction of fold change that is reported.** The name provided in the second element is the level that is used as baseline. So for example, if we observe a log2 fold change of -2 this would mean the gene expression is lower in Mov10_oe relative to the control.**
@@ -704,7 +714,7 @@ res_tableKD <- lfcShrink(dds, coef = 2, res = res_tableKD_unshrunken)
 
 # We will save these results for later use in the data directory using the following command:
 
-saveRDS(res_tableKD, file = "data/res_tableKD.rds")
+saveRDS(res_tableKD, file = "data/res_tableKD.RDS")
 
 # just for security, save all our objects in ".RData" again:
 save.image()
@@ -788,7 +798,7 @@ sigKD <- res_tableKD_tb %>%
          abs(log2FoldChange) > lfc.cutoff)
 
 # We'll save this object for use in the homework
-saveRDS(sigKD,"data/sigKD.rds")
+saveRDS(sigKD,"data/sigKD.RDS")
 ```
 
 **How many genes are differentially expressed in the Knockdown compared to Control?**
@@ -960,7 +970,7 @@ ggplot(pivoted_top20_sigOE) +
 In addition to plotting subsets, we could also extract the normalized values of *all* the significant genes and plot a heatmap of their expression using `pheatmap()`.
 ```{r}
 
-sigOE = readRDS("data/sigOE.rds")
+sigOE = readRDS("data/sigOE.RDS")
 ### Extract normalized expression for significant genes from the OE and control samples c(2:4,7:9), and set the gene column (1) to row names
 
 norm_OEsig <- normalized_counts[,c(1,2:4,7:9)] %>% 
@@ -1188,7 +1198,7 @@ library(fgsea)
 
 ```{r}
 
-res_tableOE = readRDS("data/res_tableOE.rds")
+res_tableOE = readRDS("data/res_tableOE.RDS")
 
 res_tableOE_tb <- res_tableOE %>%
 data.frame() %>%

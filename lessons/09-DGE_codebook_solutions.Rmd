@@ -33,7 +33,7 @@ library(ggrepel)
 
 data <- read.delim("data/Mov10_full_counts.txt", row.names = 1)
 
-meta <- read.delim("meta/Mov10_full_meta.txt", row.names = 1)
+meta <- read.delim("data/Mov10_full_meta.txt", row.names = 1)
 ```
 
 Use class() to inspect our data and make sure we are working with data frames:
@@ -152,33 +152,42 @@ geomean <- function(x, na.rm = TRUE){
 
 ```
 
-Hint: use the `apply` function; you can combine it with the `sweep` function but you don't need to
+Hint: use the `apply` function.
 
 1. Calculate the geometric mean for each row in the count matrix
 ```{r}
 
 geo <- apply(as.matrix(data),1,geomean)
 ```
-2. Divide each row by the row's geometric mean
+
+2. Calculates ratio of each sample to the reference
+
+Divide each row by the row's geometric mean:
 ```{r}
 
 div <- apply(data,2,"/",geo)
 
 ```
 
-3. Take the median value for each column -- these are your size factors, one for each sample
+3. Calculate the normalization factor for each sample (size factor)
+
+Take the median value for each column -- these are your size factors, one for each sample, you need to remove the `NA` values before calculating the median:
 ```{r}
 
-sf <- apply(div,2,function(x){m = median(x[is.finite(x)])})
+sf <- apply(div, 2, function(x){m = median(x[is.finite(x)])})
 
 ```
 
-4. Divide each sample by its size factor.
+4. Calculate the normalized count values using the normalization factor
+
+Divide each sample by its size factor.
+
+This is performed by dividing each raw count value in a given sample by that sample’s normalization factor to generate normalized count values. This is the final step in the normalization process.
 
 Sweep is a function that allows you to apply a function to a margin of an array. In this case, we are dividing each column by the size factor for that column. The `sweep` function takes the array, the margin to apply the function to (2 = columns), the size factor, and the function to apply (`/`).
 ```{r}
 
-norm <- sweep(data,2,sf,FUN = "/")
+norm <- sweep(data, 2, sf, FUN = "/")
 
 ```
 
@@ -631,7 +640,7 @@ res_tableOE <- lfcShrink(dds, coef = "sampletype_MOV10_overexpression_vs_control
 
 # We will save these results for later use in the data directory using the following command:
 
-saveRDS(res_tableOE, file = "data/res_tableOE.rds")
+saveRDS(res_tableOE, file = "data/res_tableOE.RDS")
 ```
 
 **The order of the names determines the direction of fold change that is reported.** The name provided in the second element is the level that is used as baseline. So for example, if we observe a log2 fold change of -2 this would mean the gene expression is lower in Mov10_oe relative to the control.**
@@ -708,7 +717,7 @@ res_tableKD <- lfcShrink(dds, coef = 2, res = res_tableKD_unshrunken)
 
 # We will save these results for later use in the data directory using the following command:
 
-saveRDS(res_tableKD, file = "data/res_tableKD.rds")
+saveRDS(res_tableKD, file = "data/res_tableKD.RDS")
 
 # just for security, save all our objects in ".RData" again:
 save.image()
@@ -794,7 +803,7 @@ sigKD <- res_tableKD_tb %>%
          abs(log2FoldChange) > lfc.cutoff)
 
 # We'll save this object for use in the homework
-saveRDS(sigKD,"data/sigKD.rds")
+saveRDS(sigKD,"data/sigKD.RDS")
 ```
 
 **How many genes are differentially expressed in the Knockdown compared to Control?**
@@ -836,10 +845,7 @@ mov10_meta <- meta %>%
   rownames_to_column(var = "samplename") %>% 
   as_tibble()
         
-# you might to read in normalized_counts if it is not in your current session:
-
-
-
+# you might need to read in normalized_counts if it is not in your current session:
 normalized_counts <-     read.delim("data/normalized_counts.txt", row.names = 1)
 
 # then make sure the colnames of normalized_counts are the same as the mov10_meta$sampname
@@ -852,8 +858,6 @@ normalized_counts <- normalized_counts %>%
   data.frame() %>%
   rownames_to_column(var = "gene") %>% 
   as_tibble()
-
-
 
 ```
 
@@ -942,12 +946,12 @@ pivoted_top20_sigOE <- top20_sigOE_norm %>%
 head(pivoted_top20_sigOE)
 ```
 
-Now, if we want our counts colored by sample group, then we need to combine the metadata information with the melted normalized counts data into the same data frame for input to `ggplot()`:
+Now, if we want our counts colored by sample group, then we need to combine the metadata information with the melted normalized counts data into the same data frame for input to `ggplot()`. We can do this using the `inner_join()` function from the **dplyr** package. `inner_join()` will merge 2 data frames by the colname in x that matches a column name in y. 
+
 ```{r}
-# `inner_join(x,y)` will merge 2 data frames by the colname in x that matches a column name in y. 
-# it is similar to doing a match(pivoted_top20_sigOE$samplename, mov10_meta$samplename) and then adding sampletype and MOV10exr to pivoted_top20_sigOE, but it is more efficient because the columns from mov10_meta are added in a single command.
 
 pivoted_top20_sigOE <- inner_join(mov10_meta, pivoted_top20_sigOE, by = "samplename")
+
 ```
 
 Now that we have a data frame in a format that can be utilised by ggplot easily, let’s plot!
@@ -960,8 +964,8 @@ ggplot(pivoted_top20_sigOE) +
         ylab("log10 Normalized Counts") +
         ggtitle("Top 20 Significant DE Genes") +
         theme_bw() +
-	theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
-	theme(plot.title = element_text(hjust = 0.5))
+      	theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+      	theme(plot.title = element_text(hjust = 0.5))
 ```
 
 ### Heatmap
@@ -969,7 +973,7 @@ ggplot(pivoted_top20_sigOE) +
 In addition to plotting subsets, we could also extract the normalized values of *all* the significant genes and plot a heatmap of their expression using `pheatmap()`.
 ```{r}
 
-sigOE = readRDS("data/sigOE.rds")
+sigOE = readRDS("data/sigOE.RDS")
 ### Extract normalized expression for significant genes from the OE and control samples c(2:4,7:9), and set the gene column (1) to row names
 
 norm_OEsig <- normalized_counts[,c(1,2:4,7:9)] %>% 
@@ -1197,7 +1201,7 @@ library(fgsea)
 
 ```{r}
 
-res_tableOE = readRDS("data/res_tableOE.rds")
+res_tableOE = readRDS("data/res_tableOE.RDS")
 
 res_tableOE_tb <- res_tableOE %>%
 data.frame() %>%
@@ -1421,7 +1425,7 @@ names(vis)
 Now we use runNetwork to view the map: 
 
 ```{r}
-runNetwork(vis$nodes,vis$edges)
+# runNetwork(vis$nodes,vis$edges)
 ```
 
 This is one of the best visualizations available out of all the GO packages.

@@ -49,10 +49,11 @@ The z-score is a measure of variability. So it's easy to see how in our plot, th
 ![Alt text](img/PCA_samples.png){ width=600 }
 
 
-The take home message for our purposes is that if two samples have similar levels of expression for the genes that contribute significantly to the variation represented by PC1, they will be plotted close together on the PC1 axis. Therefore, we would expect biological replicates to have similar scores (since the same genes are changing) and cluster together on PC1 and/or PC2, and the samples from different treatment groups to have different scores. This is easiest to understand by visualizing example PCA plots.
+**The take home message for our purposes is that if two samples have similar levels of expression for the genes that contribute significantly to the variation represented by PC1, they will be plotted close together on the PC1 axis. Therefore, we would expect biological replicates to have similar scores (since the same genes are changing) and cluster together on PC1 and/or PC2, and the samples from different treatment groups to have different scores.** This is easiest to understand by visualizing example PCA plots.
 
 
 #### Interpreting PCA plots
+
 We have an example dataset and a few associated PCA plots below to get a feel for how to interpret them. The metadata for the experiment is displayed below. The main condition of interest is treatment.
 
 To evaluate the results of a PCA, we usually plot principal components against each other, starting with PCs that explain the most amount of variation in your data.
@@ -68,7 +69,7 @@ We have an example dataset and a few associated PCA plots below to get a feel fo
 
 ![Alt text](img/example_metadata.png){ width=600 }
 
-When visualizing on PC1 and PC2, we don't see the samples separate by `treatment`, so we decide to explore other sources of variation present in the data. We hope that we have included all possible known sources of variation in our metadata table, and we can use these factors to color the PCA plot. 
+When visualizing on PC1 and PC2, in the following identical plots we color the points by metadata column. In the first plot, we don't see the samples separate by `treatment`, so we decide to explore other sources of variation present in the data. We hope that we have included all possible known sources of variation in our metadata table, and we can use these factors to color the PCA plot. 
 
 ![Alt text](img/example_PCA_treatmentPC1.png){ width=600 }
 
@@ -101,9 +102,11 @@ We find that the samples separate by `treatment` on PC3, and are optimistic abou
 
 The figure below was generated from a time course experiment with sample groups 'Ctrl' and 'Sci' and the following timepoints: 0h, 2h, 8h, and 16h. 
 
+![Alt text](img/PCA_example3.png){ width=600 }
+
 **Determine the sources explaining the variation represented by PC1 and PC2.** 
 
-- Ans: 
+  - Ans: 
 
 ```{r, results = "asis", echo = FALSE}
 solutions("The sample groups 'Ctrl' and 'Sci' separate well on PC1 and PC2")
@@ -127,9 +130,10 @@ solutions("For the most part")
 
 **Are there any outliers in the data?**
 
-  - Ans: 
+  - Ans:
+  
 ```{r, results = "asis", echo = FALSE}
-solutions("Yes, sci8_rep2, ctrl_rep3 cluster away from their replicates")
+solutions("Yes, sci8_rep2, ctrl0_rep3 cluster away from their replicates")
 ```
 
 **Should we have any other concerns regarding the samples in the dataset?**
@@ -137,12 +141,9 @@ solutions("Yes, sci8_rep2, ctrl_rep3 cluster away from their replicates")
   - Ans: 
   
 ```{r, results = "asis", echo = FALSE}
-solutions("Yes, sci8 and sci16 don't separate well, the ctrls show big variations among replicates")
+solutions("Yes, sci8 and sci16 don't separate well, the ctrl0 group shows big variations among replicates")
 ```
 
-
-
-![Alt text](img/PCA_example3.png){ width=600 }
 
 ***
 
@@ -175,7 +176,14 @@ Now that we have a good understanding of the QC steps normally employed for RNA-
 
 ### Transform normalized counts using the rlog transformation
 
-**To improve the distances/clustering for the PCA and heirarchical clustering visualization methods**, we need to moderate the variance across the mean by applying the rlog transformation to the normalized counts. 
+**To improve the distances/clustering for the PCA and heirarchical clustering visualization methods**, we need to moderate the variance across the mean by applying the rlog transformation to the normalized counts.
+
+Example of Variance Stabilization
+Raw RNA-Seq count data has different levels of variability:
+
+Without stabilization: Lowly expressed genes show high variability between samples (often due to noise), and highly expressed genes show less variability.
+With stabilization (e.g., rlog or vst): Variance across genes is more evenly distributed, which makes the data easier to work with in analyses like clustering or PCA.
+
 
 > The rlog transformation of the normalized counts is only necessary for these visualization methods during this quality assessment. We will not be using these tranformed counts downstream.
 
@@ -193,12 +201,11 @@ DESeq2 has a built-in function for plotting PCA plots, that uses `ggplot2` under
 
 The function `plotPCA()` requires two arguments as input: an `rlog` object and the `intgroup` (the column in our metadata that we are interested in). 
 
-```{r}
+```{r, fig.width=6, fig.height=4, fig.align='center'}
 ### Plot PCA 
 plotPCA(rld, intgroup="sampletype")
 ```
 
-![pca](img/pca_500.png)
 
 **What does this plot tell you about the similarity of samples? Does it fit the expectation from the experimental design?** By default the function uses the *top 500 most variable genes*. You can change this by adding the `ntop` argument and specifying how many genes you want to use to draw the plot.
 
@@ -226,7 +233,7 @@ head(rld_cor)   ## check the output of cor(), make note of the rownames and coln
 
 And now to plot the correlation values as a heatmap:
 
-```{r}
+```{r, fig.width=6, fig.height=6, fig.align='center'}
 ### Plot heatmap
 pheatmap(rld_cor)
 ```
@@ -237,16 +244,21 @@ Overall, we observe pretty high correlations across the board ( > 0.999) suggest
 
 **Exercise** points = +3
 
-The pheatmap function has a number of different arguments that we can alter from default values to enhance the aesthetics of the plot. Try adding the arguments `color`, `border_color`, `fontsize_row`, `fontsize_col`, `show_rownames` and `show_colnames` How does your plot change? Take a look through the help pages (?pheatmap) and identify what each of the added arguments is contributing to the plot.
+The pheatmap function has a number of different arguments that we can alter from default values to enhance the aesthetics of the plot. Try adding the arguments `color`, `border_color`, `fontsize_row`, `fontsize_col`, `show_rownames` and `show_colnames` to your pheatmap. How does your plot change? Take a look through the help pages (?pheatmap) and identify what each of the added arguments is contributing to the plot.
 
 First run:
 ```{r}
+# Display all available color palettes
 display.brewer.all()
 
 # The color palette "Blues" is a good choice for this heatmap
 heat.colors <- brewer.pal(9, "Blues")
+
 # Your code here
+
 ```
+
+  - Ans: 
 
 ```{r, results = "asis", echo = FALSE}
 

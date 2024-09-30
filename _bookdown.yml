@@ -5,12 +5,12 @@ rmd_files:
   - lessons/01-DGE_setup_and_overview.Rmd
   - lessons/02-DGE_count_normalization.Rmd
   - lessons/03-DGE_QC_analysis.Rmd
-  - lessons/04-DGE_DESeq2_analysis.Rmd
+  - lessons/04-DGE_DESeq2_analysis_fully_edited_with_shrinkage.Rmd
   - lessons/05-DGE_DESeq2_analysis2.Rmd
   - lessons/06-DGE_visualizing_results.Rmd
   - lessons/07-DGE_summarizing_workflow.Rmd
   - lessons/08-GO_enrichment_analysis.Rmd
-  - lessons/09-RNA-seq_codebook_solutions.Rmd
+  - lessons/09-DGE_codebook_solutions.Rmd
 delete_merged_file: no
 chapter_name: "Chapter "
 language:

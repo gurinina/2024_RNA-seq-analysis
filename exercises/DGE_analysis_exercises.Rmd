@@ -106,7 +106,7 @@ total points = 30
 	
 ```{r}
 
-res_tableOE <-  readRDS("data/res_tableOE.rds")
+res_tableOE <-  readRDS("data/res_tableOE.RDS")
 
 # Your code here
 ```
@@ -138,11 +138,11 @@ res_tableOE <-  readRDS("data/res_tableOE.rds")
 normalized_counts <- read.delim("data/normalized_counts.txt",row.names = 1)
 
 
-meta <- read.table("meta/Mov10_full_meta.txt", header=T, row.names=1)
+meta <- read.table("data/Mov10_full_meta.txt", header=T, row.names=1)
 
 
 
-sigKD <- readRDS("data/sigKD.rds")
+sigKD <- readRDS("data/sigKD.RDS")
 
 
 

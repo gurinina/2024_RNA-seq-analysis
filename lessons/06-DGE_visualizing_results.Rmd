@@ -4,7 +4,7 @@ During this lesson, we will get you started with some basic and more advanced pl
 
 Let's start by loading a few libraries (if not already loaded):
 
-```{r}
+```{r, message = FALSE}
 # load libraries
 library(tidyverse)
 library(ggplot2)
@@ -12,6 +12,7 @@ library(ggrepel)
 library(RColorBrewer)
 library(DESeq2)
 library(pheatmap)
+library(dplyr)
 ```
 
 > **NOTE:** Since we are using the `tidyverse` suite of packages, we may run into conflicts with functions that have the same name but are part of different packages (i.e `filter`). If you run the code and run into an error try re-running the code using syntax where you specify package explicitly (i.e `dplyr::filter`).
@@ -31,8 +32,7 @@ mov10_meta <- meta %>%
   rownames_to_column(var="samplename") %>% 
   as_tibble()
         
-# you might to read in normalized_counts if it is not in your current session:
-
+# you might need to read in normalized_counts if it is not in your current session:
 normalized_counts <- read.delim("data/normalized_counts.txt", row.names=1)
 
 # then make sure the colnames of normalized_counts are the same as the mov10_meta$sampname
@@ -107,7 +107,7 @@ To do this, we first need to determine the gene names of our top 20 genes by ord
 
 ```{r}
 
-res_tableOE <- readRDS("data/res_tableOE.rds")
+res_tableOE <- readRDS("data/res_tableOE.RDS")
 
 res_tableOE_tb <- res_tableOE %>%
   data.frame() %>%
@@ -182,7 +182,7 @@ In addition to plotting subsets, we could also extract the normalized values of 
 
 ```{r}
 
-sigOE = readRDS("data/sigOE.rds")
+sigOE = readRDS("data/sigOE.RDS")
 
 ### Extract normalized expression for significant genes from the OE and control samples c(2:4,7:9), 
 ### and set the gene column (1) to row names
@@ -200,7 +200,7 @@ Now let's draw the heatmap using `pheatmap`:
 ### Annotate our heatmap (optional)
 
 annotation <- mov10_meta %>% 
-	select(samplename, sampletype) %>% 
+	dplyr::select(samplename, sampletype) %>% 
 	data.frame(row.names = "samplename")
 
 ### Set a color palette

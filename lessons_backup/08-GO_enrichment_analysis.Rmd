@@ -40,7 +40,7 @@ library(fgsea)
 
 ```{r}
 
-res_tableOE = readRDS("data/res_tableOE.rds")
+res_tableOE = readRDS("data/res_tableOE.RDS")
 
 res_tableOE_tb <- res_tableOE %>%
 data.frame() %>%
@@ -266,7 +266,7 @@ Now we use runNetwork to view the map:
 
 ```{r}
 
-runNetwork(vis$nodes,vis$edges)
+# runNetwork(vis$nodes,vis$edges)
 ```
 
 This is one of the best visualizations available out of all the GO packages.

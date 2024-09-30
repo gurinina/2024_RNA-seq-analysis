@@ -48,7 +48,7 @@ library(ggrepel)
 ## Load in data
 data <- read.delim("data/Mov10_full_counts.txt", row.names=1)
 
-meta <- read.delim("meta/Mov10_full_meta.txt", row.names=1)
+meta <- read.delim("data/Mov10_full_meta.txt", row.names=1)
 ```
 
 Use class() to inspect our data and make sure we are working with data frames:
@@ -611,7 +611,7 @@ res_tableOE <- lfcShrink(dds, coef = "sampletype_MOV10_overexpression_vs_control
 
 # We will save these results for later use in the data directory using the following command:
 
-saveRDS(res_tableOE, file = "data/res_tableOE.rds")
+saveRDS(res_tableOE, file = "data/res_tableOE.RDS")
 ```
 
 **The order of the names determines the direction of fold change that is reported.** The name provided in the second element is the level that is used as baseline. So for example, if we observe a log2 fold change of -2 this would mean the gene expression is lower in Mov10_oe relative to the control.
@@ -683,7 +683,7 @@ res_tableKD <- lfcShrink(dds, coef = 2, res=res_tableKD_unshrunken)
 
 # We will save these results for later use in the data directory using the following command:
 
-saveRDS(res_tableKD, file = "data/res_tableKD.rds")
+saveRDS(res_tableKD, file = "data/res_tableKD.RDS")
 
 # just for security, save all our objects in ".RData" again:
 save.image()
@@ -763,7 +763,7 @@ sigKD <- res_tableKD_tb %>%
          abs(log2FoldChange) > lfc.cutoff)
 
 # We'll save this object for use in the homework
-saveRDS(sigKD,"data/sigKD.rds")
+saveRDS(sigKD,"data/sigKD.RDS")
 ```
 
 **Exercise** 
@@ -1170,7 +1170,7 @@ library(fgsea)
 
 ```{r}
 
-res_tableOE = readRDS("data/res_tableOE.rds")
+res_tableOE = readRDS("data/res_tableOE.RDS")
 
 res_tableOE_tb <- res_tableOE %>%
 data.frame() %>%

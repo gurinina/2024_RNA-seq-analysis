@@ -2,6 +2,7 @@ bookdown::gitbook:
   fig_caption: false  # Disable figure captions in Gitbook
   df_print: kable
   css: [css/git.css, css/toc.css]
+  mathjax: default
   config:
     toc:
       collapse: section

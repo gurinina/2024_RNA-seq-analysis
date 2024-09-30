@@ -66,7 +66,7 @@ To load the data into our current environment, we will be using the `read.table`
 ## Load in data
 data <- read.table("data/Mov10_full_counts.txt", header=T, row.names=1) 
 
-meta <- read.table("meta/Mov10_full_meta.txt", header=T, row.names=1)
+meta <- read.table("data/Mov10_full_meta.txt", header=T, row.names=1)
 ```
 
 Use `class()` to inspect our data and make sure we are working with data frames:
@@ -123,7 +123,6 @@ ggplot(data) +
   ylab("Number of genes")
 ```
 
-![Alt text](img/deseq_counts_distribution.png){ width=400 }
 
 If we zoom in close to zero, we can see a large number of genes with counts of zero:
 
@@ -135,7 +134,6 @@ ggplot(data) +
    ylab("Number of genes")
 ```
 
-![Alt text](img/deseq_counts_distribution_zoomed.png){ width=400 }
 
 These images illustrate some common features of RNA-seq count data, including a **low number of counts associated with a large proportion of genes**, and a long right tail due to the **lack of any upper limit for expression**. 
 
@@ -171,9 +169,6 @@ ggplot(df) +
         scale_y_log10() +
         scale_x_log10()
 ```
-
-![Alt text](img/deseq_mean_vs_variance.png){ width=600 }
-
 
 By plotting the *mean versus the variance* of our data we can easily see that the mean < variance and therefore it does not fit the Poisson distribution. Genes having higher mean counts have even higher variance. Also for gene having low mean counts, there is a scatter of points and we can see that there is variability even in the variance. To account for this extra variance we need a new model. 
 
@@ -212,7 +207,7 @@ Here is a comparison of the three most highy used software packages for differen
 
 We will go in-depth into each of these steps in the following lessons, but additional details and helpful suggestions regarding DESeq2 can be found in the [DESeq2 vignette](http://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html). As you go through this workflow and questions arise, you can reference the vignette from within RStudio:
 
-```
+```{r}
 vignette("DESeq2")
 ```
 

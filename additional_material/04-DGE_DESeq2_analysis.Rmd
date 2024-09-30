@@ -2,15 +2,22 @@
 
 Differential expression analysis with DESeq2 involves multiple steps as displayed in the flowchart below in blue. Briefly, DESeq2 will:
 
+**Full Workflow in DESeq2:**
+
+Load Data: Start with raw count data and sample metadata.
+
+Estimate Size Factors: Normalize counts across samples.
+
+Estimate Raw Dispersions: Calculate the raw dispersion for each gene.
+
+Fit the Global Trend: Fit a parametric or non-parametric global trend to model the relationship between mean counts and dispersion.
+
+Shrink the Dispersion Estimates: Shrink the gene-wise dispersion estimates toward the values predicted by the global trend to generate more accurate values.
+
+Fit the negative binomial using the final gene-wise dispersion estimates to obtain the log-fold changes in gene expression between conditions.
+
+
 ![Alt text](img/DESeq2_workflow_2018.png){ width=600 }
-
-* normalize the raw counts using size factors to account for differences in library depth
-
-* estimate the gene-wise dispersions
-
-* shrink these estimates to generate more accurate dispersion estimates
-
-* fit the negative binomial (NG) model and perform hypothesis testing using the Wald test.
 
 This final step in the differential expression analysis workflow of fitting the raw counts to the NB model and performing the statistical test for differentially expressed genes, is the step we care about. This is the step that determines whether the mean expression levels of different sample groups are significantly different.
 
@@ -25,7 +32,7 @@ Prior to performing the differential expression analysis, it is a good idea to k
 
 ### Design formula
 
-A design formula tells the statistical software the known sources of variation to control for, as well as, the factor of interest to test for during differential expression testing. For example, if you know that sex is a significant source of variation in your data, then sex should be included in your model. The design formula should have all of the factors in your metadata that account for major sources of variation in your data. The last factor entered in the formula should be the condition of interest.
+A design formula tells the statistical software the known sources of variation to control for, as well as, the factor of interest to test for during differential expression testing. For example, if you know that sex is a significant source of variation in your data, then sex should be included in your model. The design formula should have all of the factors in your metadata that account for major sources of variation in your data. The last factor entered in the formula should be the condition of interest. 
 
 For example, suppose you have the following metadata:
 
@@ -35,17 +42,9 @@ If you want to examine the expression differences between treatments, and you kn
 
 `design <- ~ sex + age + treatment`
 
-The tilde (`~`) should always proceed your factors and tells DESeq2 to model the counts using the following formula. Note the **factors included in the design formula need to match the column names in the metadata**. 
+The tilde (`~`) should always proceed your factors and tells DESeq2 to model the counts using the following formula. Note the **factors included in the design formula need to match the column names in the metadata**. In this case, the comparison between treatment and control in the results() function will still compare the two levels of condition, but after adjusting for sex and age effects. This helps ensure that any differences in gene expression are due to the biological condition (e.g., treatment vs. control) and not sex and age effects.
 
 ***
-**Exercises**
-
-1. Suppose you wanted to study the expression differences between the two age groups in the metadata shown above, and major sources of variation were `sex` and `treatment`, how would the design formula be written?
-
-2. Based on our **Mov10** `metadata` dataframe, which factors could we include in our design formula?
-
-3. What would you do if you wanted to include a factor in your design formula that is not in your metadata? 
-
 
 **Exercise** points = +3
 
@@ -68,7 +67,7 @@ solutions(
 
 2. Based on our Mov10 metadata dataframe, which factors could we include in our design formula?
 
-- Ans: 
+  - Ans: 
 
 ```{r, results = "asis", echo = FALSE}
 solutions("sampletype, you could also use MOVexpr, but it is 
@@ -82,6 +81,7 @@ solutions("sampletype, you could also use MOVexpr, but it is
   - Ans: 
   
 ```{r, results = "asis", echo = FALSE}
+
 solutions(
   "Add the factor as an additional column in the metadata points"
 )
@@ -190,25 +190,114 @@ To address this problem, DESeq2 **shares information across genes** to generate 
 
 **Estimating the dispersion for each gene separately:**
 
-The first step in estimating dispersion is to get the dispersion estimates for each gene. The dispersion for each gene is estimated using maximum likelihood estimation (MLE). MLE can be thought about as **given the count values of the replicates, the most likely estimate of dispersion is calculated**.
+To estimate dispersion, DESeq2 uses the negative binomial (NB) distribution, which is a probability distribution that models the count data. The negative binomial distribution is a two-parameter distribution that describes the distribution of counts in RNA-Seq data. The two parameters are the mean expression level and the dispersion. The negative binomial distribution is used in DESeq2 because it is well-suited for modeling count data, which is often overdispersed (variance is greater than the mean:\
+
+$$
+Y_{ij} \sim \text{NB}\left(\mu_{ij} = \text{sizeFactor}_{j} \times \text{normalizedCounts}_{ij}, \alpha_i = \text{dispersion}\right)
+$$
+
+Where:
+
+- \( Y_{ij}\) is the observed count for gene \( i \) in sample \( j \)
+
+- \( \mu_{ij}\) is the mean normalized count for gene \( i \) in sample \( j \)
+
+- \( \alpha_i \) is the dispersion parameter for gene \( i \) 
+
+- \( sizeFactor{j} \) is the size factor for sample \( j \)
+
+
+The first step in estimating dispersion is to get the dispersion estimates for each gene. The dispersion for each gene is estimated using maximum likelihood estimation (MLE) based on the negative binomial distribution. MLE can be thought about as **given the count values of the replicates, the most likely estimate of dispersion is calculated**, more specifically:
+
+Log-Likelihood Function of the Negative Binomial Distribution
+The log-likelihood function for the negative binomial distribution, which is used to estimate both the mean ($\mu$) and dispersion ($\alpha$) parameters, is given by:
+
+$$
+\log L(Y_{ij}| \mu_ij, \alpha_i) = \log \left( \frac{\Gamma(Y_{ij}+ \frac{1}{\alpha_i})}{\Gamma(Y_ij+1) \Gamma(\frac{1}{\alpha_i})} \right) + Y_{ij}\log \left( \frac{\alpha_i \mu_{ij}}{1 + \alpha_i \mu_{ij}} \right) - \frac{1}{\alpha_i} \log(1 + \alpha_i \mu_{ij})
+$$
+Where:
+
+- \( Y_{ij}\) is the observed count for gene \( i \) in sample \( j \)
+
+- \( \mu_{ij}\) is the mean normalized count for gene \( i \) in sample \( j \)
+
+- \( \alpha_i \) is the dispersion parameter for gene i
+
+- \(⋅\Gamma \): Gamma function, which arises from the negative binomial distribution..
+
+The dispersion is estimated by maximizing the likelihood of observing the counts $Y_{ij}$ based on the mean ($\mu_{ij}$) and variance $\mu_{ij} + \alpha \mu_{ij}^2$).
+
+**The initial raw dispersion estimate:** 
+
+The variance of $Y_{ij}$ in the Negative Binomial model is given by:
+
+$$
+V{ij} = \mu_{ij} + \alpha_{i} \mu_{ij}^2
+$$
+Where:
+- \( V_{ij} \) is the observed variance in counts.for gene \( i \) in sample \( j \)
+- \( \mu_{ij} \) is the mean normalized count for gene \( i \) in sample \( j \)
+- \( \alpha_i\) is the dispersion parameter for gene \( i \).
+
+This equation shows how the variance increases as the mean increases in the presence of dispersion $ \alpha $. Rearranging the equation, we can solve for the initial dispersion estimate for the maximum likelihood estimation (MLE) of the dispersion:
+
+$$
+\alpha_{i} = \dfrac{V_{ij} - \mu_{ij}}{\mu_{ij}^2 \vphantom{\dfrac{A}{B}}}
+$$
+
+
+Where:
+- \( V_{ij} \) is the observed variance of gene \( i \) in sample \( j \)
+- \( \mu_{ij} \) the expected (or mean) normalized count for gene \( i \) in sample \( j \)
+- \( \alpha_{i} \) is the initial estimate of the dispersion parameter for gene \( i \).which represents the degree of overdispersion (the extent to which the variance exceeds the mean).
+
+
+![Alt text](img/deseq2_workflow_separate_dis.png){ width=200 }
 
 ### Step 3: Fit curve to gene-wise dispersion estimates
 
-The next step in the workflow is to fit a curve to the dispersion estimates for each gene. This curve represents the expected value of the dispersion given the expression values of the genes. The idea behind fitting a curve to the data is that different genes will have different scales of biological variability, but, over all genes, there will be a distribution of reasonable estimates of dispersion.
+**Fitting the Global Dispersion Trend:** 
+
+Once the initial gene-wise dispersion estimates ($\alpha_{i}$) are obtained, a global trend is fit to model how dispersion typically changes as a function of the mean expression ($\mu_{i}$) across all samples. This trend is used to account for the general pattern that genes with low mean expression tend to have higher dispersion, while highly expressed genes have lower dispersion.
+
+The global trend represents the expected value of the dispersion given the expression values of the genes. The idea behind fitting a curve to the data is that different genes will have different scales of biological variability, but, over all genes, there will be a distribution of reasonable estimates of dispersion.
+
+This trend is used to account for the general pattern that genes with low mean expression tend to have higher dispersion, while highly expressed genes have lower dispersion. This step is crucial because lowly expressed genes tend to have more variability, and highly expressed genes tend to have less variability.
 
 ![Alt text](img/deseq2_workflow_separate_fit.png){ width=200 }
 
-This curve is displayed as a red line in the figure below, which plots the estimate for the **expected dispersion value for genes of a given expression strength**. Each black dot is a gene with an associated mean expression level and maximum likelihood estimation (MLE) of the dispersion (Step 1).
+This global trend is displayed as a red line in the figure below, which plots the estimate for the **expected dispersion value for genes of a given expression strength**. Each black dot is a gene with an associated mean expression level and maximum likelihood estimation (MLE) of the dispersion (Step 1).
 
 ![Alt text](img/deseq_dispersion1.png){ width=400 }
 
+
+![Alt text](img/deseq2_workflow_separate_fit.png){ width=200 }
+
+The parametric trend describes the relationship between the mean count and dispersion in RNA-Seq data. It is given by the following formula:
+
+$$\alpha(\mu) = \alpha_0 + \frac{\alpha_1}{\mu}$$
+
+
+Where:
+- \( \alpha(\mu) \) is the dispersion as a function of the mean count \( \mu \).
+- \( \alpha_0 \) is the baseline dispersion.
+- \( \alpha_1 \) controls how the dispersion changes as the mean count decreases.
+
+This formula assumes that dispersion decreases as the mean count increases, which is typically seen in RNA-Seq data. The dispersion trend is fit to the raw dispersion estimates for each gene. Fitting the trend involves minimizing the differences between the raw dispersion estimates and the modeled values from the trend:
+
+The parametric trend is fitted using non-linear regression to estimate the parameters $\alpha_0$ and $\alpha_1$ that best describe the relationship between the raw dispersion estimates and the mean counts.
+
+Non-linear least squares regression is used to minimize the difference between the observed raw dispersion estimates and the values predicted by the parametric model. The objective is to fit the curve
+
+The trend helps capture the overall relationship between dispersion and mean counts across all genes. This is important because it allows DESeq2 to borrow information across genes to estimate the dispersion more accurately. The dispersion estimates for each gene are then shrunken towards the fitted curve to generate the final dispersion estimates. 
+
 ### Step 4: Shrink gene-wise dispersion estimates toward the values predicted by the curve
 
-The next step in the workflow is to shrink the gene-wise dispersion estimates toward the expected dispersion values to get the final dispersion estimates. 
+To further improve the reliability of dispersion estimates, DESeq2 applies **empirical Bayes shrinkage**, which shrinks the gene-specific dispersion estimates toward the global trend to get the final dispersion estimates. This ensures that genes with low or moderate counts, where estimates are less reliable, have more stable dispersions.
 
 ![Alt text](img/deseq2_workflow_separate_shr.png){ width=200 }
 
-The curve allows for more accurate identification of differentially expressed genes when sample sizes are small, and the strength of the shrinkage for each gene depends on :
+The global trend allows for more accurate identification of differentially expressed genes when sample sizes are small, and the strength of the shrinkage for each gene depends on :
 	
 - how close gene dispersions are from the curve 
 - sample size (more samples = less shrinkage)
@@ -237,7 +326,6 @@ Let's take a look at the dispersion estimates for our MOV10 data:
 plotDispEsts(dds)
 ```
 
-<img src="img/plotDispersion.png">
  
 **Since we have a small sample size, for many genes we see quite a bit of shrinkage. Do you think our data are a good fit for the model?**
 
