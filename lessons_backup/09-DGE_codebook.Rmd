@@ -181,7 +181,7 @@ all(colnames(data) == rownames(meta))
 **Exercise** points = +2
 
 Suppose we had sample names matching in the counts matrix and metadata file, but they were out of order. Write the line(s) of code required to create a new matrix with columns ordered such that they were identical to the row names of the metadata.
-```{r, eval=FALSE}
+```{r, eval = FALSE}
 
 
 
@@ -394,7 +394,7 @@ As another example, suppose you have the following metadata:
 1. Suppose you wanted to study the expression differences between the two age groups in the metadata shown above, and major sources of variation were `sex` and `treatment`, how would the design formula be written?
 
 
-```{r, eval=FALSE}
+```{r, eval = FALSE}
 
 
 ```
@@ -578,7 +578,7 @@ To indicate to DESeq2 the two groups we want to compare, we can use contrasts. C
 1. Do nothing. Automatically DESeq2 will use the base factor level of the condition of interest as the base for statistical testing. The base level is chosen based on alphabetical order of the levels.
 
 2. In the results() function you can specify the comparison of interest, and the levels to compare. The level given last is the base level for the comparison. The syntax is given below:
-```{r, eval=FALSE}
+```{r, eval = FALSE}
 # DO NOT RUN!
 contrast <- c("condition", "level_to_compare", "base_level")
 results(dds, contrast = contrast, alpha = alpha_threshold)
@@ -1046,7 +1046,7 @@ library(DESeq2)
 We have detailed the various steps in a differential expression analysis workflow, providing theory with example code. To provide a more succinct reference for the code needed to run a DGE analysis, we have summarized the steps in an analysis below:
 
 ### 1. Import data into dds object:
-```{r, eval=FALSE}
+```{r, eval = FALSE}
 
 # Check that the row names of the metadata equal the column names of the **raw counts** data
 all(colnames(raw_counts) == rownames(metadata))
@@ -1057,7 +1057,7 @@ dds <- DESeqDataSetFromMatrix(countData = raw_counts, colData = metadata, design
 ```
 
 ### 2. Exploratory data analysis (PCA & heirarchical clustering) - identifying outliers and sources of variation in the data:
-```{r, eval=FALSE}
+```{r, eval = FALSE}
 
 # Transform counts for data visualization
 rld <- rlog(dds, blind=TRUE)
@@ -1076,7 +1076,7 @@ pheatmap(rld_cor)
 ```
 
 ### 3. Run DESeq2:
-```{r, eval=FALSE}
+```{r, eval = FALSE}
 
 # **Optional step** - Re-create DESeq2 dataset if the design formula has changed after QC analysis in include other sources of variation
 
@@ -1093,14 +1093,14 @@ write.table(normalized_counts, file="data/normalized_counts.txt", sep="\t", quot
 ```
 
 ### 4. Check the fit of the dispersion estimates:
-```{r, eval=FALSE}
+```{r, eval = FALSE}
 
 # Plot dispersion estimates
 plotDispEsts(dds)
 ```
 
 ### 5. Create contrasts to perform Wald testing on the shrunken log2 foldchanges between specific conditions:
-```{r, eval=FALSE}
+```{r, eval = FALSE}
 
 # Output results of Wald test for contrast
 contrast <- c("condition", "level_to_compare", "base_level")
@@ -1113,7 +1113,7 @@ res_tableOE <- lfcShrink(dds, coef = coef[?], res=res, type = "apeglm")
 ```
 
 ### 6. Output significant results:
-```{r, eval=FALSE}
+```{r, eval = FALSE}
 ### Set thresholds
 padj.cutoff <- 0.05
 lfc.cutoff <- 0.58 ## change in expression of 1.5

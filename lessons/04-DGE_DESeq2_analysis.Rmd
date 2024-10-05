@@ -178,80 +178,67 @@ colSums(counts(dds))
 
 ### Step 2: Estimate gene-wise dispersion
 
-The next step in differential expression analysis is estimating the gene-wise dispersions. Before diving into the details of how DESeq2 estimates these values, it’s important to understand what dispersion means in the context of RNA-Seq analysis.
-
-Dispersion is a measure of variability in gene expression that cannot be explained by differences in the mean expression level alone. It captures the extra-Poisson variability observed in RNA-Seq data, where the variance tends to exceed the mean due to biological and technical factors.
-
 ![Alt text](img/deseq2_workflow_separate_dis.png){ width=200 }
 
-**What is dispersion?** 
+The next step in differential expression analysis is estimating gene-wise dispersions. Before diving into the details of how DESeq2 estimates these values, it’s important to understand what dispersion means in the context of RNA-Seq analysis.
 
-Dispersion is a measure of variability or spread in the data. Common measures of dispersion include variance, standard deviation, and interquartile range (IQR). However, in DESeq2, dispersion (denoted as $\alpha$) is specifically related to the relationship between the mean ($\mu$) and variance (Var) of the data:
+**What is Dispersion?**
 
-$$Var = \mu + \alpha \mu^2$$
+Dispersion measures the variability in gene expression that cannot be explained by differences in the mean expression level alone. It captures the extra-Poisson variability observed in RNA-Seq data, where the variance tends to exceed the mean due to both biological and technical factors.
 
+Dispersion in DESeq2 reflects the variability in gene expression for a given mean count and is inversely related to the mean and directly related to the variance:
 
-**What does the DESeq2 dispersion represent?** 
+- Genes with lower mean counts tend to have higher dispersion (more variability).
 
-Dispersion in DESeq2 reflects the variability in gene expression for a given mean count. It is **inversely related to the mean** and **directly related to variance**:
+- Genes with higher mean counts tend to have lower dispersion (less variability).
 
-Genes with lower mean counts tend to have higher dispersion (more variability).
-Genes with higher mean counts tend to show lower dispersion (less variability).
-Dispersion estimates for genes with the same mean will differ based on their variance, making dispersion an important metric for understanding the variability in expression across biological replicates.
-
-The plot below shows the relationship between **mean** and **variance** in gene expression. Each black dot represents a gene. Notice that for genes with higher mean counts, the variance can be predicted more reliably. However, for genes with low mean counts, the variance has a wider spread, and the dispersion estimates tend to vary more.
+The plot below shows the relationship between mean and variance in gene expression. Each black dot represents a gene. Notice that for genes with higher mean counts, the variance can be predicted more reliably, whereas genes with lower mean counts exhibit more variability, leading to more spread in their dispersion estimates.
 
 ![Alt text](img/deseq_mean_vs_variance.png){ width=600 }
 
-**How does the dispersion relate to our model?** 
-
-To accurately model sequencing counts, it’s crucial to estimate within-group variation (variation between replicates within the same experimental group) for each gene. However, with small sample sizes (e.g., 3-6 replicates per group), gene-specific estimates of variation can be unreliable, particularly for genes with similar mean counts but different dispersions.
-
-To address this, DESeq2 shares information across genes with similar expression levels to improve dispersion estimates. This is done through a process called shrinkage, which assumes that genes with similar mean expression tend to have similar dispersion. By borrowing strength from the entire dataset, DESeq2 produces more accurate estimates of variation.
-
 **How DESeq2 Models Dispersion Using the Negative Binomial Distribution**
 
-DESeq2 uses the **negative binomial (NB) distribution** to model count data in RNA-Seq experiments. The NB distribution accounts for the overdispersion observed in real biological data, where the variance tends to be greater than the mean. The two key parameters of the NB distribution are the mean expression level and the dispersion.
+DESeq2 models RNA-Seq count data using the negative binomial (NB) distribution, which effectively handles overdispersion -— a common feature of biological data where the variance exceeds the mean. The two primary parameters of the NB model are the mean expression level and the dispersion, which respectively capture the expected gene counts and the variability across replicates.
 
 For each gene \( i \), the observed count $Y_{ij}$ in sample \( j \)  is modeled as:
 
 $$
 Y_{ij} \sim \text{NB}\left(\mu_{ij}, \alpha_{i}\right)
 $$
+
 Where:
 
 - \( Y_{ij}\) is the observed count for gene \( i \) in sample \( j \)
 
-- \( \mu_{ij}\) ​
-  is the expected normalized count for gene \( i \) in sample \( j \). This is modeled as:
+- \( \mu_{ij}\) is the expected normalized count for gene \( i \) in sample \( j \). 
+
+- \( \alpha_{i}\) is the gene-specific dispersion parameter for gene \( i \).
   
-  $$\mu_{ij} = sizeFactor_{j} \times q_{ij}$$
-  
+**How Does Dispersion Relate to the Model?**
+
+In DESeq2, dispersion ($\alpha_{i}$) captures the variability in counts beyond what is expected based on the mean. It helps model the biological variability between replicates within the same experimental condition. However, with small sample sizes (e.g., 3-6 replicates per group), gene-specific estimates of dispersion can be unreliable, particularly for genes with similar mean counts but differing variances.
+
+To improve accuracy, DESeq2 shares information across genes with similar expression levels through a process called **shrinkage**, assuming that genes with similar mean expression tend to have similar dispersion.
+
+**Variance Formula and Its Importance**
+
+In the negative binomial model used by DESeq2, the variance for each gene \( i \) in sample \( j \) is given by:
+
+$$Var(Y_{ij})  = {\mu_{ij} + \alpha_{i}}{\mu_{ij}^2}$$
 Where:
 
-- \( sizeFactor_{j}\) normalizes for differences in sequencing depth across samples.
+- \( Var(Y_{ij}\) is the variance for gene \( i \) in sample \( j \).
 
-- \( q_{ij}\) represents the true underlying expression level of gene \( i \) in sample \( j \), which is usually modeled as a function of covariates (such as experimental conditions or sample groups).
+- \( \mu_{ij}\) is the expected normalized count for gene \( i \) in sample \( j \).
 
-- \( \alpha_{i}\) is the dispersion parameter for gene \( i \), which accounts for the variability in counts beyond what would be expected under a Poisson model (i.e., overdispersion). 
+- \( \alpha_{i}\) is the gene-specific dispersion parameter.
 
-This model captures both the variability in sequencing depth (through the size factor) and the biological variability across genes (through the dispersion).
 
 **Estimating the dispersion for each gene separately:**
 
 DESeq2 uses the negative binomial (NB) distribution to model count data in RNA-Seq experiments. The NB distribution accounts for the overdispersion commonly observed in real biological data, where the variance exceeds the mean. The two key parameters of the NB distribution are the mean expression level and the dispersion.
 
-The first step in estimating dispersion is to obtain dispersion estimates for each gene. The dispersion for each gene is estimated using maximum likelihood estimation (MLE). MLE can be thought of as finding the value of MLE can be thought about as finding the value of $\alpha_{i}$ that makes the observed counts $Y_{ij}$ most likely under the model. The dispersion parameter ($\alpha_{i}$) for each gene  represents the extra-Poisson variability in the data, accounting for biological and technical variability that isn't explained by the mean expression level. Accurately estimating this parameter is crucial for modeling count data and identifying differentially expressed genes, as it reflects how much the variability in the data exceeds what is expected based on the mean alone.
-
-Dispersion is a measure of spread or variability in the data. DESeq2 uses a specific measure of dispersion (α) related to the mean (μ) and variance of the data:  = μ + α*μ^2$. For genes with moderate to high counts, the term $\alpha_{i} \mu^2$ dominates the variance, so: $Var(Y_{ij}) ≈ \alpha_{i} \mu_{ij}^2$. The square root of dispersion will then be equal to the coefficient of variation (σ/μ). So 0.01 dispersion means 10% variation around the mean expected across biological replicates.
-
-We can make a rough estimate of the gene-wise dispersions using this formula.
-We know that:
-
-$$Var(Y_{ij})  = {\mu_{ij} + \alpha_{i}}{\mu_{ij}^2}$$
-
-So the dispersion is equal to:
-$$\alpha_{i} = \frac{Var(Y_{ij}) - \mu_{ij}}{\mu_{ij}^2}$$
+The first step in estimating dispersion is to obtain dispersion estimates for each gene. The dispersion parameter for each gene is estimated through maximum likelihood estimation (MLE). This method seeks to find the value of $\alpha_{i}$ that maximizes the likelihood of observing the counts $Y_{ij}$, given the model. In other words, MLE identifies the $\alpha_{i}$ that best explains the observed variability for gene $i$.
 
 ![Alt text](img/deseq2_workflow_separate_dis.png){ width=200 }
 

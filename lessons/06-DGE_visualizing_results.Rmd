@@ -25,6 +25,8 @@ We will be working with three different data objects we have already created in 
 
 Let's create tibble objects from the `meta` and `normalized_counts` data frames before we start plotting. This will enable us to use the `tidyverse` functionality more easily.
 
+Check to make sure the column names of the `normalized_counts` matrix are the same as the row names of the `meta` data frame. If they are not, you will need to reorder the columns of `normalized_counts` to match the row names of `meta`.
+
 ```{r}
 
 # Create a tibble for meta data
@@ -34,8 +36,6 @@ mov10_meta <- meta %>%
         
 # you might need to read in normalized_counts if it is not in your current session:
 normalized_counts <- read.delim("data/normalized_counts.txt", row.names=1)
-
-# then make sure the colnames of normalized_counts are the same as the mov10_meta$sampname
 
 all(mov10_meta$samplename == colnames(normalized_counts))
 
@@ -52,10 +52,9 @@ One way to visualize results would be to simply plot the expression data for a h
 
 #### **Using DESeq2 `plotCounts()` to plot expression of a single gene**
 
-To pick out a specific gene of interest to plot, for example Mov10, we can use the `plotCounts()` from DESeq2:
+To pick out a specific gene of interest to plot, for example Mov10, we can use the `plotCounts()` from DESeq2. `plotCounts()` is a function that allows us to plot the normalized counts for a single gene across all samples.
 
 ```{r}
-# Plot expression for single gene
 
 plotCounts(dds, gene="MOV10", intgroup="sampletype") 
 
@@ -71,6 +70,7 @@ col = brewer.pal(8,"Dark2")
 palette(col)
 
 plotCounts(dds, gene="MOV10", intgroup="sampletype",col = as.numeric(sampletype),pch = 19) 
+
 ```
 ![topgene](img/topgen_plot.png)
 
@@ -80,11 +80,12 @@ plotCounts(dds, gene="MOV10", intgroup="sampletype",col = as.numeric(sampletype)
 
 We can also use ggplot2 to plot the `MOV10` counts. We can save the output of `plotCounts()` to a variable specifying the `returnData=TRUE` argument, then use `ggplot()`:
 
+
 ```{r}
-# Save plotcounts to a data frame object
+# Save `plotCounts()` to a data frame object
 d <- plotCounts(dds, gene="MOV10", intgroup="sampletype", returnData=TRUE)
 
-# Plotting the MOV10 normalized counts, using the samplenames (rownames of d as labels)
+# Plot the MOV10 normalized counts, using the samplenames (rownames of d as labels)
 ggplot(d, aes(x = sampletype, y = count, color = sampletype)) + 
   geom_point(position=position_jitter(w = 0.1,h = 0)) +
   geom_text_repel(aes(label = rownames(d))) + 
@@ -95,7 +96,6 @@ ggplot(d, aes(x = sampletype, y = count, color = sampletype)) +
 
 > Note that in the plot below (code above), we are using `geom_text_repel()` from the `ggrepel` package to label our individual points on the plot.
 
-![Alt text](img/plotCounts_ggrepel.png){ width=600 }
 
 #### Using `ggplot2` to plot multiple genes (e.g. top 20)
 
@@ -140,18 +140,16 @@ The `pivot_longer()` function in the **tidyr** package will perform this operati
 
 ```{r}
 # Pivoting the columns to have normalized counts to a single column
-
 pivoted_top20_sigOE <- top20_sigOE_norm %>%
   pivot_longer(colnames(top20_sigOE_norm)[2:9], names_to = "samplename", values_to = "normalized_counts")
 
-## check the column header in the "pivoted" data frame
+## Check the column header in the "pivoted" data frame
 head(pivoted_top20_sigOE)
 ```
 
 Now, if we want our counts colored by sample group, then we need to combine the metadata information with the melted normalized counts data into the same data frame for input to `ggplot()`:
 
-
-`inner_join(x,y)` will merge 2 data frames by the colname in x that matches a column name in y. It is similar to doing a match(pivoted_top20_sigOE$samplename, mov10_meta$samplename) and then adding sampletype andn MOV10exr to pivoted_top20_sigOE$samplename, but it is more efficient because the columns from mov10_meta are added in a single command.
+`inner_join(x,y)` will merge 2 data frames by the colname in x that matches a column name in y.
 
 ```{r}
 
@@ -174,31 +172,27 @@ ggplot(pivoted_top20_sigOE) +
       	theme(plot.title = element_text(hjust = 0.5))
 ```
 
-![Alt text](img/sig_genes_melt2.png){ width=700 }
 
 ### Heatmap
 
-In addition to plotting subsets, we could also extract the normalized values of *all* the significant genes and plot a heatmap of their expression using `pheatmap()`.
+In addition to plotting subsets, we could also extract the normalized values of *all* the significant genes from **Control vs. Mov10 overexpression** (control and overexpression) and plot a heatmap of their expression using `pheatmap()`.
 
 ```{r}
 
 sigOE = readRDS("data/sigOE.RDS")
 
-### Extract normalized expression for significant genes from the OE and control samples c(2:4,7:9), 
-### and set the gene column (1) to row names
-
-
 norm_OEsig <- normalized_counts[,c(1,2:4,7:9)] %>% 
               filter(gene %in% sigOE$gene) %>% 
       	      data.frame() %>%
       	      column_to_rownames(var = "gene") 
+
 ```
 
 Now let's draw the heatmap using `pheatmap`:
 
-```{r}
-### Annotate our heatmap (optional)
+```{r, fig.width=6, fig.height=6}
 
+### Annotate our heatmap (optional)
 annotation <- mov10_meta %>% 
 	dplyr::select(samplename, sampletype) %>% 
 	data.frame(row.names = "samplename")
@@ -217,9 +211,9 @@ pheatmap(norm_OEsig,
          scale = "row", 
          fontsize_row = 10, 
          height = 20)
+
 ```
-         
-![Alt text](img/sigOE_heatmap2.png){ width=600 }   
+           
 
 > *NOTE:* There are several additional arguments we have included in the function for aesthetics. One important one is `scale="row"`, in which Z-scores are plotted, rather than the actual normalized count value. 
 >
@@ -256,7 +250,6 @@ ggplot(res_tableOE_tb) +
         axis.title = element_text(size = rel(1.25)))  
 ```
 
-![Alt text](img/volcano_plot_new1.png){ width=500 } 
 
 This is a great way to get an overall picture of what is going on, but what if we also wanted to know where the top 10 genes (lowest padj) in our DE list are located on this plot? We could label those dots with the gene name on the Volcano plot using `geom_text_repel()`.
 

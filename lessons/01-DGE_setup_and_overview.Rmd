@@ -41,13 +41,13 @@ Using these data, we will evaluate transcriptional patterns associated with pert
 
 ## Setting up
 
-Go to the `File` menu and open `09-DGE_codebook.Rmd`. This should open up a script editor in the top left hand corner. This is where we will be running all commands required for this analysis. Your working directory should have these folders: data, meta and results:
+Go to the `File` menu and to the `lessons` directory and open `09-DGE_codebook.Rmd`. This will open in the script editor in the top left hand corner. This is where we will be running all commands required for this analysis, and like last time this is where you will enter the code/answers for your homework assignment. Please save this as something with your name in it (e.g. `firstname_lastname_09-DGE_codebook.Rmd`). 
 
 ![setup](img/settingup.png)
 
 ### Loading libraries
 
-For this analysis we will be using several R packages, some which have been installed from CRAN and others from Bioconductor. To use these packages (and the functions contained within them), we need to **load the libraries.** Add the following to your script and don't forget to comment liberally!
+For this analysis we will be using several R packages, some which have been installed from CRAN and others from Bioconductor. To use these packages (and the functions contained within them), we need to **load the libraries**.
 
 ```{r}
 ## Setup
@@ -56,11 +56,14 @@ library(tidyverse)
 library(RColorBrewer)
 library(DESeq2)
 library(pheatmap)
+library(ggplot2)
+library(ggrepel)
+
 ```
 
 ### Loading data
 
-To load the data into our current environment, we will be using the `read.table` function. We need to provide the path to each file and also specify arguments to let R know that we have a header (`header = T`) and the first column is our row names (`row.names =1`). By default the function expects tab-delimited files, which is what we have.
+To load the data into our current environment, we will be using the `read.table` function. We need to provide the path to each file and also specify arguments to let R know that we have a header (`header = T`) and the first column is our row names (`row.names = 1`). By default the function expects tab-delimited files, which is what we have.
 
 ```{r}
 ## Load in data
@@ -82,9 +85,13 @@ class(data)
 Make sure your datasets contain the expected samples / information before proceeding to perfom any type of analysis. 
 
 ```{r}
-head(meta)
-head(data)
+
+rownames(meta)
+names(data)
+
 ```
+You'll notice the colnames of the data are the sample names, and the rownames of the metadata are the sample names. This is important as we will be merging the metadata with the data based on the sample names.
+
 ## Differential gene expression analysis overview
 
 So what does this count data actually represent? The count data used for differential expression analysis represents the number of sequence reads that originated from a particular gene. The higher the number of counts, the more reads associated with that gene, and the assumption that there was a higher level of expression of that gene in the sample. 
@@ -152,7 +159,7 @@ whether our data fulfills the criteria to use the poisson distribution. To do th
 
 To calculate the mean and variance of our data, we will use the `apply` function. The `apply` function allows you to apply a function to the margins (rows or columns) of a matrix. The syntax for `apply` is as follows: `apply(X, MARGIN, FUN)`, where `X` is a matrix, `MARGIN` is the margin of the matrix to apply the function to (1 = rows, 2 = columns), and `FUN` is the function to apply. 
 
-We will use `MARGIN = 1` to apply the mean and variance of the counts for each row (gene) across the 'Mov10 overexpression' replicates. We will then create a data frame with the mean and variance of the counts for each gene.
+We will use `MARGIN = 1` to apply the function mean and variance of the counts for each row (gene) across the 'Mov10 overexpression' replicates. We will then create a data frame with the mean and variance of the counts for each gene.
 ```{r}
 mean_counts <- apply(data[, 3:5], 1, mean)
 
@@ -170,15 +177,16 @@ ggplot(df) +
         scale_x_log10()
 ```
 
-By plotting the *mean versus the variance* of our data we can easily see that the mean < variance and therefore it does not fit the Poisson distribution. Genes having higher mean counts have even higher variance. Also for gene having low mean counts, there is a scatter of points and we can see that there is variability even in the variance. To account for this extra variance we need a new model. 
+By plotting the *mean versus the variance* of our data we can easily see that the **variance > mean** and therefore it does not fit the Poisson distribution. Genes having higher mean counts have even higher variance. Also for gene having low mean counts, there is a scatter of points and we can see that there is variability even in the variance. To account for this extra variance we need a new model. 
 
-The model that fits best, given this type of variability between replicates, is the Negative Binomial (NB) model. Essentially, **the NB model is a good approximation for data where the mean < variance**, as is the case with RNA-seq count data.
+The model that fits best, given this type of variability between replicates, is the **Negative Binomial (NB) model**. Essentially, **the NB model** is a good approximation for data where the **variance > mean**, as is the case with RNA-seq count data.
 
 ### Improving mean estimates (i.e. reducing variance) with biological replicates
 
 The variance or scatter tends to reduce as we increase the number of biological replicates (*the distribution will approach the Poisson distribution with increasing numbers of replicates*). **The value of additional replicates is that as you add more data (replicates), you get increasingly precise estimates of group means, and ultimately greater confidence in the ability to distinguish differences between sample classes (i.e. more DE genes).**
 
-The figure below illustrates the relationship between sequencing depth and number of replicates on the number of differentially expressed genes identified [[1](https://academic.oup.com/bioinformatics/article/30/3/301/228651/RNA-seq-differential-expression-studies-more)]. Note that an **increase in the number of replicates tends to return more DE genes than increasing the sequencing depth**. This is because most of the biological variability is between samples. Therefore, generally more replicates are better than higher sequencing depth, with the caveat that higher depth is required for detection of lowly expressed DE genes and for performing isoform-level differential expression. Generally, the minimum sequencing depth recommended is 20-30 million reads per sample, but we have seen good RNA-seq experiments with 10 million reads if there are a good number of replicates.
+The figure below shows how the number of differentially expressed (DE) genes identified is influenced by sequencing depth and number of replicates [[1](https://academic.oup.com/bioinformatics/article/30/3/301/228651/RNA-seq-differential-expression-studies-more)]. Notice that increasing the number of replicates identifies more DE genes compared to increasing sequencing depth. This is because most of the biological variability occurs between samples. As a result, having more replicates typically yields better results than increasing sequencing depth, as it captures natural biological variability more effectively and leads to more accurate estimates of within-group variation. While increasing sequencing depth reduces technical noise, it has less impact on detecting DE genes since it doesn't account for biological variability. Generally, a minimum sequencing depth of 20-30 million reads per sample is recommended, though successful RNA-seq experiments have been conducted with as few as 10 million reads when enough replicates are included.
+
 
 ![Alt text](img/de_replicates_img.png){ width=500 }
 
@@ -189,17 +197,13 @@ The figure below illustrates the relationship between sequencing depth and numbe
 > - Usually biological variance is much greater than technical variance, so we do not need to account for technical variance to identify biological differences in expression
 > - **Don't spend money on technical replicates - biological replicates are much more useful**
 
->**NOTE:**
-> If you are using **cell lines** and are unsure whether or not you have prepared biological or technical replicates, take a look at [this link](https://web.archive.org/web/20170807192514/http://www.labstats.net:80/articles/cell_culture_n.html). This is a useful resource in helping you determine how best to set up your *in-vitro* experiment.
-
 ### Differential expression analysis workflow
 
 To model counts appropriately when performing a differential expression analysis, there are a number of software packages that have been developed for differential expression analysis of RNA-seq data. Even as new methods are continuously being developed a few  tools are generally recommended as best practice, e.g. **[DESeq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html)** and **[EdgeR](https://bioconductor.org/packages/release/bioc/html/edgeR.html)**. Both these tools use the negative binomial model, employ similar methods, and typically, yield similar results. They are pretty stringent, and have a good balance between sensitivity and specificity (reducing both false positives and false negatives).
 
 Here is a comparison of the three most highy used software packages for differential expression analysis. No single method is optimal under all circumstances, for example, limma works best when sample number is high, and edgeR and DESeq2 perform well for small sample sizes. It is also difficult to compare analysis methods due to different procedures in calculating pvalues. 
 
-<img src="img/venn.png" width = "300">
-
+![Alt text](img/venn.png){ width=300 }
 
 **We will be using [DESeq2](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-014-0550-8) for the DE analysis, and the analysis steps with DESeq2 are shown in the flowchart below**. DESeq2 first normalizes the count data to account for differences in library sizes and RNA composition between samples. Then, we will use the normalized counts to make some plots for QC at the gene and sample level. The final step is to use the appropriate functions from the DESeq2 package to perform the differential expression analysis. 
 

@@ -37,7 +37,7 @@ total points = 30
 
 	**a.** Reorder the columns of the `counts` dataset such that `rownames(meta) == colnames(counts)`. points = +2
 	
-```{r, eval=FALSE}
+```{r, eval = FALSE}
 idx <- match(rownames(meta), colnames(counts))
 
 counts <- counts[,idx]
@@ -48,25 +48,25 @@ all(colnames(counts)==rownames(meta))
 	
 	**b.** Provide the line of code used to create a DESeqDataSet object called `dds` in which `Genotype` is the factor of interest and `Celltype` and `Batch` are other contributing sources of variation in your data. points = +1
 	
-```{r, eval=FALSE}
+```{r, eval = FALSE}
 dds <- DESeqDataSetFromMatrix(countData = counts, colData = meta, design = ~ Celltype + Batch + Genotype)
 ```
 
 	**c.** Provide the line of code required to run DESeq2 on `dds`. points = +1
 	
-```{r, eval=FALSE}
+```{r, eval = FALSE}
 dds <- DESeq(dds)
 ```
 	
 	**d.** Provide the line of code to create a dispersion plot. points = +1
 	
-```{r, eval=FALSE}
+```{r, eval = FALSE}
 plotDispEsts(dds)
 ```
 	
 	**e.** Provide the line of code to return the results of a Wald test comparison for `Celltype` categories `typeA` versus `typeB` (i.e the fold changes reported should reflect gene expression changes relative to `typeB`). points = +2
 	 	
-```{r, eval=FALSE}
+```{r, eval = FALSE}
 
 contrast <- c("Celltype","typeA","typeB")
 
@@ -75,7 +75,7 @@ res <- results(dds, contrast = contrast)
 	
 	**f.** Provide the line of code to return the results with log2 fold change shrinkage performed. points = +1
 	
-```{r, eval=FALSE}
+```{r, eval = FALSE}
 
 res_shrunken <- lfcShrink(dds = dds, coef = "Celltype_typeA_vs_typeB", res = res,type = "apeglm")
 
@@ -83,7 +83,7 @@ res_shrunken <- lfcShrink(dds = dds, coef = "Celltype_typeA_vs_typeB", res = res
 	
 	**g.** Provide the line of code to write the results of the Wald test with shrunken log2 fold changes to file. points = +1
 	
-```{r, eval=FALSE}
+```{r, eval = FALSE}
 
 write.table(res_shrunken, file="data/res_shrunkeg.txt", sep="\t")
 
@@ -91,7 +91,7 @@ write.table(res_shrunken, file="data/res_shrunkeg.txt", sep="\t")
 	
 	**h.** Provide the line of code to subset the results to return those genes with adjusted p-value < 0.05 and logFold2Change > 1. points = +2
 	
-```{r, eval=FALSE}
+```{r, eval = FALSE}
 
 padj.cutoff <- 0.05
 lfc.cutoff <- 1
