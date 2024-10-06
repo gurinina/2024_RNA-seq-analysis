@@ -459,7 +459,7 @@ points = +1
 
 3. What would you do if you wanted to include a factor in your design formula that is not in your metadata? points = +1
 
-  - Ans: 
+- Ans: 
 
 
 ### MOV10 Differential Expression Analysis
@@ -970,7 +970,7 @@ saveRDS(sigKD,"data/sigKD.RDS")
 ```{r}
 
 ```
-  - Ans: 
+- Ans: 
 
 ## Visualizing rna-seq results
 

@@ -79,38 +79,15 @@ By including known sources of variation (such as **sex** and **age**) in the des
 
 ```
 
-```{r, results = "asis", echo = FALSE}
-
-solutions(
-  '# the default behavior of `results` is to return the comparison of the last group in the design formula, so your condition of interest should come last:\n
-     ~ sex + treatment + age'
-)
-
-```
-
 2. Based on our Mov10 metadata dataframe, which factors could we include in our design formula?
 
-  - Ans: 
-
-```{r, results = "asis", echo = FALSE}
-solutions("sampletype, you could also use MOVexpr, but it is 
-           redundant with sampletype. Sampletype is also 
-           more descriptive.")
-```
+- Ans: 
 
 
 3. What would you do if you wanted to include a factor in your design formula that is not in your metadata?
 
-  - Ans: 
+- Ans: 
   
-```{r, results = "asis", echo = FALSE}
-
-solutions(
-  "Add the factor as an additional column in the metadata points"
-)
-
-```
-
 ***
 
 ### MOV10 Differential Expression Analysis

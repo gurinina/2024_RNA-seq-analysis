@@ -167,15 +167,6 @@ size_factors <- c(1.32, 0.70, 1.04, 1.27, 1.11, 0.85)
 
 ```
 
-```{r, results = "asis", echo = FALSE}
-
-solutions('PD1_normalized <- PD1 / size_factors 
-
-# OR
-
-PD1_normalized <- sweep(PD1,2,size_factors,FUN = "/")')
-```
-
 ***
 
 ## Count normalization of Mov10 dataset
@@ -216,18 +207,7 @@ Suppose we had sample names matching in the counts matrix and metadata file, but
 
 # check that the rownames of the metadata match the colnames of the 'counts' matrix
 
-
 ```
-```{r, results = "asis", echo = FALSE}
-
-solutions(
-  'idx <- match(rownames(metadata), colnames(counts))\n
-   counts <- counts[, idx]\n
-   all(colnames(counts) == rownames(metadata))'
-)
-
-```
-
 *** 
 
 ### 2. Create DESEq2 object

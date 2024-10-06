@@ -102,43 +102,24 @@ The figure below was generated from a time course experiment with sample groups 
 
 **Determine the sources explaining the variation represented by PC1 and PC2.** 
 
-  - Ans: 
-
-```{r, results = "asis", echo = FALSE}
-solutions("The sample groups 'Ctrl' and 'Sci' separate well on PC1 and PC2")
-```
+- Ans: 
 
 **Do the sample groups separate well?**
 
-  - Ans: 
+- Ans: 
   
-```{r, results = "asis", echo = FALSE}
-solutions("Yes")
-```
 
 **Do the replicates cluster together for each sample group?**
 
-  - Ans:
-
-```{r, results = "asis", echo = FALSE}
-solutions("For the most part")
-```
+- Ans:
 
 **Are there any outliers in the data?**
 
-  - Ans:
-  
-```{r, results = "asis", echo = FALSE}
-solutions("Yes, sci8_rep2, ctrl0_rep3 cluster away from their replicates")
-```
+- Ans:
 
 **Should we have any other concerns regarding the samples in the dataset?**
 
-  - Ans: 
-  
-```{r, results = "asis", echo = FALSE}
-solutions("Yes, sci8 and sci16 don't separate well, the ctrl0 group shows big variations among replicates")
-```
+- Ans: 
 
 
 ***
@@ -252,25 +233,7 @@ heat.colors <- brewer.pal(9, "Blues")
 
 ```
 
-  - Ans: 
-
-```{r, results = "asis", echo = FALSE}
-
-solutions(
-  'display.brewer.all()\n
-  
-   heat.colors <- brewer.pal(9, "Blues")\n
-   
-   pheatmap(rld_cor, color = heat.colors, border_color = "black", 
-   fontsize = 10, fontsize_row = 12, show_rownames = T, show_colnames = T)\n
-   
-   "It changes the color palette, adds a border color, changes the font size 
-    of the heatmap, row names, and column names, and shows the row and 
-    column names."'
-)
-
-```
-
+- Ans: 
 
 
 ***

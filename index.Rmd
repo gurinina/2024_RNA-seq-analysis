@@ -17,13 +17,6 @@ cover-image: "img/football.png"
 always_allow_html: true
 link-citations: true
 ---
-```{r setup function, include=FALSE}
-
-source("setup.R")
-
-source("solutions.R")
-
-```
 
 # RNA-seq analysis workshop {-}
 
@@ -33,3 +26,5 @@ source("solutions.R")
 
 
 The published version for this module can be found on my bookdown site [RNA-seq-analysis](https://bookdown.org/ggiaever/RNA-seq-analysis/).
+
+*This lesson has been developed by members of the teaching team at the [Harvard Chan Bioinformatics Core (HBC)](http://bioinformatics.sph.harvard.edu/). These are open access materials distributed under the terms of the [Creative Commons Attribution license](https://creativecommons.org/licenses/by/4.0/) (CC BY 4.0), which permits unrestricted use, distribution, and reproduction in any medium, provided the original author and source are credited.*

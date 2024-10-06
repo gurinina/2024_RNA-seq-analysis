@@ -478,25 +478,11 @@ How many genes are differentially expressed in the **Overexpression vs. Control*
 # Your code here
 ```
 
-```{r, results = "asis", echo = FALSE}
-
-solutions( 'nrow(sigOE)')
-
-```
   
 **Does this reduce our results?** 
 
 ```{r}
 # Your code here
-```
-
-```{r, results = "asis", echo = FALSE}
-
-solutions( 'nrow(sigOE)\n
-            nrow(res_tableOE)\n
-            100 - (nrow(sigOE)/nrow(res_tableOE) *100)\n
-            "Yes, it is decreased from 23368 to 951 
-            (representing about 4% of the genes)."')
 ```
  
 ### MOV10 Knockdown Analysis: Control vs. Knockdown
@@ -521,10 +507,6 @@ saveRDS(sigKD,"data/sigKD.RDS")
 
 ```{r}
 # Your code here
-```
-
-```{r, results = "asis", echo = FALSE}
-solutions('nrow(sigKD)')
 ```
  
 With our subset of significant genes identified, we can now proceed to visualize the results and explore patterns of differential expression.
