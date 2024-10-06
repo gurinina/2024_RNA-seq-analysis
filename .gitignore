@@ -9,6 +9,7 @@ data/sigOE.RDS
 data/sigKD.RDS
 data/normalized_counts.txt
 2024_RNA-seq-analysis.Rmd
+2024_RNA-seq-analysis_files/
 # Ignore everything in the results folder
 results/*
 

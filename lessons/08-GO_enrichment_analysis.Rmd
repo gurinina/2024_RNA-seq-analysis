@@ -270,8 +270,9 @@ Here we can use the GO annotations in `hGOBP.gmt` (downloaded recently) to run G
 ```{r}
 
 
-fgseaRes <-  fgsea::fgseaSimple(pathways, hGOBP.gmt,
-             stats = foldchanges, nperm = 1000,maxSize = 300,minSize = 20)
+fgseaRes <-  fgsea::fgseaSimple(pathways = hGOBP.gmt,
+             stats = foldchanges, nperm = 1000,
+             maxSize = 300, minSize = 20)
 
 fgsea <- data.frame(fgseaRes,stringsAsFactors = F)
 
@@ -330,12 +331,15 @@ names(vis)
 ```
 
 Now we use runNetwork to view the network map: 
-
 ```{r interactive network, echo=FALSE, results='asis'}
 
-  GOenrichment::runNetwork(vis$nodes, vis$edges)
+  # Skip rendering for EPUB and PDF as it requires an interactive R session
 
+  # GOenrichment::runNetwork(vis$nodes, vis$edges)
+
+  cat("Interactive visualization available in the HTML version.")
 ```
+
 
 This is one of the best visualizations available out of all the GO packages.
 
