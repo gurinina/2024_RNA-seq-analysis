@@ -3,8 +3,8 @@ _book
 _bookdown_files
 _pdf
 _epub
-data/res_tableOE
-data/res_tableKD
+data/res_tableOE.RDS
+data/res_tableKD.RDS
 data/sigOE.RDS
 data/sigKD.RDS
 RNA-seq-analysis.Rmd
