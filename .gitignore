@@ -9,6 +9,12 @@ data/sigOE.RDS
 data/sigKD.RDS
 data/normalized_counts.txt
 2024_RNA-seq-analysis.Rmd
+# Ignore everything in the results folder
+results/*
+
+# Keep tracking .gitkeep so that the folder exists in Git
+!results/.gitkeep
+
 
 # History files
 .Rhistory
