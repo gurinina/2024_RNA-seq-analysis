@@ -1,4 +1,4 @@
-book_filename: "RNA-seq-analysis"
+book_filename: "2024_RNA-seq-analysis"
 new_session: no
 rmd_files:
   - index.Rmd

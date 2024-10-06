@@ -1,5 +1,5 @@
 ---
-title: "RNA-seq-analysis"
+title: "2024_RNA-seq-analysis"
 output:
   bookdown::gitbook:
     css: [css/git.css, css/toc.css]
@@ -8,9 +8,8 @@ output:
       toc:
         collapse: section
       download: ["pdf", "epub"]
-github-repo: "gurinina/RNA-seq-analysis"
-url: "https://bookdown.org/ggiaever/RNA-seq-analysis"
-description: "RNA-seq analysis workshop"
+github-repo: "gurinina/2024_RNA-seq-analysis"
+url: "https://bookdown.org/ggiaever/2024_RNA-seq-analysis"
 site: bookdown::bookdown_site
 documentclass: book
 cover-image: "img/football.png"
@@ -25,4 +24,4 @@ link-citations: true
 </p>
 
 
-The published version for this module can be found on my bookdown site [RNA-seq-analysis](https://bookdown.org/ggiaever/RNA-seq-analysis/).
+The published version for this module can be found on my bookdown site [2024_RNA-seq-analysis](https://bookdown.org/ggiaever/2024_RNA-seq-analysis/).

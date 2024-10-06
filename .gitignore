@@ -7,7 +7,8 @@ data/res_tableOE.RDS
 data/res_tableKD.RDS
 data/sigOE.RDS
 data/sigKD.RDS
-RNA-seq-analysis.Rmd
+data/normalized_counts.txt
+2024_RNA-seq-analysis.Rmd
 
 # History files
 .Rhistory
