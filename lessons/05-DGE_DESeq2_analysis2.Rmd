@@ -297,7 +297,11 @@ res_tableOE_unshrunken <- results(dds, contrast=contrast_oe, alpha = 0.05)
 
 resultsNames(dds)
 
-res_tableOE <- lfcShrink(dds = dds, coef =  "sampletype_MOV10_overexpression_vs_control", res = res_tableOE_unshrunken)
+res_tableOE <- lfcShrink(dds = dds, coef = "sampletype_MOV10_overexpression_vs_control", 
+                         res = res_tableOE_unshrunken)
+
+## Save results for future use
+saveRDS(res_tableOE, file = "data/res_tableOE.RDS")
 ```
 
 **The Importance of Contrast Order in Log2 Fold Change (LFC) Calculations**
@@ -406,7 +410,7 @@ res_tableKD_unshrunken <- results(dds, contrast = contrast_kd, alpha = 0.05)
 resultsNames(dds)
 
 # We can also specify contrasts using `coef` argument in `lfcShrink()`
-res_tableKD <- lfcShrink(dds, coef = 2, res=res_tableKD_unshrunken)
+res_tableKD <- lfcShrink(dds, coef = 2, res = res_tableKD_unshrunken)
 
 ## Save results for future use
 saveRDS(res_tableKD, file = "data/res_tableKD.RDS")

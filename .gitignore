@@ -3,14 +3,11 @@ _book
 _bookdown_files
 _pdf
 _epub
-epub
-render_all.R
-09-DGE1_codebook.Rmd
-data/res_tableKD.RDS
-data/res_tableOE.RDS
+data/res_tableOE
+data/res_tableKD
+data/sigOE.RDS
 data/sigKD.RDS
 RNA-seq-analysis.Rmd
-
 
 # History files
 .Rhistory
