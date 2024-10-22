@@ -16,7 +16,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ### Setting up
 
-#### Loading libraries
+#### Loading libraries; technically we don't need to load all of these libraries because they are in the file setup.R which is sourced in the first .Rmd of the module. However, it's good practice to load them all at the beginning of your script.
 ```{r, message = FALSE}
 
 library(tidyverse)
@@ -51,8 +51,11 @@ rownames(meta)
 
 names(data)
 
+data[1:4,1:4]
+
 ```
-You’ll notice the colnames of the data are the sample names, and the rownames of the metadata are the sample names. This is important as we will be merging the metadata with the data based on the sample names.
+You’ll notice that the colnames of the data and the rownames of metadata are the same except that they are in a different order. This is important later as we will be merging the metadata with the data based on these sample names.
+
 
 ### DGE analysis workflow
 
@@ -75,7 +78,7 @@ geom_histogram(aes(x = Mov10_oe_1), stat = "bin", bins = 200) +
    ylab("Number of genes")
 ```
 
-These images illustrate some common features of RNA-seq count data, including a low number of counts associated with a large proportion of genes, and a long right tail due to the lack of any upper limit for expression.
+These images illustrate some common features of RNA-seq count data, including a low counts associated with a large proportion of genes, and a long right tail due to the lack of any upper limit for expression.
 
 #### Modeling count data
 
@@ -164,14 +167,12 @@ all(colnames(data) == rownames(meta))
 
 ```
 
-**Exercise** points = +2
+**Exercise** points = +1
 
 Suppose we had sample names matching in the counts matrix and metadata file, but they were out of order. Write the line(s) of code required to create a new matrix with columns ordered such that they were identical to the row names of the metadata.
 ```{r, eval = FALSE}
 
 # write the code to reorder the columns of the 'counts' matrix to match the rownames of the metadata
-
-# check that the rownames of the metadata match the colnames of the 'counts' matrix
 
 ```
 
@@ -188,7 +189,7 @@ Let's start by creating the `DESeqDataSet` object and then we can talk a bit mor
 dds <- DESeqDataSetFromMatrix(countData = data, colData = meta, design = ~ sampletype)
 ```
 
-You can use DESeq-specific functions to access the different slots and retrieve information, if you wish. For example, suppose we wanted the original count matrix we would use `counts()`:
+You can use DESeq2-specific functions to access the different slots and retrieve information, if you wish. For example, suppose we wanted the original count matrix we would use `counts()`:
 
 ```{r}
 head(counts(dds[,1:5]))
@@ -221,7 +222,7 @@ sizeFactors(dds)
 Now, to retrieve the normalized counts matrix from `dds`, we use the `counts()` function and add the argument `normalized=TRUE`.
 
 ```{r}
-normalized_counts <- counts(dds, normalized=TRUE)
+normalized_counts <- counts(dds, normalized = TRUE)
 ```
 
 We can save this normalized data matrix to file for later use:
@@ -324,7 +325,7 @@ Overall, we observe pretty high correlations across the board ( > 0.999) suggest
 
 **Exercise** points = +3
 
-The pheatmap function has a number of different arguments that we can alter from default values to enhance the aesthetics of the plot. Try adding the arguments `color`, `border_color`, `fontsize_row`, `fontsize_col`, `show_rownames` and `show_colnames` to your pheatmap. How does your plot change (plot shown below)? Take a look through the help pages (?pheatmap) and identify what each of the added arguments is contributing to the plot.
+The pheatmap function has a number of different arguments that we can alter from default values to enhance the aesthetics of the plot. Try adding the arguments `color`, `border_color`, `fontsize_row`, `fontsize_col`, `show_rownames` and `show_colnames` to your pheatmap. How does your plot change. Take a look through the help pages (?pheatmap) and identify what each of the added arguments is contributing to the plot.
 
 
 ```{r, fig.width=8, fig.height=8, echo=FALSE}
@@ -337,6 +338,7 @@ display.brewer.all()
 heat.colors <- brewer.pal(9, "Blues")
 
 # Your code here
+pheatmap(rld_cor, border_color = "grey", fontsize_row = 12, fontsize_col = 12, show_rownames = TRUE, show_colnames = TRUE, color = heat.colors)
 ```
 
 ## DGE analysis workflow
@@ -1353,11 +1355,9 @@ names(vis)
 ```
 
 Now we use runNetwork to view the map: 
+```{r interactive network, echo=FALSE, results='asis'}
 
-```{r, echo=FALSE, results='asis'}
-
- 
-GOenrichment::runNetwork(vis$nodes, vis$edges)
+# GOenrichment::runNetwork(vis$nodes, vis$edges)
 
 ```
 
