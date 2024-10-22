@@ -4,7 +4,7 @@ editor_options:
   chunk_output_type: console
 ---
 # Codebook
-34 total points
+33 total points
 
 
 ```{r, include = FALSE}
@@ -113,7 +113,7 @@ By plotting the mean versus the variance of our data, we can see that the varian
 
 **.Rmd file = 02-DGE_count_normalization.Rmd**
 
-**Exercise**
+**Exercise** points +1
 
 Determine the normalized counts for your gene of interest, PD1, given the raw counts and size factors below. 
 
@@ -137,8 +137,6 @@ size_factors <- c(1.32, 0.70, 1.04, 1.27, 1.11, 0.85)
 # Your code here
 
 ```
-
-
 
 Now that we know the theory of count normalization, we will normalize the counts for the Mov10 dataset using DESeq2. This requires a few steps:
 
@@ -255,6 +253,7 @@ The figure below was generated from a time course experiment with sample groups 
 **Do the replicates cluster together for each sample group?**
 
 - Ans:
+
 **Are there any outliers in the data?**
 
 - Ans:
@@ -270,7 +269,6 @@ Raw RNA-Seq count data has different levels of variability:
 
 Without stabilization: Lowly expressed genes show high variability between samples (often due to noise), and highly expressed genes show less variability.
 With stabilization (e.g., rlog or vst): Variance across genes is more evenly distributed, which makes the data easier to work with in analyses like clustering or PCA.
-
 
 > The rlog transformation of the normalized counts is only necessary for these visualization methods during this quality assessment. 
 
@@ -363,17 +361,15 @@ points = +1
 
 # the default behavior of `results` is to return the comparison of the last group in the design formula, so your condition of interest should come last:
 
-~ sex + treatment + age
 
 ```
 
 2. Based on our Mov10 metadata dataframe, which factors could we include in our design formula?
 
-- Ans: sampletype, you could also use MOVexpr, but it is redundant with sampletype. Sampletype is also more descriptive. points = +1
+
 
 3. What would you do if you wanted to include a factor in your design formula that is not in your metadata?
 
-- Ans: Add the factor as an additional column in the metadata points = +1
 
 ### MOV10 Differential Expression Analysis
 
@@ -424,7 +420,6 @@ colSums(counts(dds, normalized = FALSE))
 
 ```{r}
 
-```
 
 - Ans: 
 
@@ -539,9 +534,7 @@ Calculate the expected log2 counts for all genes and samples using matrix multip
 ```{r}
 # Your code here
 ```
-
- 
-
+STOP Tues Oct 22
 ## MOV10 Differential Expression Analysis: Control versus Overexpression
 
 **Building the Results Table**
@@ -684,7 +677,7 @@ saveRDS(sigOE,"data/sigOE.RDS")
 
 ```
 
-**Exercise** points = +3
+**Exercise** points = +2 
 
 How many genes are differentially expressed in the **Overexpression vs. Control** comparison based on the criteria we just defined? Does this reduce the number of significant genes compared to using only the FDR threshold?
 ```{r}
