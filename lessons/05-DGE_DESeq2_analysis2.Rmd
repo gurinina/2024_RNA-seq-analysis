@@ -140,15 +140,6 @@ Calculate the expected mean expression for gene \( 1 \) in sample \( 4 \) using 
 ```
 
 
-**Exercise** points = +3
-
-Calculate the expected log2 counts for all genes and samples using matrix multiplication of $\beta$ and $X^T$. Hint: use `coef` to extract the beta coefficients and `t()` to transpose the design matrix $X$.
-
-```{r}
-# Your code here
-```
-
-
 ### Matrix Multiplication Form:
 If you want to calculate the fitted values for all genes and samples at once, you can express the model as a **matrix multiplication**:
 
@@ -166,6 +157,16 @@ log2_fitted <- beta_coefficients %*% t(X)
 ``` 
 
 This step multiplies the beta coefficients matrix by the transpose of the design matrix to compute the fitted log2 counts.
+
+
+**Exercise** points = +3
+
+Calculate the expected log2 counts for all genes and samples using matrix multiplication of $\beta$ and $X^T$. Hint: use `coef` to extract the beta coefficients and `t()` to transpose the design matrix $X$.
+
+```{r}
+# Your code here
+```
+
 
 
 ### Hypothesis Testing
