@@ -20,12 +20,9 @@ When using these unsupervised clustering methods, log2-transformation of the nor
 
 ![Alt text](img/rlog_transformation.png){ width=500 }
 
-### [Principal Component Analysis (PCA)](https://hbctraining.github.io/DGE_workshop/lessons/principal_component_analysis.html)
-
 Principal Component Analysis (PCA) is a technique used to emphasize variation and highlight strong patterns in a dataset. It is particularly useful for dimensionality reduction, meaning it simplifies large datasets by identifying the directions (or principal components) that explain the greatest variation in the data. For a more detailed introduction to PCA, we recommend watching this [StatQuest's video](https://www.youtube.com/watch?v=_UVHneBUBW0).
 
 Suppose we have a dataset with two samples and four genes. To evaluate the relationship between these samples, we can plot the counts of one sample against the other, with Sample 1 on the x-axis and Sample 2 on the y-axis, as shown below:
-
 
 ![Alt text](img/PCA_2sample_genes.png){ width=600 }
 
@@ -37,17 +34,50 @@ After determining PC1, PCA assigns each sample a **PC1 score**, which represents
 
 The formula to calculate a sample’s PC1 score is as follows: 
 
-Sample1 PC1 score = (read count Gene A * influence Gene A) + (read count Gene B * influence Gene B) + for all genes
+$$
+\text{Sample1 PC1 score} = \sum_{i=1}^{n} (\text{counts}_{i} \times \text{influence}_{i})
+$$
+
+Where:
+
+- \( \text{counts}_{i} \): Normalized expression of gene \( i \) in the sample
+
+- \( \text{influence}_{i} \): Influence of gene \( i \) on PC1
 
 While calculating the **influence** of each gene on PC1 is complex, a key step involves calculating a z-score for each gene. 
-
-![Alt text](img/zscore.png){ width=200 }
-
 
 A z-score measures how far a gene’s expression deviates from the mean, and genes with larger z-scores (like Gene B and Gene C in this example) have a greater influence on PC1 because they contribute more to the variation.
 
 ![Alt text](img/PCA_samples.png){ width=600 }
 
+Briefly, calculating PCA and the influence of each gene on PC1 involves the following steps:
+
+#### Steps to calculate PCA
+
+1. **Z-Scores**:
+- A z-score transforms the data points, indicating how far a value is from the mean in terms of standard deviations. This standardization adjusts for differences in scale between different genes, allowing for more accurate comparisons.
+- The formula for calculating a z-score for a value \( x \) of a gene is:
+
+$$
+z = \frac{x - \mu}{\sigma}
+$$
+
+Where:
+
+- \( \mu \) is the mean expression of the gene across samples.
+
+- \( \sigma \) is the standard deviation of the gene expression.
+
+2. **Covariance matrix**:
+- Covariance measures the degree to which two variables change together. In the context of PCA, we calculate the covariance matrix for standardized (z-scored) gene expressions to understand how genes vary together.
+
+- A positive covariance indicates that higher values of one gene correspond to higher values of another, while a negative covariance implies that higher values of one gene correspond to lower values of another. 
+
+- After standardizing the data, calculate the covariance between the z-scores of different genes. This will produce a covariance matrix that reveals how gene expressions vary together.
+
+- In the context of Principal Component Analysis (PCA), the covariance matrix is a crucial component. It captures how variables in the dataset change with respect to one another and is used to determine the principal components. 
+
+3. **Eigenvectors and Eigenvalues:** Find these from the covariance matrix. They reveal the directions (principal components) and their importance (variance explained) in the data. Think of PCA as creating new "axes" or dimensions that capture the most variation in the data. PCA will identify the direction of these axes based on the covariance of the standardized gene expressions that better highlight differences in your data. 
 
 The **take-home message** is that if **two samples have similar levels of expression for the genes that contribute significantly to PC1**, they will have similar PC1 scores and will be plotted close to each other on the PC1 axis. Therefore, we would expect **biological replicates** (samples from the same condition) to have similar PC1 scores and cluster together. On the other hand, samples from different treatment groups should have different PC1 scores, reflecting their distinct gene expression patterns. This is more easily understood through visualizing example PCA plots.
 
@@ -90,9 +120,7 @@ Still we haven't found if `treatment` is a major source of variation after `stra
 ![Alt text](img/example_PCA_treatmentPC3.png){ width=600 }
 
 We find that the samples separate by `treatment` on PC3, and are optimistic about our DE analysis since our condition of interest, `treatment`, is separating on PC3 and we can regress out the variation driving PC1 and PC2. Treatment separating on PC3 indicates that it still contributes to variation, but its effect is smaller and is only captured after accounting for the larger effects (`strain`, `sex`)..
-
-
-***
+me stop
 
 **Exercise** points = +5
 
@@ -109,6 +137,7 @@ The figure below was generated from a time course experiment with sample groups 
 
 - Ans: 
   
+
 **Do the replicates cluster together for each sample group?**
 
 - Ans:
@@ -122,7 +151,11 @@ The figure below was generated from a time course experiment with sample groups 
 - Ans: 
   
 
-***
+### Recommended Resources
+
+For further reading and visual examples of PCA, consider resources such as:
+- StatQuest's PCA video ([Link](https://www.youtube.com/watch?v=_UVHneBUBW0))
+- Online tutorials on PCA in bioinformatics.
 
 ### Hierarchical Clustering Heatmap
 
@@ -196,14 +229,14 @@ Since there is no built-in function for heatmaps in DESeq2 we will be using the 
 
 ```{r}
 ### Extract the rlog matrix from the object
-rld_mat <- assay(rld)    ## assay() is function from the "SummarizedExperiment" package that was loaded when you loaded DESeq2
+rld_mat <- assay(rld) ## assay() is function from the "SummarizedExperiment" package that was loaded when you loaded DESeq2
 ```
 
 Then we need to compute the pairwise correlation values for samples. We can do this using the `cor()` function:
 
 ```{r}
 ### Compute pairwise correlation values
-rld_cor <- cor(rld_mat)    ## cor() is a base R function
+rld_cor <- cor(rld_mat) ## cor() is a base R function
 
 head(rld_cor)   ## check the output of cor(), make note of the rownames and colnames
 ```
@@ -219,9 +252,8 @@ Overall, we observe pretty high correlations across the board ( > 0.999) suggest
 
 **Exercise** points = +3
 
-The pheatmap function has a number of different arguments that we can alter from default values to enhance the aesthetics of the plot. Try adding the arguments `color`, `border_color`, `fontsize_row`, `fontsize_col`, `show_rownames` and `show_colnames` to your pheatmap. How does your plot change? Take a look through the help pages (?pheatmap) and identify what each of the added arguments is contributing to the plot.
+The pheatmap function has a number of different arguments that we can alter from default values to enhance the aesthetics of the plot. Try adding the arguments `color`, `border_color`, `fontsize_row`, `fontsize_col`, `show_rownames` and `show_colnames` to your pheatmap. How does your plot change (plot shown below)? Take a look through the help pages (?pheatmap) and identify what each of the added arguments is contributing to the plot.
 
-First run:
 ```{r, fig.width=8, fig.height=8, echo=FALSE}
 # Display all available color palettes
 display.brewer.all()
@@ -233,6 +265,5 @@ heat.colors <- brewer.pal(9, "Blues")
 
 # Your code here
 ```
-
 
 ***

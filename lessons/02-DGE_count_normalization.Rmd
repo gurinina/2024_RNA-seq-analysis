@@ -24,7 +24,7 @@ Accounting for gene length is necessary for comparing expression between differe
  
 ![Alt text](img/normalization_methods_length.png){ width=200 }
  
- - **RNA composition:** 
+- **RNA composition:** 
  
 RNA composition bias arises when a few highly expressed genes dominate the overall expression profile of a sample. Accounting for RNA composition is recommended for accurate comparison of expression between samples, and is particularly important when performing differential expression analyses [[1](https://genomebiology.biomedcentral.com/articles/10.1186/gb-2010-11-10-r106)]. 
  
@@ -37,7 +37,33 @@ In the example, if we were to divide each sample by the total number of counts t
 ### Common normalization methods
 
 Several common normalization methods exist to account for these differences:
+
+
+TPM is very similar to RPKM and FPKM. The only difference is the order of operations. Here’s how you calculate TPM:
+
+For example, here's how you would calculate TPM for a gene in a sample:
+
+1. Divide the read counts by the length of each gene in kilobases. This gives you reads per kilobase (RPK).
 	
+$$
+RPK = \frac{reads}{gene length (kb)}
+$$
+
+2. Count up all the RPK values in a sample and divide this number by 1,000,000. This is your “per million” scaling factor.
+
+$$
+\text{Per million scaling factor} = \frac{\sum RPK}{1,000,000}
+$$
+
+3. Divide the RPK values by the “per million” scaling factor. This gives you TPM.
+
+$$
+TPM = \frac{RPK}{\text{Per million scaling factor}}
+$$
+
+
+The key idea here is that **TPM** normalizes for both **gene length** and **sequencing depth**, making it easier to compare the **relative abundance** of genes across different samples, regardless of how many total reads were generated.
+
 | Normalization method | Description | Accounted factors | Recommendations for use |
 | ---- | ---- | ---- | ---- |
 | **TPM** (transcripts per kilobase million) | counts per length of transcript (kb) per million reads mapped | sequencing depth and gene length | gene count comparisons within a sample or between samples of the same sample group; **NOT for DE analysis** |
@@ -45,109 +71,183 @@ Several common normalization methods exist to account for these differences:
 | DESeq2's **median of ratios** [[1](https://genomebiology.biomedcentral.com/articles/10.1186/gb-2010-11-10-r106)] | counts divided by sample-specific size factors determined by median ratio of gene counts relative to geometric mean per gene | sequencing depth and RNA composition | gene count comparisons between samples and for **DE analysis**; **NOT for within sample comparisons** |
 | EdgeR's **trimmed mean of M values (TMM)** [[2](https://genomebiology.biomedcentral.com/articles/10.1186/gb-2010-11-3-r25)] | uses a weighted trimmed mean of the log expression ratios between samples | sequencing depth, RNA composition | gene count comparisons between samples and for **DE analysis**; **NOT for within sample comparisons** |
 
-### RPKM/FPKM (not recommended)
+### TPM (Not Recommended)
 
-While TPM and RPKM/FPKM normalization methods both account for sequencing depth and gene length, RPKM/FPKM are not recommended. **The reason  is that the normalized count values output by the RPKM/FPKM method are not comparable between samples.** 
+**Step 1: Calculate Reads Per Kilobase (RPK)**
 
-Using RPKM/FPKM normalization, the total number of RPKM/FPKM normalized counts for each sample will be different. Therefore, you cannot compare the normalized counts for each gene equally between samples. 
+To calculate RPK for each gene in each sample, divide the read counts by the gene length in kilobases.
 
-**RPKM-normalized counts table**
+<div style="text-align:center">
 
-| gene | sampleA | sampleB |
-| ----- |:-----:|:-----:|
-| XCR1 | 5.5 | 5.5 |
-| WASHC1 | 73.4 | 21.8 |
-| ... | ... | ... |
-|Total RPKM-normalized counts | 1,000,000 | 1,500,000 |
+| Gene   | Sample 1 (reads) | Sample 2 (reads | Length |
+|--------|:----------------:|:---------------:|:------:|
+| Gene A |       300        |       600       |  1 kb  |
+| Gene B |       500        |       400       |  2 kb  |
 
-For example, in the table above, SampleA has a greater proportion of counts associated with XCR1 (5.5/1,000,000) than does sampleB (5.5/1,500,000) even though the RPKM count values are the same. Therefore, we cannot directly compare the counts for XCR1 (or any other gene) between sampleA and sampleB because the total number of normalized counts are different between samples. 
+</div>
 
-### DESeq2-normalized counts: Median of ratios method
 
-Since tools for differential expression analysis are comparing the counts between sample groups for the same gene, gene length does not need to be accounted for by the tool. However, **sequencing depth** and **RNA composition** do need to be taken into account. The median of ratios method helps neutralize differences in **sequencing depth** and **RNA composition**. DESeq2 normalizes by scaling the counts based on the majority of genes, not influenced by outliers (e.g., extremely highly expressed genes).
+**Sample 1:**
+- Gene A RPK = 300 reads / 1 kb = 300
+- Gene B RPK = 500 reads / 2 kb = 250
 
-On the user-end there is only one step in DESeq2's median of ratios method, but on the back-end there are multiple steps involved, as described below.
+**Sample 2:**
+- Gene A RPK = 600 reads / 1 kb = 600
+- Gene B RPK = 400 reads / 2 kb = 200
 
-> **NOTE:**  The steps below describe in detail some of the steps performed by DESeq2 when you run a single function to get DE genes. Basically, for a typical RNA-seq analysis, **you would not run these steps individually**.
+<div style="text-align:center">
 
-**Step 1: creates a pseudo-reference sample (row-wise geometric mean)**
+| Gene   | Sample 1 (RPK) | Sample 2 (RPK) |
+|--------|:--------------:|:--------------:|
+| Gene A |       300      |       600      |
+| Gene B |       250      |       200      |
 
-## Geometric Mean
+</div>
 
-The **geometric mean** of a set of \( n \) positive numbers \( x_1, x_2, \dots, x_n \) is defined as the \( n \)th root of the product of the numbers. It is mathematically expressed as:
+
+**Step 2: Calculate the Per-Million Scaling Factor**
+
+Sum the RPK values in each sample and divide by 1,000,000.
+
+**Sample 1:**
+- Total RPK = 300 + 250 = 550
+- Scaling Factor = 550 / 1,000,000 = 0.00055
+
+**Sample 2:**
+- Total RPK = 600 + 200 = 800
+- Scaling Factor = 800 / 1,000,000 = 0.0008
+
+**Step 3: Calculate TPM**
+
+Now, divide each gene's RPK by the per-million scaling factor to get the TPM.
+
+**Sample 1:**
+- Gene A TPM = 300 / 0.00055 = 545,455
+- Gene B TPM = 250 / 0.00055 = 454,545
+
+**Sample 2:**
+- Gene A TPM = 600 / 0.0008 = 750,000
+- Gene B TPM = 200 / 0.0008 = 250,000
+
+<div style="text-align:center">
+
+| Gene   | Sample 1 (TPM) | Sample 2 (TPM) |
+|--------|:--------------:|:--------------:|
+| Gene A |    545,455     |    750,000     |
+| Gene B |    454,545     |    250,000     |
+
+</div>
+
+TPM normalizes read counts by the total reads in a sample, allowing comparisons between genes while accounting for gene length. However, it does not account for the variability inherent in count data or overdispersion, making statistical testing on these values unreliable. 
+
+### RPKM/FPKM (Not Recommended)
+
+Using RPKM/FPKM normalization means the total normalized counts will vary between samples, making direct comparisons between genes unreliable.
+
+<div style="text-align:center">
+
+| Gene   | Sample A | Sample B |
+|--------|:--------:|:--------:|
+| XCR1   |   5.5    |   5.5    |
+| WASHC1 |   73.4   |   21.8   |
+| ...    | ...      | ...      |
+| Total RPKM | 1,000,000 | 1,500,000 |
+
+</div>
+
+
+For example, even though both samples show XCR1 as 5.5, they cannot be directly compared because their total counts differ.
+
+**Conclusion:**
+Tools like DESeq2 or edgeR are better suited for differential expression analysis, as they:
+
+- Use raw counts for more accurate modeling.
+
+- Apply statistical modeling (e.g., Negative Binomial) to account for variance across replicates.
+
+### DESeq2 Normalization: Median of Ratios Method
+
+For differential expression analysis, gene length need not be factored in; however, **sequencing depth** and **RNA composition** must be considered. The median of ratios method neutralizes these differences.
+
+This method involves several steps, even though from the user-end it appears as a single function call in DESeq2.
+
+**Step 1: Create a Pseudo-reference Sample (Row-wise Geometric Mean)**
+
+The **geometric mean** of a set of \( n \) positive numbers \( x_1, x_2, \dots, x_n \) is defined as:
 
 $$
 \text{Geometric Mean} = \left( \prod_{i=1}^{n} x_i \right)^{\frac{1}{n}}
 $$
 
-Where:
-- \( x_{1}, x_{2}, \dots, x_{n} \) are the individual numbers in the set,
-- \( \prod_{i=1}^{n} x_{i} \) denotes the product of all the numbers.
+For each gene, a pseudo-reference sample is created that is equal to the geometric mean across all samples, reducing the impact of extreme values.
 
-For each gene, a pseudo-reference sample is created that is equal to the geometric mean across all samples. The geometric mean is less affected by extremely high or low values than the arithmetic mean, making it more appropriate for skewed data, such as count data that has a large number of genes with low counts.
+<div style="text-align:center">
 
-| gene | sampleA | sampleB | pseudo-reference sample  |
-| ----- |:-----:|:-----:|:-----:|
-| EF2A | 1489 | 906 | sqrt(1489 * 906) = **1161.5** |
-| ABCD1 | 22 | 13 | sqrt(22 * 13) = **17.7** |
-| ... | ... | ... | ... |
+| Gene   | Sample A | Sample B | Pseudo-reference Sample |
+|--------|:--------:|:--------:|:-----------------------:|
+| EF2A   | 1489     | 906      | sqrt(1489 * 906) = **1161.5** |
+| ABCD1  | 22       | 13       | sqrt(22 * 13) = **17.7** |
+| ...    | ...      | ...      | ...                     |
 
-**Step 2: calculates ratio of each sample to the reference**
+</div>
 
-For every gene in a sample, the ratios (sample/ref) are calculated (as shown below). This is performed for each sample in the dataset. Since the majority of genes are not differentially expressed, the majority of genes in each sample should have similar ratios within the sample.
+**Step 2: Calculate the Ratio of Each Sample to the Reference**
 
-| gene | sampleA | sampleB | pseudo-reference sample  | ratio of sampleA/ref | ratio of sampleB/ref |
-| ----- |:-----:|:-----:|:-----:| :-----: | :-----: |
-| EF2A | 1489 | 906 | 1161.5 | 1489/1161.5 = **1.28** | 906/1161.5 = **0.78** |
-| ABCD1 | 22 | 13 | 16.9 | 22/16.9 = **1.30** | 13/16.9 = **0.77** |
-| MEFV | 793 | 410 | 570.2 | 793/570.2 = **1.39** | 410/570.2 = **0.72**
-| BAG1 | 76 | 42 | 56.5 | 76/56.5 = **1.35** | 42/56.5 = **0.74**
-| MOV10 | 521 | 1196 | 883.7 | 521/883.7 = **0.590** | 1196/883.7 = **1.35** |
-| ... | ... | ... | ... |
+For every gene in a sample, calculate the ratio of the sample count to the reference (sample/ref). This is performed for each sample in the dataset, resulting in ratios for most genes that are similar, as depicted below:
 
-**Step 3: calculate the normalization factor for each sample (size factor)**
+<div style="text-align:center">
 
-The median value (column-wise for the above table) of all ratios for a given sample is taken as the normalization factor (size factor) for that sample, as calculated below. Notice that the differentially expressed genes should not affect the median value:
+| Gene   | Sample A | Sample B | Pseudo-reference Sample | Ratio of Sample A/Ref | Ratio of Sample B/Ref |
+|--------|:--------:|:----------:|:------------------------:|:-----------------------:|-----------------------:|
+| EF2A   | 1489     | 906      | 1161.5                 | 1489/1161.5 = **1.28** | 906/1161.5 = **0.78**  |
+| ABCD1  | 22       | 13       | 17.7                   | 22/17.7 = **1.24**    | 13/17.7 = **0.73**     |
+| MEFV   | 793      | 410      | 570.2                  | 793/570.2 = **1.39**   | 410/570.2 = **0.72**    |
+| ...    | ...      | ...      | ...                    | ...                   | ...                   |
 
-`normalization_factor_sampleA <- median(c(1.28, 1.3, 1.39, 1.35, 0.59))`
+</div>
 
-`normalization_factor_sampleB <- median(c(0.78, 0.77, 0.72, 0.74, 1.35))`
- 
-The figure below illustrates the median value for the distribution of all gene ratios for a single sample (frequency is on the y-axis).
+**Step 3: Calculate the Normalization Factor for Each Sample (Size Factor)**
 
-![Alt text](img/deseq_median_of_ratios.png){ width=400 }
+The median value of all ratios for a given sample is calculated as the normalization factor (size factor):
 
-The median of ratios method makes the assumption that not **ALL** genes are differentially expressed; therefore, the normalization factors should account for sequencing depth and RNA composition of the sample (large outlier genes will not represent the median ratio values). **This method is robust to imbalance in up-/down-regulation and large numbers of differentially expressed genes.**
+```{r}
+normalization_factor_sampleA <- median(c(1.28, 1.24, 1.39, 1.35, 0.59))
+normalization_factor_sampleB <- median(c(0.78, 0.73, 0.72, 0.74, 1.35))
+```
 
-> Usually these size factors are around 1, if you see large variations between samples it is important to take note since it might indicate the presence of extreme outliers.
+The figure below illustrates the distribution of values for the ratios across all genes in a single sample.
 
-**Step 4: calculate the normalized count values using the normalization factor**
+![Median of Ratios](img/deseq_median_of_ratios.png){ width=400 }
 
-This is performed by dividing each raw count value in a given sample by that sample's normalization factor to generate normalized count values. This is performed for all count values (every gene in every sample). For example, if the median ratio for SampleA was 1.3 and the median ratio for SampleB was 0.77, you could calculate normalized counts as follows:
+This method is robust as it assumes that not all genes are differentially expressed, allowing normalization factors to account for both sequencing depth and RNA composition efficiently.
 
-SampleA median ratio = 1.3
+**Step 4: Calculate the Normalized Count Values Using the Normalization Factor**
 
-SampleB median ratio = 0.77
+Each raw count value in a given sample is divided by that sample's normalization factor to generate normalized count values across all genes:
 
-**Raw Counts**
 
-| gene | sampleA | sampleB |  
-| ----- |:-----:|:-----:|
-| EF2A | 1489 | 906 | 
-| ABCD1 | 22 | 13 | 
-| ... | ... | ... | 
+<div style="text-align:center">
 
-**Normalized Counts**
+| Gene   | Sample A | Sample B |
+|--------|:----------:|:----------:|
+| EF2A   | 1489 / 1.3 = **1145.39**  | 906 / 0.77 = **1176.62**  |
+| ABCD1  | 22 / 1.3 = **16.92**      | 13 / 0.77 = **16.88**      |
+| ...    | ...      | ...      |
 
-| gene | sampleA | sampleB |
-| ----- |:-----:|:-----:|
-| EF2A | 1489 / 1.3 = **1145.39** | 906 / 0.77 = **1176.62** | 
-| ABCD1 | 22 / 1.3 = **16.92** | 13 / 0.77 = **16.88** | 
-| ... | ... | ... | 
+</div>
 
-> Please note that normalized count values are not whole numbers.
+> Note that normalized count values may not always be whole numbers.
 
-***
+### Summary of Key Reasons for Using DESeq2
+
+- **Median of Ratios**: This method accounts for sequencing depth and RNA composition, making it more appropriate for RNA-Seq data analysis.
+
+- **Geometric Mean**: It creates a pseudo-reference that reduces sensitivity to extreme values, affording more stable estimates.
+
+- **Normalization Procedures**: It ensures reliable comparisons of gene expression across samples by mitigating bias from technical variations, leading to more accurate differential expression analysis.
+
+This combination of methodologies allows DESeq2 to provide robust results, enhancing the identification of differentially expressed genes in complex biological datasets.
+
 **Exercise**
 
 Determine the normalized counts for your gene of interest, PD1, given the raw counts and size factors below. 
@@ -173,9 +273,7 @@ size_factors <- c(1.32, 0.70, 1.04, 1.27, 1.11, 0.85)
 
 ```
 
-***
-
-## Count normalization of Mov10 dataset
+## Count normalization of Mov10
 
 Now that we know the theory of count normalization, we will normalize the counts for the Mov10 dataset using DESeq2. This requires a few steps:
 
@@ -195,7 +293,6 @@ all(colnames(data) == rownames(meta))
 
 The colnames of our data don't match the rownames of our metadata so we need to reorder them. We can use the `match` function:
 ```{r}
-
 
 idx <- match(rownames(meta),colnames(data))
 data <- data[,idx]

@@ -3,8 +3,8 @@ output: html_document
 editor_options:
   chunk_output_type: console
 ---
-# Codebook answers
-30 total points
+# Codebook
+34 total points
 
 
 ```{r, include = FALSE}
@@ -135,18 +135,6 @@ size_factors <- c(1.32, 0.70, 1.04, 1.27, 1.11, 0.85)
 
 ```
 
-```{r, results = "asis", echo = FALSE}
-
-solution3('
-
-PD1_normalized <- PD1 / size_factors 
-
-# OR
-
-PD1_normalized <- sweep(PD1,2,size_factors,FUN = "/")
-
-')
-```
 
 
 Now that we know the theory of count normalization, we will normalize the counts for the Mov10 dataset using DESeq2. This requires a few steps:
@@ -184,16 +172,6 @@ Suppose we had sample names matching in the counts matrix and metadata file, but
 # write the code to reorder the columns of the 'counts' matrix to match the rownames of the metadata
 
 # check that the rownames of the metadata match the colnames of the 'counts' matrix
-
-
-```
-```{r, results = "asis", echo = FALSE}
-
-solution3('
-idx <- match(rownames(metadata), colnames(counts))\n
-counts <- counts[, idx]\n
-all(colnames(counts) == rownames(metadata))
-')
 
 ```
 
@@ -252,6 +230,7 @@ We can save this normalized data matrix to file for later use:
 write.table(normalized_counts, file="data/normalized_counts.txt", sep="\t", quote=F, col.names=NA)
 ```
 
+## Quality Control
 
 **.Rmd file = 03-DGE_QC_analysis.Rmd**
 
@@ -266,41 +245,24 @@ The figure below was generated from a time course experiment with sample groups 
 
 - Ans: 
 
-```{r, results = "asis", echo = FALSE}
-solution3("The sample groups 'Ctrl' and 'Sci' separate well on PC1 and PC2")
-```
 
 **Do the sample groups separate well?**
 
 - Ans: 
   
-```{r, results = "asis", echo = FALSE}
-solution3("Yes")
-```
 
 **Do the replicates cluster together for each sample group?**
 
 - Ans:
-
-```{r, results = "asis", echo = FALSE}
-solution3("For the most part")
-```
-
 **Are there any outliers in the data?**
 
 - Ans:
   
-```{r, results = "asis", echo = FALSE}
-solution3("Yes, sci8_rep2, ctrl0_rep3 cluster away from their replicates")
-```
 
 **Should we have any other concerns regarding the samples in the dataset?**
 
 - Ans: 
   
-```{r, results = "asis", echo = FALSE}
-solution3("Yes, sci8 and sci16 don't separate well, the ctrl0 group shows big variations among replicates")
-```
 
 **Example of Variance Stabilization**
 Raw RNA-Seq count data has different levels of variability:
@@ -377,36 +339,7 @@ heat.colors <- brewer.pal(9, "Blues")
 # Your code here
 ```
 
-
-```{r, results = "asis", echo = FALSE}
-
-solution3('
-
-display.brewer.all()\n
-  
-heat.colors <- brewer.pal(9, "Blues")\n
-
-pheatmap(rld_cor, color = heat.colors, 
-border_color = "black", fontsize = 10, fontsize_row = 12,  show_rownames = T,
-show_colnames = T)\n
-
-"It changes the color palette, adds a border color, 
-changes the font size 
-of the heatmap, row names, and column names, and shows the row and column names."
-
-')
-
-```
-
-Pheatmap for exercise:
-```{r}
-
-pheatmap(rld_cor, color = heat.colors, 
-border_color = "black", fontsize = 10, fontsize_row = 12,  show_rownames = T,
-show_colnames = T)
-
-```
-
+## DGE analysis workflow
 
 **.Rmd file = 04_DGE_DESeq2_analysis.Rmd**
 
@@ -427,7 +360,8 @@ points = +1
 ```{r, eval = FALSE}
 
 # the default behavior of `results` is to return the comparison of the last group in the design formula, so your condition of interest should come last:
-   ~ sex + treatment + age
+
+~ sex + treatment + age
 
 ```
 
@@ -512,7 +446,7 @@ plotDispEsts(dds)
 
 - Ans: Yes
 
-## Model fitting
+## Negative Binomial model fitting
 
 **.Rmd file = 05_DGE_DESeq2_analysis2.Rmd**
 
@@ -567,12 +501,6 @@ In the DESeq2 workflow, what is the purpose of the design matrix in the context 
 - Ans:
 
 
-```{r, results = "asis", echo = FALSE}
-
-solution3('The design matrix captures the experimental conditions for each sample, allowing the model to estimate the expected mean expression for each gene in each sample based on the experimental covariates. The design matrix is used to model the relationship between the expected mean expression and the beta coefficients for each gene, which represent the log2 fold changes in gene expression between different conditions.')
-
-```
-
 
 **Exercise** points = +3
 
@@ -581,38 +509,6 @@ Calculate the expected mean expression for gene \( 1 \) in sample \( 4 \) using 
 ```{r}
 # Your code here
 ```
-
-```{r, echo = FALSE}
-# The code to be executed
-code_text <- 
-'
-# Extract the beta coefficients for gene 1
-betas <- coef(dds)[1, ]
-
-# Define the design matrix row for sample 4
-X_j4 <- X[4,]
-
-# Calculate the log2 expected count for gene 1 in sample 4 using the dot product
-log2_mu_14 <- sum(betas * X_j4)
-log2_mu_14
-
-# Convert the log2 expected count to the original count scale
-mu_14 <- 2^log2_mu_14
-mu_14 * sizeFactors(dds)[4]
-'
-
-# Evaluate the code and capture the output
-evaluated_output <- capture.output(eval(parse(text = code_text)))
-
-```
-
-
-```{r, results = "asis", echo = FALSE}
-
-folded(code_text, paste(evaluated_output, collapse = "\n"))
-
-```
- 
 
 
 ### Matrix Multiplication Form:
@@ -643,34 +539,6 @@ Calculate the expected log2 counts for all genes and samples using matrix multip
 ```
 
  
-```{r, echo = FALSE}
-
-# Capture the code using substitute
-code_lines <- substitute({
-  beta_coefficients  <- coef(dds)  # Extract coefficients
-  log2_fitted <- beta_coefficients %*% t(X)  # Fit log2
-  fitted_counts <- 2^log2_fitted  # Calculate fitted counts
-  size_factors <- sizeFactors(dds)  # Get size factors
-  normalized_fitted_counts <- sweep(fitted_counts, 2, size_factors, "*")  # Normalize counts
-  fitted_counts_deseq <- assays(dds)[["mu"]]  # Extract fitted counts from DESeq2
-  result <- all.equal(normalized_fitted_counts, fitted_counts_deseq)  # Compare results
-})
-
-# Step 1: Evaluate the captured code to perform calculations
-eval(code_lines)  # Perform the calculations
-
-# Step 2: Get the result of the comparison
-result_value <- eval(result)  # Evaluate the result expression
-
-
-
-```
-
-```{r, results = "asis", echo = FALSE}
-# Call the solutions function to display both the code and the result
-solutions(code_lines, result_value)
-
-```
 
 ## MOV10 Differential Expression Analysis: Control versus Overexpression
 
@@ -821,39 +689,10 @@ How many genes are differentially expressed in the **Overexpression vs. Control*
 # Your code here
 ```
 
-```{r, results = "asis", echo = FALSE}
-
-solution3('nrow(sigOE)')
-
-
-```
   
 **Does this reduce our results?** 
 ```{r}
 # Your code here
-```
-
-
-```{r, echo = FALSE}
-# The code to be executed
-code_text <- 
-'nrow(sigOE)
-nrow(res_tableOE)
-100 - (nrow(sigOE)/nrow(res_tableOE) *100)
-"Yes, it is decreased from 23368 to 951 
-(representing about 4% of the genes)."'
-
-
-# Evaluate the code and capture the output
-evaluated_output <- capture.output(eval(parse(text = code_text)))
-
-```
-
-nrow(res_tableOE)
-```{r, results = "asis", echo = FALSE}
-
-folded(code_text, paste(evaluated_output, collapse = "\n"))
-
 ```
 
 
@@ -880,28 +719,7 @@ saveRDS(sigKD,"data/sigKD.RDS")
 # Your code here
 ```
 
-```{r, echo = FALSE}
-# The code to be executed
-code_text <- '
-nrow(sigKD)
-'
-
-# Evaluate the code and capture the output
-evaluated_output <- capture.output(eval(parse(text = code_text)))
-
-```
-
-
-
-
-```{r, results = "asis", echo = FALSE}
-
-
-solution3(nrow(sigKD))
-
-```
-
-## Visualizing rna-seq results
+## Visualizing RNA-seq results
 
 **.Rmd file = 06_DGE_visualizing_results.Rmd**
 
@@ -1156,7 +974,7 @@ ggplot(res_tableOE_tb, aes(x = log2FoldChange,
         axis.title = element_text(size = rel(1.25))) 
 ```
 
-## Summary of differential expression analysis workflow
+## Summary of DGE workflow
 
 **.Rmd file = 07-DGE_summarizing_workflow.Rmd**
 
@@ -1258,7 +1076,7 @@ sessionInfo()
 
 **Exercise/Homework: modify this file to analyze the MOV dataset, starting with Mov10_full_counts.txt in your data folder. Compare the "MOV10_knockdown" to the "control". Include a heatmap and a volcano plot** points = +10
 
-## Functional analysis
+## Functional analysis of RNA-seq data
 
 **.Rmd file = 08-GO_enrichment_analysis.Rmd**
 
@@ -1535,8 +1353,10 @@ names(vis)
 ```
 
 Now we use runNetwork to view the map: 
-```{r interactive network, echo=FALSE, results='asis'}
 
+```{r, echo=FALSE, results='asis'}
+
+ 
 GOenrichment::runNetwork(vis$nodes, vis$edges)
 
 ```

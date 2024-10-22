@@ -36,8 +36,12 @@ Using these data, we will evaluate transcriptional patterns associated with pert
 
 
 **Our questions:**
-* What patterns of expression can we identify with the loss or gain of MOV10? 
-* Are there any genes shared between the two conditions?
+
+- What patterns of expression can we identify with the loss or gain of MOV10? 
+
+- Are there any genes that are differentially expressed between the two conditions?
+
+- Are there any genes shared between the two conditions?
 
 ## Setting up
 
@@ -146,7 +150,10 @@ These images illustrate some common features of RNA-seq count data, including a 
 
 ### Modeling count data
 
-Count data is often modeled using the **binomial distribution**. The Binomial distribution is a common probability distribution that models the probability of obtaining one of two outcomes under a given number of parameters. It summarizes the number of trials when each trial has the same chance of attaining one specific outcome. For example, it can give you the **probability of getting a number of heads upon tossing a coin a number of times**. However, not all count data can be fit with the binomial distribution. The binomial is based on discrete events and used in situations when you have a certain number of cases.
+Count data is often modeled using the **binomial distribution**. The Binomial distribution is a common probability distribution that models the probability of obtaining one of two outcomes under a given number of parameters. It summarizes the number of successes in a fixed number of trials when each trial has two possible outcomes. For example, a coin toss is typically modeled using a binomial distribution, where the number of successes (e.g., heads) in a fixed number of trials (e.g., 10 coin tosses) when each trial has two possible outcomes (e.g., heads or tails) and the probability of success is constant. However, not all count data can be fit with the binomial distribution. The binomial is based on discrete events and used in situations when you have a certain number of cases.
+
+
+The **binomial distribution** is used to model scenarios where there are two possible outcomes, such as "success" or "failure," over a fixed number of trials. For example, flipping a coin 10 times and counting the number of "heads" out of those 10 flips follows a binomial distribution with a probability of success (\( p \)) equal to 0.5.
 
 When **the number of cases is very large (i.e. people who buy lottery tickets), but the probability of an event is very small (probability of winning)**, the **Poisson distribution** is used to model these types of count data. 
 
@@ -161,6 +168,8 @@ To calculate the mean and variance of our data, we will use the `apply` function
 
 We will use `MARGIN = 1` to apply the function mean and variance of the counts for each row (gene) across the 'Mov10 overexpression' replicates. We will then create a data frame with the mean and variance of the counts for each gene.
 ```{r}
+
+# calculate the mean and variance of the counts for each gene
 mean_counts <- apply(data[, 3:5], 1, mean)
 
 variance_counts <- apply(data[, 3:5], 1, var)
@@ -168,13 +177,13 @@ variance_counts <- apply(data[, 3:5], 1, var)
 # for ggplot we need the data to be in a data.frame
 df <- data.frame(mean_counts, variance_counts)
 ```
+
 Run the following code to plot the *mean versus variance* for the 'Mov10 overexpression' replicates:
 ```{r}
 ggplot(df) +
-        geom_point(aes(x=mean_counts, y=variance_counts)) + 
-        geom_line(aes(x=mean_counts, y=mean_counts, color="red")) +
-        scale_y_log10() +
-        scale_x_log10()
+  geom_point(aes(x = mean_counts, y = variance_counts)) + 
+  geom_line(aes(x = mean_counts, y = mean_counts, color="red")) +
+  scale_y_log10() + scale_x_log10()
 ```
 
 By plotting the *mean versus the variance* of our data we can easily see that the **variance > mean** and therefore it does not fit the Poisson distribution. Genes having higher mean counts have even higher variance. Also for gene having low mean counts, there is a scatter of points and we can see that there is variability even in the variance. To account for this extra variance we need a new model. 
