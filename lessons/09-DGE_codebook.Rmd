@@ -423,10 +423,10 @@ colSums(counts(dds, normalized = FALSE))
 **How do the numbers correlate with the size factor?**
 
 ```{r}
-cor(colSums(counts(dds, normalized = FALSE)),sizeFactors(dds))
+
 ```
 
-- Ans: they are highly correlated
+- Ans: 
 
 
 
@@ -446,7 +446,7 @@ plotDispEsts(dds)
 
 **Do you think our data are a good fit for the model?**
 
-- Ans: Yes
+- Ans: 
 
 ## Negative Binomial model fitting
 
