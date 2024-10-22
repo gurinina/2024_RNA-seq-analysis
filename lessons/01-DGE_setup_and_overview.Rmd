@@ -16,7 +16,7 @@ What is the function of **FMRP** and **MOV10**?
 
 > **FMRP** is “most commonly found in the brain, is essential for normal cognitive development and female reproductive function. Mutations of this gene can lead to fragile X syndrome, mental retardation, premature ovarian failure, autism, Parkinson's disease, developmental delays and other cognitive deficits.” - from [wikipedia](https://en.wikipedia.org/wiki/FMR1)
 
-> **MOV10** is a putative RNA helicase that is associated with **FMRP** in the context of the microRNA pathway. **MOV10** has a role in regulating translation: it facilitates microRNA-mediated translation of some RNAs, but it also increases expression of other RNAs. 
+> **MOV10** MOV10 has been shown to associate with the 3' UTR of mRNAs as part of its role in the RNA-induced silencing complex (RISC). MOV10 is an RNA helicase believed to assist in the unwinding of RNA duplexes. MOV10 is associated with **FMRP** in the context of the microRNA pathway. **MOV10** has a role in regulating translation: it facilitates microRNA-mediated translation of some RNAs, but it also increases expression of other RNAs. 
 
 The aim of the RNAseq part of the study was to characterize the transcription expression patterns of **FMRP** and **MOV10** to identify overlapping target genes which would suggest that these genes are regulated by the **MOV10-FMRP** complex.
 
@@ -49,7 +49,7 @@ Go to the `File` menu and to the `lessons` directory and open `09-DGE_codebook.R
 
 For this analysis we will be using several R packages, some which have been installed from CRAN and others from Bioconductor. To use these packages (and the functions contained within them), we need to **load the libraries**.
 
-```{r}
+```{r, message=FALSE}
 ## Setup
 ### Bioconductor and CRAN libraries used
 library(tidyverse)

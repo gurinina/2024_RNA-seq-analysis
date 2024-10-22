@@ -167,6 +167,12 @@ size_factors <- c(1.32, 0.70, 1.04, 1.27, 1.11, 0.85)
 
 ```
 
+```{r}
+
+# Your code here
+
+```
+
 ***
 
 ## Count normalization of Mov10 dataset
@@ -207,7 +213,9 @@ Suppose we had sample names matching in the counts matrix and metadata file, but
 
 # check that the rownames of the metadata match the colnames of the 'counts' matrix
 
+
 ```
+
 *** 
 
 ### 2. Create DESEq2 object

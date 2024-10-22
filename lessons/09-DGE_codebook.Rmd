@@ -1636,4 +1636,3 @@ There are other gene sets available for GSEA analysis in clusterProfiler (Diseas
 - [DAVID](http://david.abcc.ncifcrf.gov/tools.jsp). The fold enrichment is defined as the ratio of the two proportions; one is the proportion of genes in your list belong to certain pathway, and the other is the proportion of genes in the background information (i.e., universe genes) that belong to that pathway.
 
 - etc.
-

@@ -104,11 +104,11 @@ The figure below was generated from a time course experiment with sample groups 
 
 - Ans: 
 
+
 **Do the sample groups separate well?**
 
 - Ans: 
   
-
 **Do the replicates cluster together for each sample group?**
 
 - Ans:
@@ -120,7 +120,7 @@ The figure below was generated from a time course experiment with sample groups 
 **Should we have any other concerns regarding the samples in the dataset?**
 
 - Ans: 
-
+  
 
 ***
 
@@ -222,19 +222,17 @@ Overall, we observe pretty high correlations across the board ( > 0.999) suggest
 The pheatmap function has a number of different arguments that we can alter from default values to enhance the aesthetics of the plot. Try adding the arguments `color`, `border_color`, `fontsize_row`, `fontsize_col`, `show_rownames` and `show_colnames` to your pheatmap. How does your plot change? Take a look through the help pages (?pheatmap) and identify what each of the added arguments is contributing to the plot.
 
 First run:
-```{r}
+```{r, fig.width=8, fig.height=8, echo=FALSE}
 # Display all available color palettes
 display.brewer.all()
+```
 
+```{r}
 # The color palette "Blues" is a good choice for this heatmap
 heat.colors <- brewer.pal(9, "Blues")
 
 # Your code here
-
 ```
-
-- Ans: 
 
 
 ***
-

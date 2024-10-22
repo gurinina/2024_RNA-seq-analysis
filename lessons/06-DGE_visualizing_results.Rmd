@@ -279,7 +279,6 @@ ggplot(res_tableOE_tb, aes(x = log2FoldChange,
         plot.title = element_text(size = rel(1.5),             hjust = 0.5),
         axis.title = element_text(size = rel(1.25))) 
 ```
-
 ![Alt text](img/volcano_plot_new2.png){ width=500 } 
 
 ***

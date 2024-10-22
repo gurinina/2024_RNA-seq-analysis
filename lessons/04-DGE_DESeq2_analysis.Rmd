@@ -30,7 +30,7 @@ Although the [DESeq2 paper](https://genomebiology.biomedcentral.com/articles/10.
 
 ## Running DESeq2
 
-Prior to performing the differential expression analysis, it is a good idea to know what **sources of variation** are present in your data, either by exploration during the QC and/or prior knowledge. **Sources of variation** refer to anything that causes differences in gene expression across your samples, including **biological factors** (**treatment**, **sex**, **age**) and **technical factors** (**batch effects**, **sequencing depth**). Ideally, these are all factors in you metadata. These factors lead to variability in the data and can affect your ability to detect meaningful biological signals (like differential expression between **treated** and **control** samples).Once you know the major sources of variation, you can remove them prior to analysis or control for them in the statistical model by including them in your **design formula**.
+Prior to performing the differential expression analysis, it is a good idea to know what **sources of variation** are present in your data, either by exploration during the QC and/or prior knowledge. **Sources of variation** refer to anything that causes differences in gene expression across your samples, including **biological factors** (**treatment**, **sex**, **age**) and **technical factors** (**batch effects**, **sequencing depth**). Ideally, these are all factors in your metadata. These factors lead to variability in the data and can affect your ability to detect meaningful biological signals (like differential expression between **treated** and **control** samples).Once you know the major sources of variation, you can remove them prior to analysis or control for them in the statistical model by including them in your **design formula**.
 
 ### Set the Design Formula
 
@@ -47,8 +47,10 @@ For example, let's look at the design formula for our count matrix:
 design(dds)
 ```
 
+The design only has one covariate, **sampletype**, which is the condition of interest. This means that DESeq2 will test for differential expression between the two sample types, while adjusting for any other sources of variation in the data.
+
 **Example**
-Suppose you have metadata that includes **sex**, **age**, and **treatment** as shown below:
+Let's look at another example. Suppose you have metadata that includes **sex**, **age**, and **treatment** as shown below:
 
 ![Alt text](img/meta_example.png){ width=300 }
 
@@ -82,7 +84,6 @@ By including known sources of variation (such as **sex** and **age**) in the des
 2. Based on our Mov10 metadata dataframe, which factors could we include in our design formula?
 
 - Ans: 
-
 
 3. What would you do if you wanted to include a factor in your design formula that is not in your metadata?
 
@@ -151,7 +152,13 @@ Take a look at the total number of reads for each sample:
 colSums(counts(dds))
 ```
 
-*How do the numbers correlate with the size factor?*
+**How do the numbers correlate with the size factor?**
+```{r}
+
+# Your code here
+```
+
+
 
 ### Step 2: Estimate gene-wise dispersion
 

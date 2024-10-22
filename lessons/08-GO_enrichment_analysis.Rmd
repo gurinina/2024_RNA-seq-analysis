@@ -76,6 +76,7 @@ library(tidyverse)
 library(enrichplot)
 library(fgsea) 
 
+
 ```
 
 #### Running clusterProfiler
@@ -250,6 +251,7 @@ gseaplot2(gseaGO, geneSetID = 1:4)
 ```
 
 
+
 We can also use our homemade GO enrichment analysis. To do this we need to load the library GOenrichment:
 
 ```{r}
@@ -270,9 +272,8 @@ Here we can use the GO annotations in `hGOBP.gmt` (downloaded recently) to run G
 ```{r}
 
 
-fgseaRes <-  fgsea::fgseaSimple(pathways = hGOBP.gmt,
-             stats = foldchanges, nperm = 1000,
-             maxSize = 300, minSize = 20)
+fgseaRes <-  fgsea::fgseaSimple(pathways = hGOBP.gmt,stats = foldchanges,
+                                nperm=  1000, maxSize = 300, minSize = 20)
 
 fgsea <- data.frame(fgseaRes,stringsAsFactors = F)
 
@@ -303,7 +304,9 @@ maxSetSize = 300)
 
 names(hresp$edgeMat)
 names(hresp$enrichInfo)
+
 # View(hresp$enrichInfo[,c(2,3,4,5,10)])
+
 ```
 
 Let's check the overlap between the enriched terms found using `runGORESP` and those found using `fgseaSimple` as they used the same GO term libraries:
@@ -323,25 +326,22 @@ percent_overlap
 
 80%, that's very good, especially because we are using two different GO enrichment methods, over-representation analysis and GSEA. The overlap between these enrichment and the ones using the other GO enrichment tools will be very small because of the differences in the GO annotation libraries.
 
-Now to set up the results for viewing in a network, we use the function `visSetup`, which creates a set of nodes and edges in the network, where nodes are GO terms (node size proportional to FDR score) and edges represent the overlap between GO terms (proportional to edge width). This network analysis is based on [Cytoscape](https://cytoscape.org/), an open source bioinformatics software platform for visualizing molecular interaction networks.
-
+Now to set up the results for viewing in a network, we use the function `visSetup`, which returns a list of nodes and edges for the network visualization.
 ```{r}
 vis = visSetup(hresp$enrichInfo,hresp$edgeMat)
 names(vis)
 ```
 
 Now we use runNetwork to view the network map: 
-```{r interactive network, echo=FALSE, results='asis'}
+```{r interactive GO network, echo=FALSE, results='asis'}
 
-  # Skip rendering for EPUB and PDF as it requires an interactive R session
+# GOenrichment::runNetwork(vis$nodes, vis$edges)
 
-  # GOenrichment::runNetwork(vis$nodes, vis$edges)
-
-  cat("Interactive visualization available in the HTML version.")
 ```
 
+The network map shows the relationships between the enriched GO terms. The size of the nodes represents the significance of the GO term, with larger nodes indicating more significant terms. The width of the edges represents the overlap between GO terms, with wider edges indicating more overlap.
 
-This is one of the best visualizations available out of all the GO packages.
+This network analysis is one of the best GO enrichment visualizations available. The network analysis is based on [Cytoscape](https://cytoscape.org/), an open source bioinformatics software platform for visualizing molecular interaction networks. out of all the GO packages.
 
 There are other gene sets available for GSEA analysis in clusterProfiler (Disease Ontology, Reactome pathways, etc.). In addition, it is possible to supply your own gene set GMT file, such as a GMT for MSigDB called c2.
 

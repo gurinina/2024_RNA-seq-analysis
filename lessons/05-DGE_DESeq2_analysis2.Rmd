@@ -1,332 +1,298 @@
-# Model and hypothesis testing
+# Negative Binomial model fitting
 
-## Fitting the Generalized Linear Model for Each Gene
+## Generalized Linear Model fit for each gene
 
-The final step in the DESeq2 workflow involves fitting a Negative Binomial (NB) model to each gene’s expression data and performing differential expression testing.
+The final step in the DESeq2 workflow is fitting the **Negative Binomial (NB) model** for each gene and performing differential expression testing. This step is crucial for identifying genes that are significantly differentially expressed between experimental conditions.
 
 ![Alt text](img/deseq2_workflow_separate_2018.png){ width=400 }
 
-**Modeling RNA-Seq Counts**
+DESeq2 uses a **Negative Binomial Generalized Linear Model (GLM)** to estimate the counts for each gene. A GLM is a statistical method that models relationships between variables and is an extension of linear regression. It is suitable for handling non-normally distributed data, such as RNA-seq counts, which often exhibit overdispersion (variance > mean).
 
-As mentioned in the previous chapter DESeq2 uses the negative binomial (NB) distribution to is to obtain dispersion estimates for each gene. The dispersion parameter for each gene is estimated through maximum likelihood estimation (MLE). This method seeks to find the value of $\alpha_{i}$ that maximizes the likelihood of observing the counts $Y_{ij}$, given the model.
+To fit the NB GLM, DESeq2 requires two key parameters:
 
-The general form of the negative binomial model is shown below:
+- **Size factor**, which accounts for differences in sequencing depth across samples.
 
-$$
-Y_{ij} \sim \text{NB}\left(\mu_{ij}, \alpha_{i}\right)
-$$
-Where:
+- **Dispersion estimate**, which measures variability in gene expression across replicates.
 
-- \( Y_{ij}\) is the observed count for gene \( i \) in sample \( j \)
+The model incorporates the estimated dispersion and the design matrix specifying the experimental conditions and covariates.
 
+### Negative Binomial Model Formula
 
-- \( \mu_{ij}\) is the expected normalized count for gene \( i \) in sample \( j \). 
-
-
-- \( \alpha_{i}\) is the gene-specific dispersion parameter for gene \( i \).
-
-The first step in estimating dispersion is to obtain dispersion estimates for each gene. The dispersion parameter for each gene is estimated through maximum likelihood estimation (MLE). This method seeks to find the value of $\alpha_{i}$ that maximizes the likelihood of observing the counts $Y_{ij}$, given the model. In other words, MLE identifies the $\alpha_{i}$ that best explains the observed variability for gene $i$.
-
-DESeq2 models RNA-Seq count data using the negative binomial (NB) distribution. As we saw in the last chapter, irst, it estimates the overdispersion ($\alpha_{i}$) a common feature of biological data where the variance exceeds the mean. The two primary parameters of the NB model are the mean expression level and the dispersion, which respectively capture the expected gene counts and the variability across replicates.
-
-For each gene \( i \), the observed count $Y_{ij}$ in sample \( j \)  is modeled as:
-
-
-As mentioned in the previous chapter DESeq2 first models RNA-Seq count by fitting the negative binomial (NB) distribution to estimate the dispersions $\alpha_{i}$ for each gene.
-
-$\alpha_{i}$ is a common feature of biological data where the variance exceeds the mean. DESeq2 first uses a **negative binomial generalized linear model (GLM)** to estimate the dispersions for each gene. A GLM is a flexible statistical framework similar to linear regression, but it can handle data that doesn't follow a normal distribution, such as count data. DESeq2 firsts fits the NB model to estimate the **mean expression** and **dispersion** for each gene.
-
-The general form of the negative binomial model is shown below:
+DESeq2 models RNA-seq counts as follows:
 
 $$
-Y_{ij} \sim \text{NB}\left(\mu_{ij}, \alpha_{i}\right)
-$$
-Where:
-
-- \( Y_{ij}\) is the observed count for gene \( i \) in sample \( j \)
-
-
-- \( \mu_{ij}\) is the expected normalized count for gene \( i \) in sample \( j \). 
-
-
-- \( \alpha_{i}\) is the gene-specific dispersion parameter for gene \( i \).
-
-This is modeled as:
-  
-  $$\mu_{ij} = sizeFactor_{j} \times q_{ij}$$
-  
-Where:
-
-- \( sizeFactor_{j}\) normalizes for differences in sequencing depth across samples.
-
-- \( q_{ij}\) represents the true underlying expression level of gene \( i \) in sample \( j \), which is usually modeled as a function of covariates (such as experimental conditions or sample groups).
-
-- \( \alpha_{i}\) is the dispersion parameter for gene \( i \), which accounts for the variability in counts beyond what would be expected under a Poisson model (i.e., overdispersion). 
-
-**Step 1: Estimating Gene-wise Dispersion and Regression Coefficients**
-As mentioned in the previous chapter, DESeq2 models RNA-Seq count data by fitting the negative binomial (NB) distribution to estimate the dispersion parameter $\alpha_{i}$ for each gene. Dispersion, $\alpha_{i}$, reflects the variability in RNA-Seq data where the variance exceeds the mean. DESeq2 uses a negative binomial generalized linear model (GLM) to estimate the dispersions for each gene. A GLM is similar to linear regression but is more flexible, accommodating data that doesn’t follow a normal distribution—such as count data from RNA-Seq experiments.
-
-**Modeling the Negative Binomial Distribution**
-DESeq2 first fits the NB model to estimate the mean expression and dispersion for each gene. The general form of the negative binomial model is:
-
-$$Var(Y_{ij})  = {\mu_{ij} + \alpha_{i}}{\mu_{ij}^2}$$
-Where:
-
-- \( Var(Y_{ij}\) is the variance for gene \( i \) in sample \( j \).
-
-- \( \mu_{ij}\) is the expected normalized count for gene \( i \) in sample \( j \).
-
-- \( \alpha_{i}\) is the gene-specific dispersion parameter.
-
-Once the dispersion parameter $\alpha_{i}$ is estimated for each gene, DESeq2 refits the negative binomial model to estimate the regression coefficients $\beta$, while keeping the dispersion fixed. These coefficients represent the log2 fold changes in gene expression between different experimental conditions.
-
-**Estimating Regression Coefficients $\beta$**
-
-The regression coefficients $\beta$ are determined for each sample group using maximum likelihood estimation (MLE), which maximizes the likelihood of observing the data under the negative binomial model. The $\beta$ values describe the relationship between the mean expression $\mu_{i}$ and the experimental conditions (e.g., treated vs. control).
-
-The expected mean expression $\mu_{ij}$ for gene $i$ in sample $j$ is modeled as a function of the covariates in the design matrix $X_{ij}$ and the regression coefficients $\beta$:
-
-$$log(\mu_{ij}) = X_{ij} \beta$$
-or equivalently:
-
-$$\mu_{ij} = exp{X_{ij} \beta}$$
-
-Where:
-
-- \( \mu_{ij}\) is the expected normalized count for gene \( i \) in sample \( j \).
-
-- \( X_{ij}\) represents the covariates (design matrix) for gene \( i \) in sample \( j \)
-
-- \( \beta\) is the vector of coefficients (log2 fold changes) for the covariates.
-
-**Interpreting the Regression Coefficients**
-
-In the case of our dataset, the design has three levels, and the model can be written as:
-
-$$
-y = \beta_0 + \beta_1 x_{mov10kd} + \beta_2 x_{mov10oe}
+Y_{ij} \sim \text{NB}\left(\mu_{ij}, \alpha_i\right)
 $$
 
 Where:
 
-* $y$ is the **log2 of the fitted counts** for each gene
+- \(Y_{ij}\) is the observed counts for gene \(i\) in sample \(j\)
 
-* $\beta_0$ is the **log2 average** of the reference group (e.g. “control”)
+- \(\mu_{ij}\) is the expected normalized counts for gene \(i\) in sample \(j\)
 
-* $\beta_1$ is the **log2 fold change** between “Mov10_kd” and the reference group “control”
+- \(\alpha_i\) is the dispersion parameter for gene \(i\), which has been estimated
 
-* $\beta_2$ is the **log2 fold change** between “Mov10_oe” and the reference group “control”
+The expected mean \(\mu_{ij}\) is modeled as:
 
-* $x_{mov10kd}$ and $x_{mov10oe}$ are indicators of whether a sample belongs to the "Mov10_kd" or "Mov10_oe" groups, respectively.
+$$
+\mu_{ij} = sizeFactor_{j} \times q_{ij}
+$$
 
-**Log2 Fold Changes and Adjustments**
+Where:
 
-The $\beta$ coefficients represent the **log2 fold changes** for each sample group. However, **log2 fold changes** tend to be noisier when counts are low due to the large dispersion. To stabilize these estimates, DESeq2 adjusts the log2 fold changes through a process known as shrinkage.
+- \(sizeFactor_{j}\) normalizes for differences in sequencing depth across samples
 
-**Shrunken Log2 Fold Changes (LFC)**
+- \(q_{ij}\) represents the true underlying expression level of gene \(i\) in sample \(j\), typically modeled as a function of covariates (such as experimental conditions).
 
-**Why Are Shrunken Log2 Fold Changes Used in DESeq2?**
+### Estimating Beta Coefficients Using the Design Matrix
 
-Genes with low counts or high variability often produce large or erratic log2 fold change (LFC) estimates, even when the actual difference between conditions is small. These noisy estimates can skew downstream analyses. To address this, DESeq2 applies Empirical Bayes shrinkage to bring extreme log2 fold changes closer to more reasonable values.
+In DESeq2, **beta coefficients** (\( \beta \)) are estimated using the **design matrix**, which captures the experimental conditions for each sample (e.g., control, treatment). These coefficients represent the **log2 fold changes** in gene expression between different conditions. The estimation process involves fitting a **negative binomial generalized linear model (GLM)** to the observed count data for each gene, where the expected mean expression \( \mu_{ij} \) is modeled as a function of the design matrix \( X_j \) and the beta coefficients \( \beta_i \).
 
-**How Does Shrinkage Work?**
+### Step-by-Step Process:
 
-Similar to how dispersion shrinkage works, DESeq2 stabilizes log2 fold change estimates by leveraging information from all genes. A normal distribution is fitted to the LFC estimates, which serves as a prior. This prior is used to shrink the estimates for genes with high variability, pulling noisy LFC estimates closer to the global average.
+1. **Define the Design Matrix \( X_j \):**
+The design matrix \( X \) includes the covariates (experimental conditions) for each sample. Each row of the matrix corresponds to a sample, and each column corresponds to a covariate (e.g., intercept, control, treatment). This matrix is generated using the **`model.matrix()`** function in R.
 
-Genes with low counts or high dispersion undergo more shrinkage, while genes with more reliable data undergo less.
+```{r}
+X <- model.matrix(~ sampletype, data = meta)
 
-**Statistical Testing of LFC: Wald Test**
+# OR
 
-DESeq2 uses the **Wald test** to test the significance of the log2 fold change for each gene. The test compares the estimated LFC to its **standard error** to assess whether the difference in gene expression between conditions is statistically significant.
+X <- model.matrix(design(dds), data = colData(dds))
 
-1. The log2 fold change is divided by its standard error to produce a **z-statistic**.
+```
 
-2. The z-statistic is compared to a standard normal distribution to calculate the p-value.
+2. **Link Mean Expression to the Design Matrix:**
+The expected mean expression for **gene \( i \)** in **sample \( j \)** is modeled as:
+
+$$
+\log_2(\mu_{ij}) = \beta_i X_j
+$$
+
+Or equivalently:
+
+$$
+\mu_{ij} = 2^{\beta_i X_j}
+$$
+
+Here:
+
+- \( X_j \) is the row of the design matrix for sample \( j \) (it contains the covariates for that sample)
+
+- \( \beta_i \) is the vector of log2 fold changes (beta coefficients) for gene \( i \).
+
+3. **Estimate the Beta Coefficients:**
+"DESeq2 estimates the **beta coefficients** by fitting a **negative binomial GLM** to the data using **Maximum Likelihood Estimation (MLE)**. DESeq2 substitutes the mean (\( \mu_{ij} \)) with \( 2^{\beta_i X_j} \) in the negative binomial model, using MLE to predict expected counts based on experimental covariates and estimate gene expression changes while controlling for design factors.
+
+The model is fit using the **`DESeq()`** function in R, which carries out the entire estimation process:
+
+```{r}
+dds <- DESeq(dds)
+```
+
+4. **Extract the Beta Coefficients:**
+Once the model is fitted, the estimated beta coefficients (log2 fold changes) for each gene can be extracted using the **`coef()`** function:
+
+```{r}
+beta_coefficients <- coef(dds)
+```
+
+This gives a matrix of estimated beta coefficients, where each row corresponds to a gene and each column corresponds to a covariate in the design matrix.
+
+### Example:
+For example, if the design matrix includes an intercept (control) and two conditions (MOV10 knockdown and MOV10 overexpression), the beta coefficients \( \beta_i \) for gene \( i \) would represent:
+
+- \( \beta_{i1} \): the log2 fold change for the control group (intercept)
+
+- \( \beta_{i2} \): the log2 fold change for the MOV10 knockdown group
+
+- \( \beta_{i3} \): the log2 fold change for the MOV10 overexpression group.
+
+### Calculation:
+To calculate the fitted (expected) log2 counts for **gene \( i \)** in **sample \( j \)**, you can take the **dot product** of the row of the design matrix \( X_j \) for that sample and the beta coefficients \( \beta_i \) for that gene:
+
+$$
+\log_2(\mu_{ij}) = \beta_i X_j = \beta_{i1} X_{j1} + \beta_{i2} X_{j2}  + \dots + \beta_{iP} X_{jP}
+$$
+
+Where:
+
+- \( P \) is the number of covariates in the design matrix
+
+The expected mean \( \mu_{ij} \) on the original count scale is obtained by exponentiating the log2-scale fitted values:
+
+$$
+\mu_{ij} = 2^{\beta_i X_j}
+$$
+**Exercise** points = +1
+
+In the DESeq2 workflow, what is the purpose of the design matrix in the context of fitting the Negative Binomial model for each gene?
+
+- Ans:
+
+
+**Exercise** points = +3
+
+Calculate the expected mean expression for gene \( 1 \) in sample \( 4 \) using the design matrix and beta coefficients using the design matrix is \( X_j \) and the beta coefficients are \( \beta_i \).
+
+```{r}
+# Your code here
+```
+
+
+**Exercise** points = +3
+
+Calculate the expected log2 counts for all genes and samples using matrix multiplication of $\beta$ and $X^T$. Hint: use `coef` to extract the beta coefficients and `t()` to transpose the design matrix $X$.
+
+```{r}
+# Your code here
+```
+
+
+### Matrix Multiplication Form:
+If you want to calculate the fitted values for all genes and samples at once, you can express the model as a **matrix multiplication**:
+
+$$
+\log_2(\mu) = \beta X^T
+$$
+
+This computes the expected log2 counts for all genes across all samples.
+
+In R, you can calculate the fitted log2 counts for all genes and samples using:
+
+```{r}
+
+log2_fitted <- beta_coefficients %*% t(X)
+``` 
+
+This step multiplies the beta coefficients matrix by the transpose of the design matrix to compute the fitted log2 counts.
+
+
+### Hypothesis Testing
+
+In DESeq2, hypothesis testing evaluates whether changes in gene expression between conditions are statistically significant. The **null hypothesis** assumes no differential expression between groups, meaning the log2 fold change is zero (\( LFC = 0 \)).
+
+To test this, DESeq2 uses the **Wald test**, which compares the estimated log2 fold change (LFC) to its standard error.
+
+### Wald Test for Log2 Fold Change
+
+The **Wald test** assesses whether the log2 fold change is significantly different from zero:
+
+1. The log2 fold change is divided by its standard error to compute a **z-statistic**.
+
+2. The z-statistic is compared to a standard normal distribution to obtain the p-value.
 
 3. A small p-value indicates evidence of differential expression.
 
-**Modeling the Negative Binomial Distribution**
-DESeq2 first fits the NB model to estimate the mean expression and dispersion for each gene. The general form of the negative binomial model is:
 
-Once the dispersion parameter $\alpha$ has been estimated for each gene, DESeq2 refits the negative binomial model to estimate the regression coefficients $ \beta $, while keeping the dispersion fixed. These coefficients represent the log2 fold changes in gene expression between different experimental conditions. These coefficients $ \beta $ are determined for each sample group using maximum likelihood estimation (MLE), which maximizes the log-likelihood of the Negative Binomial distribution. The $ \beta $ values describe the relationship between the mean expression $ \mu_i $ and the experimental conditions (e.g., treated vs. control).
+### Multiple Testing Correction
 
-The expected mean expression $ \mu_{ij} $ for gene $ i $ in sample $ j $ is modeled as a function of the covariates in the design matrix $ X_{ij} $ and the regression coefficients $ \beta $:
+When testing many genes, using raw **p-values** increases the chance of false positives (genes appearing significant by chance). If we used the `p-value` directly from the Wald test with a significance cut-off of p < 0.05, that means there is a 5% chance it is a false positives. Each p-value is the result of a single test (single gene). The more genes we test, the more we inflate the false positive rate. This issue is the known as the **multiple testing problem.** For example, testing 20,000 genes with p < 0.05 could result in 1,000 genes being falsely labeled as significant.
 
-$$log(\mu_{ij}) = X_{ij} \beta$$
-or equivalently:
+DESeq2 addresses this by removing genes with low counts or outliers before testing and by applying the **Benjamini-Hochberg (BH)** method to control the **false discovery rate (FDR)**. 
 
-$$\mu_{ij} = exp{X_{ij} \beta}$$
+The **BH-adjusted p-value** is calculated as:
 
-Where:
+1. Sort p-values from smallest to largest.
 
+2. Assign ranks to each p-value \( p_i \).
 
-- \( \mu_{ij}\) is the expected normalized count for gene \( i \) in sample \( j \).
+3. Compute the adjusted p-value: 
 
-- \( X_{ij}\) represents the covariates (design matrix) for gene \( i \) in sample \( j \)
-
-- \( \beta\) is the vector of coefficients (log2 fold changes) for the covariates.
-
-The log-likelihood function for the regression coefficients $ \beta $ is maximized by substituting the mean expression $ \mu_{ij} $ with $ exp{X_{ij} \beta} $ into the negative binomial model. This process estimates the $ \beta $ values that best describe the relationship between the experimental conditions and gene expression levels.
-
-**Estimating Coefficients Using Maximum Likelihood**
-
-The mean expression ($\mu_{i}$) is modeled as a function of the covariates in the design matrix ($X_{i}$) and the regression coefficients ($\beta$):
-
-$$log(\mu_{ij}) = X_{ij} \beta$$
-
-or equivalently:
-
-$$\mu_{ij} = exp{X_{ij} \beta}$$
+$$p_{i}^{adj} = p_{i} \times \frac{m}{i}$$
 
 Where:
 
-- \( \mu_{ij}\) is the expected count for gene \( i \) in sample \( j \)
+- \( p_{i} \) is the raw p-value
 
-- \( X_{ij}\) represents the covariates (design matrix) for gene \( i \) and sample \( j \)
+- \( m \) is the total number of genes tested
 
-- \( \beta\) is the vector of coefficients (log2 fold changes) for the covariates
+- \( i \) is the rank of the p-value.
 
+**Adjusted p-values** are compared to a significance threshold (e.g., 0.05) to identify significant genes. The **Bonferroni method**, another correction, is more conservative and less commonly used due to a higher risk of false negatives.
 
-The log-likelihood for the regression coefficients $\beta$ is maximized by substituting the mean ($\mu_{ij}$) with $exp{X_{ij} \beta}$ into the negative binomial likelihood function.
-
-After the model is fit, coefficients are estimated for each sample group along with their standard error.
-
-In the case of our dataset, the design has three levels, and the model can be written as:
-
-$$
-y = \beta_0 + \beta_1 x_{mov10kd} + \beta_2 x_{mov10oe}
-$$
-
-Where:
-
-* $y$ is the **log2 of the fitted counts** for each gene
-
-* $\beta_0$ is the **log2 average** of the reference group (e.g. “control”)
-
-* $\beta_1$ is the **log2 fold change** between “Mov10_kd” and the reference group “control”
-
-* $\beta_2$ is the **log2 fold change** between “Mov10_oe” and the reference group “control”
-
-* $x_{mov10kd}$ and $x_{mov10oe}$ are indicators of whether a sample belongs to the "Mov10_kd" or "Mov10_oe" groups, respectively.
-
-The $\beta$ coefficients are the estimates for the **log2 fold changes** for each sample group. However, **log2 fold changes** are inherently noisier when counts are low due to the large dispersion we observe with low read counts. To avoid this, the **log2 fold changes calculated by the model need to be adjusted**. 
-
-**Log2 Fold Change and Adjustments**
-
-The estimated $\beta$ coefficients represent the log2 fold changes in gene expression between different experimental conditions. However, when gene counts are low, these estimates can be more variable, and additional adjustments may be needed to stabilize the results.
-
-## Shrunken Log2 Fold Changes (LFC)
-
-To generate more accurate LFC estimates, DESeq2 allows for the **shrinkage of the LFC estimates toward zero** when the information for a gene is low, which could include:
-
-- Low counts
-- High dispersion values
-
-As with the shrinkage of dispersion estimates, LFC shrinkage uses **information from all genes** to generate more accurate estimates. Specifically, the distribution of LFC estimates for all genes is used (as a prior) to shrink the LFC estimates of genes with little information or high dispersion toward more likely (lower) LFC estimates. This process helps to stabilize the LFC estimates and reduce the impact of outliers or noisy data.
+In most cases, we should use the **adjusted p-values** (BH-corrected) to identify significant genes.
 
 
-![Alt text](img/deseq2_shrunken_lfc.png){ width=500 }
+## MOV10 Differential Expression Analysis: Control versus Overexpression
 
-*Illustration taken from the [DESeq2 paper](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-014-0550-8).*
+We have three sample classes so we can make three possible pairwise comparisons:
 
-In the figure above, both the green and purple genes have the same mean values across two sample groups (C57BL/6J and DBA/2J), but the green gene shows little variation while the purple gene has high variation. The **shrunken log2 fold change** for the green gene (dotted line) is nearly the same as its **unshrunken estimate** (vertex of the green **solid line**). However, the LFC estimates for the purple gene is pulled much closer to the prior distribution (black line) due to its higher dispersion.
-
-**Generating Shrunken LFC Estimates**
-
-To generate shrunken log2 fold change estimates, you can run the `lfcShrink()` function on your results object:
-
-```{r, eval = FALSE}
-shrunken_results <- lfcShrink(dds, contrast = c("condition", "treated", "control"), res = results)
-```
-
-
-**DESeq2 Workflow Overview:**
-
-In DESeq2, the Wald test is an integral part of the hypothesis testing procedure. The overall workflow follows these steps:
-
-1. Estimate Size Factors
-2. Estimate Dispersions
-3. Fit the Negative Binomial GLM
-4. Perform Hypothesis Testing (using the Wald test for LFC estimates)
-
-**Creating Contrasts for Hypothesis Testing**
-
-In DESeq2, **contrasts** define the specific groups to compare for differential expression testing. There are two ways to create contrasts:
-
-**Default Comparison:**
-
-DESeq2 automatically uses the base level of the factor of interest, determined alphabetically, as the **baseline for comparisons (reference)**.
-
-**Manual Specification:**
-
-You can manually specify the contrast using the `contrast` argument in the `results()` function. **The last group in the contrast becomes the base for comparison (reference).**
-
-	
-```{r, eval = FALSE}
-	
-	# DO NOT RUN!
-	contrast <- c("condition", "level_to_compare", "base_level")
-	results(dds, contrast = contrast, alpha = alpha_threshold)
-	
-```
-
-The `alpha` parameter in DESeq2 sets the significance cutoff used for optimizing independent filtering. The `alpha` value is used to determine the criteria for independent filtering, meaning DESeq2 will try to optimize the filtering process to maximize the number of genes with adjusted p-values below the `alpha` threshold.
-The filtering step removes genes that are unlikely to achieve an adjusted p-value (FDR) below this `alpha` value (i.e., those with low counts or low statistical power). However, the primary criterion used for independent filtering is the mean normalized count of the genes.
-
-By default, `alpha` is set to 0.1, meaning that genes with an adjusted p-value (false discovery rate, or FDR) below this threshold will be considered significant. However, you can adjust the `alpha`  parameter to reflect a more stringent FDR threshold, such as 0.05, depending on your analysis needs.
-
-### MOV10 DE Analysis: Contrasts and Wald Tests
-
-In our MOV10 dataset, there are three groups, allowing for the following pairwise comparisons:
-
-1. **Control vs. Mov10 overexpression**
-2. **Control vs. Mov10 knockdown**
+1. Control vs. Mov10 overexpression
+2. Control vs. Mov10 knockdown
 3. Mov10 knockdown vs. Mov10 overexpression
 
-For this analysis, **we are primarily interested in comparisons #1 and #2.** The design formula we provided earlier (~ sampletype) defines our main factor of interest.
+**We are really only interested in #1 and #2 from above**. Using the design formula we provided `~ sampletype`, indicating that this is our main factor of interest.
+
+### Creating Contrasts for Hypothesis Testing
+
+In DESeq2, **contrasts** specify which groups to compare for differential expression testing. You can define contrasts in two ways:
+
+1. **Default Comparison:** DESeq2 automatically uses the alphabetically first level of the factor as the **baseline**.
+  
+2. **Manual Specification:** You can manually specify the comparison using the `contrast` argument in the `results()` function. The `contrast` argument takes a vector of three elements. The first element is the name of the factor (design). The second and third elements listed in the contrast are the names of the numerator and denominator level for the fold change, respectively.
+
+The order of the contrast defines the direction of the fold change (see below). A positive log2 fold change means expression is higher in the "treated" group than in "control," and a negative fold change means expression is lower.
+
+```{r, eval = FALSE}
+	
+# DO NOT RUN!
+
+
+contrast <- c("treatment", "treated", "control")
+
+contrast <- c("condition", "level_to_compare", "base_level")
+
+results(dds, contrast = contrast, alpha = alpha_threshold)
+	
+```
+
+In DESeq2, the `alpha` parameter sets the significance threshold for adjusted p-values (FDR) when identifying differentially expressed genes. By default, it is set to 0.1, meaning genes with an adjusted p-value (FDR) below 0.1 are considered significant. You can lower `alpha` to be more stringent (e.g., 0.05) to reduce false positives, but this might also reduce the number of significant genes detected.
 
 **Building the Results Table**
 
-To build the results table, we use the `results()` function. You can specify the `contrast` to be tested using the contrast argument. In this example, we’ll save the unshrunken and shrunken results of **Control vs. Mov10 overexpression** to different variables. We’ll also set the `alpha` to 0.05, which is the significance cutoff for independent filtering.
+To build the results table, we use the `results()` function. You can specify the `contrast` to be tested using the contrast argument. In this example, we’ll save the unshrunken and shrunken results of **Control vs. Mov10 overexpression** to different variables. We’ll also set the `alpha` to 0.05, which is more stringent than the default value of 0.1.
 ```{r}
-
-## Define contrasts, extract results table, and shrink log2 fold changes
+# define contrasts
 contrast_oe <- c("sampletype", "MOV10_overexpression", "control")
 
-res_tableOE_unshrunken <- results(dds, contrast=contrast_oe, alpha = 0.05)
+# extract results table
+res_tableOE_unshrunken <- results(dds, contrast = contrast_oe, alpha = 0.05)
 
 resultsNames(dds)
 
-res_tableOE <- lfcShrink(dds = dds, coef = "sampletype_MOV10_overexpression_vs_control", 
-                         res = res_tableOE_unshrunken)
+# shrink log2 fold changes
+res_tableOE <- lfcShrink(dds = dds, coef =  "sampletype_MOV10_overexpression_vs_control", res = res_tableOE_unshrunken)
 
-## Save results for future use
+# save the results for future use
 saveRDS(res_tableOE, file = "data/res_tableOE.RDS")
+
 ```
 
-**The Importance of Contrast Order in Log2 Fold Change (LFC) Calculations**
-
-In DESeq2, when you specify a contrast, you are defining a comparison between two levels of a factor (in this case, the "sampletype" factor). The order of the names in the contrast determines the direction of the fold change reported. The first group listed in the contrast ("MOV10_overexpression") is the group you are comparing. The second group listed in the contrast ("control") is the baseline or reference group, against which the comparison is made. A positive log2 fold change means that gene expression is higher in the "MOV10_overexpression" group compared to "control". A negative log2 fold change means that gene expression is lower in the "MOV10_overexpression" group compared to "control".
 
 **MA Plot**
 
-An MA plot is a useful visualization for exploring differential expression results. It shows the relationship between the mean of the normalized counts (on the x-axis) and the log2 fold changes (on the y-axis) for all genes tested. Genes that are significantly differentially expressed are highlighted in color for easier identification.
+A **MA plot** visualizes the relationship between the **mean expression** (on the x-axis) and the **log2 fold change** (on the y-axis) for all genes in a dataset. Genes that are significantly differentially expressed are highlighted, while most other genes cluster around zero log2 fold change. 
+
+When **shrinkage** is applied, as in DESeq2, large log2 fold change estimates for genes with low counts or high variability are pulled toward more moderate values, reducing the noise in the plot. This helps focus attention on the more reliable fold changes and makes the plot cleaner, especially for low-expression genes that tend to have more variable LFC estimates without shrinkage.
 
 This plot is also a great way to illustrate the effect of LFC shrinkage. DESeq2 provides a simple function to generate an MA plot.
 
-**Unshrunken Results:**
+**Shrunken & Unshrunken Results:**
 ```{r}
+
+par(mfrow = c(1,2))
+
 plotMA(res_tableOE_unshrunken, ylim=c(-2,2))
-```
 
+abline(v = 10,col="red",lwd = 2)
 
-**Shrunken results:**
-```{r}
+# Shrunken results:
 plotMA(res_tableOE, ylim=c(-2,2))
+
+abline(v = 10,col="red",lwd = 2)
+
 ```
-
-
-In addition to comparing LFC shrinkage, the MA plot helps you evaluate the magnitude of fold changes and how they are distributed relative to mean expression. You would expect to see significant genes across the full range of expression levels. 
 
 **MOV10 DE Analysis: Exploring the Results**
 
@@ -336,21 +302,14 @@ class(res_tableOE)
 ```
 
 Let's go through some of the columns in the results table to get a better idea of what we are looking at. To extract information regarding the meaning of each column we can use `mcols()`:
-
 ```{r}
 mcols(res_tableOE, use.names = T)
 ```
 
-* `baseMean`: mean of normalized counts for all samples
-* `log2FoldChange`: log2 fold change estimate
-* `lfcSE`: standard error of the LFC estimate
-* `stat`: Wald statistic
-* `pvalue`: P-value from the Wald test
-* `padj`: Adjusted p-values using the Benjamini-Hochberg method
- 
 Now let's take a look at what information is stored in the results:
 ```{r}
 head(res_tableOE)
+names(res_tableOE)
 ```
 
 **Interpreting p-values Set to NA**
@@ -363,66 +322,60 @@ In some cases, p-values or adjusted p-values may be set to NA for a gene. This h
 
 3. **Low counts:** If a gene is filtered out by independent filtering for having a low mean normalized count, only the adjusted p-value will be set to NA.
 
-**Multiple Testing Correction**
+**Log2 Fold Change and Adjustments**
 
-In the results table, we see both **p-values** and **adjusted p-values.** Which should we use to identify significantly differentially expressed genes?
+The estimated $\beta$ coefficients represent the log2 fold changes in gene expression between different experimental conditions. However, when gene counts are low, these estimates can be more variable, and additional adjustments may be needed to stabilize the results.
 
-If we used the `p-value` directly from the Wald test with a significance cut-off of p < 0.05, that means there is a 5% chance it is a false positives. Each p-value is the result of a single test (single gene). The more genes we test, the more we inflate the false positive rate. **This is the known as the multiple testing problem.** For example, testing 20,000 genes with a p-value threshold of 0.05 would result in 1,000 genes being significant by chance alone. If we found 3000 genes to be differentially expressed total, 150 of our genes are false positives. We would not want to sift through our "significant" genes to identify which ones are true positives.
+## Shrunken log2 foldchanges (LFC)
 
-DESeq2 helps reduce the number of genes tested by removing those genes unlikely to be significantly DE prior to testing, such as those with low number of counts and outlier samples (gene-level QC). However, we still need to correct for multiple testing to reduce the number of false positives, and there are a few common approaches:
+To generate more accurate LFC estimates, DESeq2 allows for the **shrinkage of the LFC estimates toward zero** when the information for a gene is low, which could include:
 
-DESeq2 corrects p-values using the **Benjamini-Hochberg (BH)** method by default, which controls the **false discovery rate (FDR)**. 
+- Low counts
+- High dispersion values
 
-Step-by-Step Process:
+**Why Are Shrunken Log2 Fold Changes Used in DESeq2?**
 
-1. Sort the p-values from smallest to largest.
+Shrunken log2 fold changes are used in DESeq2 to provide more reliable estimates of fold changes, especially for genes with low counts or high variability. Without shrinkage, log2 fold changes for these genes can be overestimated or erratic, leading to misleading results.
 
-2. Assign ranks to each p-value ($p_{i}$) based on their order in the sorted list, (the smallest p-value gets rank 1, the second smallest gets rank 2, and so on).
+By applying shrinkage, DESeq2 moderates the large, uncertain fold changes toward more realistic values, reducing noise and improving the overall interpretability of the data. This is particularly important when comparing genes with low expression levels, where the raw fold change estimates tend to be more variable and less accurate.
 
-3. Compute the **BH-adjusted p-value** using the formula:
+In summary, shrinkage helps stabilize fold change estimates, reducing false positives and allowing for more biologically meaningful conclusions.
 
-$$p_{i}^{adj} = p_{i} \times \frac{m}{i}$$
+Genes with low counts or high dispersion undergo more shrinkage, while genes with more reliable data undergo less.
 
-Where:
+![Alt text](img/deseq2_shrunken_lfc.png){ width=500 }
 
-- \( p_{i}\) is the raw p-value for hypothesis \( i \)
+*Illustration taken from the [DESeq2 paper](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-014-0550-8).*
 
-- \( m\) is the total number of hypotheses (e.g., the total number of genes tested),
+For example, in the figure above, the green gene and purple gene have the same mean values for the two sample groups (C57BL/6J and DBA/2J), but the green gene has little variation while the purple gene has high levels of variation. For the green gene with low variation, the **unshrunken LFC estimate** (vertex of the green **solid line**) is very similar to the shrunken LFC estimate (vertex of the green dotted line), but the LFC estimates for the purple gene are quite different due to the high dispersion. So even though two genes can have similar normalized count values, they can have differing degrees of LFC shrinkage. Notice the **LFC estimates are shrunken toward the prior (black solid line)**.
 
-- \( i\) is the rank of the p-value.
+**Generating Shrunken LFC Estimates**
 
-4. The BH procedure sets a threshold for significance based on the desired FDR level (e.g., 0.05), and the adjusted p-values \( p_{i}^{adj}\) are compared to this threshold.
-
-Other methods, like **Bonferroni**, are available but tend to be more conservative and lead to higher rates of false negatives.
-
-In most cases, we should use the **adjusted p-values** (BH-corrected) to identify significant genes.
+To generate the shrunken log2 fold change estimates, you have to run an additional step on your results object (that we will create below) with the function `lfcShrink()`.
 
 ### MOV10 DE Analysis: **Control vs. Knockdown**
 
 After examining the overexpression results, let's move on to the comparison between **Control vs. Knockdown**. We’ll use contrasts in the `results()` function to extract the results table and store it in the `res_tableKD` variable.
 ```{r}
 
-## Define contrasts, extract results table, and shrink log2 fold changes
+# define contrast
 contrast_kd <-  c("sampletype", "MOV10_knockdown", "control")
 
+# extract results table
 res_tableKD_unshrunken <- results(dds, contrast = contrast_kd, alpha = 0.05)
 
 resultsNames(dds)
 
 # We can also specify contrasts using `coef` argument in `lfcShrink()`
+
+# shrink log2 fold changes
 res_tableKD <- lfcShrink(dds, coef = 2, res = res_tableKD_unshrunken)
 
 ## Save results for future use
 saveRDS(res_tableKD, file = "data/res_tableKD.RDS")
 
-## Save all objects for later
-save.image()
-
 ```
 
-### MOV10 DE Analysis: **Control versus Knockdown**
-
-Let’s take a quick look at the results table from the Wald test for the **Control-Knockdown** comparison to ensure the format is similar to what we observed with the **overexpression (OE) analysis**.
 
 ## Summarizing Results
 
@@ -477,18 +430,16 @@ saveRDS(sigOE,"data/sigOE.RDS")
 **Exercise** points = +3
 
 How many genes are differentially expressed in the **Overexpression vs. Control** comparison based on the criteria we just defined? Does this reduce the number of significant genes compared to using only the FDR threshold?
-
 ```{r}
 # Your code here
 ```
 
-  
 **Does this reduce our results?** 
-
 ```{r}
 # Your code here
 ```
- 
+
+
 ### MOV10 Knockdown Analysis: Control vs. Knockdown
 
 Next, let’s perform the same analysis for the **Control vs. Mov10 knockdown** comparison. We’ll use the same thresholds for adjusted p-value (FDR < 0.05) and log2 fold change (|log2FC| > 0.58).
@@ -508,11 +459,16 @@ saveRDS(sigKD,"data/sigKD.RDS")
 ```
 
 **How many genes are differentially expressed in the Knockdown compared to Control?**
-
 ```{r}
 # Your code here
 ```
- 
+
 With our subset of significant genes identified, we can now proceed to visualize the results and explore patterns of differential expression.
 
-***
+
+```{r}
+
+## Save all objects for later
+save.image()
+
+```
