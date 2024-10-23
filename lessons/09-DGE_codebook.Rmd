@@ -3,7 +3,7 @@ output: html_document
 editor_options:
   chunk_output_type: console
 ---
-# Codebook
+# Codebook: last modified October 23, 2024
 33 total points
 
 
@@ -174,7 +174,6 @@ Suppose we had sample names matching in the counts matrix and metadata file, but
 
 ```
 
-*** 
 
 ### 2. Create DESEq2 object
 
@@ -232,7 +231,6 @@ write.table(normalized_counts, file="data/normalized_counts.txt", sep="\t", quot
 ## Quality Control
 
 **.Rmd file = 03-DGE_QC_analysis.Rmd**
-
 
 **Exercise** points = +5
 
@@ -356,7 +354,7 @@ This shows that **sampletype** is the condition of interest and as such is the o
 **Exercise** points = +3
 
 1. Suppose you wanted to study the expression differences between the two age groups in the metadata shown above, and major sources of variation were `sex` and `treatment`, how would the design formula be written?
-points = +1
+
 ```{r, eval = FALSE}
 
 # the default behavior of `results` is to return the comparison of the last group in the design formula, so your condition of interest should come last:
@@ -366,10 +364,11 @@ points = +1
 
 2. Based on our Mov10 metadata dataframe, which factors could we include in our design formula?
 
-
+- Ans:
 
 3. What would you do if you wanted to include a factor in your design formula that is not in your metadata?
 
+- Ans:
 
 ### MOV10 Differential Expression Analysis
 
@@ -491,13 +490,12 @@ The expected mean \( \mu_{ij} \) on the original count scale is obtained by expo
 $$
 \mu_{ij} = 2^{\beta_i X_j}
 $$
+
 **Exercise** points = +1
 
 In the DESeq2 workflow, what is the purpose of the design matrix in the context of fitting the Negative Binomial model for each gene?
 
 - Ans:
-
-
 
 **Exercise** points = +3
 
@@ -681,13 +679,17 @@ saveRDS(sigOE,"data/sigOE.RDS")
 
 How many genes are differentially expressed in the **Overexpression vs. Control** comparison based on the criteria we just defined? Does this reduce the number of significant genes compared to using only the FDR threshold?
 ```{r}
+
 # Your code here
+
 ```
 
   
 **Does this reduce our results?** 
 ```{r}
+
 # Your code here
+
 ```
 
 
