@@ -334,7 +334,7 @@ names(vis)
 
 Now we use runNetwork to view the network map: 
 
-```{r, echo=FALSE, results='asis'}
+```{r, results='asis'}
 
 GOenrichment::runNetwork(vis$nodes, vis$edges)
 

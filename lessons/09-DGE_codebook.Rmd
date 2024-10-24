@@ -535,7 +535,17 @@ Calculate the expected log2 counts for all genes and samples using matrix multip
 ```
 STOP Tues Oct 22
 
-## MOV10 Differential Expression Analysis: Control versus Overexpression
+Let's restart where we left off
+```{r}
+
+```
+
+
+
+
+## MOV10 Differential Expression Analysis:
+
+Control versus Overexpression
 
 **Building the Results Table**
 
@@ -556,7 +566,6 @@ res_tableOE <- lfcShrink(dds = dds, coef =  "sampletype_MOV10_overexpression_vs_
 saveRDS(res_tableOE, file = "data/res_tableOE.RDS")
 
 ```
-
 
 **MA Plot**
 
@@ -1352,9 +1361,9 @@ names(vis)
 ```
 
 Now we use runNetwork to view the map: 
-```{r interactive network, echo=FALSE, results='asis'}
+```{r, results='asis'}
 
-# GOenrichment::runNetwork(vis$nodes, vis$edges)
+GOenrichment::runNetwork(vis$nodes, vis$edges)
 
 ```
 
