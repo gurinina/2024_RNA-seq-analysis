@@ -1,10 +1,13 @@
 ---
 output: html_document
+title: "Codebook"
 editor_options:
   chunk_output_type: console
+  
 ---
-# Codebook: last modified October 23, 2024
-33 total points
+# Codebook: 
+
+34 total points
 
 
 ```{r, include = FALSE}
@@ -165,12 +168,16 @@ all(colnames(data) == rownames(meta))
 
 ```
 
-**Exercise** points = +1
+**Exercise** points = +2
 
 Suppose we had sample names matching in the counts matrix and metadata file, but they were out of order. Write the line(s) of code required to create a new matrix with columns ordered such that they were identical to the row names of the metadata.
 ```{r, eval = FALSE}
 
 # write the code to reorder the columns of the 'counts' matrix to match the rownames of the metadata
+
+
+# write the code to reorder the columns of the 'counts' matrix to match the rownames of the metadata
+
 
 ```
 
@@ -417,13 +424,7 @@ colSums(counts(dds, normalized = FALSE))
 
 **How do the numbers correlate with the size factor?**
 
-```{r}
-
-
 - Ans: 
-
-
-
 
 ### MOV10 Differential Expression Analysis: Exploring Dispersion Estimates
 
@@ -533,6 +534,7 @@ Calculate the expected log2 counts for all genes and samples using matrix multip
 # Your code here
 ```
 STOP Tues Oct 22
+
 ## MOV10 Differential Expression Analysis: Control versus Overexpression
 
 **Building the Results Table**
@@ -668,7 +670,7 @@ Now, we can filter the table to retain only the genes that meet the significance
 ```{r}
 
 sigOE <- res_tableOE_tb %>%
-        filter(padj < padj.cutoff & abs(log2FoldChange) > lfc.cutoff)
+  dplyr::filter(padj < padj.cutoff & abs(log2FoldChange) > lfc.cutoff)
 
 # Save the results for future use
 saveRDS(sigOE,"data/sigOE.RDS")

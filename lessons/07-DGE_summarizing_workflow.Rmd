@@ -1,6 +1,6 @@
 # Summary of DGE workflow
 
-**Exercise/Homework: modify this file to analyze the MOV dataset, starting with Mov10_full_counts.txt in your data folder. Compare the "MOV10_knockdown" to the "control". Include a heatmap and a volcano plot** points = +10
+**Homework: modify this file to analyze the MOV dataset, starting with Mov10_full_counts.txt in your data folder. Compare the "MOV10_knockdown" to the "control". Include a heatmap and a volcano plot** points = +10
 
 We have detailed the various steps in a differential expression analysis workflow, providing theory with example code. To provide a more succinct reference for the code needed to run a DGE analysis, we have summarized the steps in an analysis below:
 

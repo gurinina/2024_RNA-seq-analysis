@@ -11,7 +11,7 @@
 
 
 
-<title>2024_RNA-seq-analysis_install.knit</title>
+<title>2024_RNA-seq-analysis_Github.knit</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -353,31 +353,175 @@ display: none;
 
 
 <div id="syncing-with-the-course-repository-2024_rna-seq-analysis" class="section level2">
-<h2>Syncing with the Course Repository 2024_RNA-seq-analysis</h2>
-<p>For the 2024_RNA-seq-analysis module, we will be using another github
-repository that you’ll have to clone. This repository contains the
-course materials, including the R scripts, data files, and other
-resources. You can clone the repository using the following steps:</p>
-<div id="syncing-the-repository-using-rstudio" class="section level3">
-<h3>Syncing the repository using RStudio:</h3>
+<h2>Syncing with the Course Repository
+<strong>2024_RNA-seq-analysis</strong></h2>
+<p><strong>Note:</strong> Bash commands should be run in the terminal,
+not in RStudio.</p>
+<div id="definitions" class="section level3">
+<h3>Definitions:</h3>
+<ul>
+<li><p><strong>Local Repository:</strong> The version of the repository
+on your computer where you make changes commit them, and interact with
+Git. It exists independently of the remote repository.</p></li>
+<li><p><strong>Remote Repository:</strong> The version hosted on GitHub
+(often referred to as <code>origin</code> in Git commands) and is where
+you push your local commits when you want to share your changes. You
+don’t have permissions to push to the course repository, but you can
+pull changes from it.</p></li>
+<li><p><strong>Unstaged or Untracked:</strong> The git pane in RStudio
+where the checkboxes next to the files are unclicked. The checkboxes
+that are yellow and have a question mark on them are untracked, all the
+others are unstaged. Untracked and unstaged files need to be staged by
+clicking checkboxes or running <code>git add filename</code> in the
+terminal before you are ready to be committed.</p></li>
+<li><p><strong>Staged:</strong> The git pane in RStudio where the
+checkboxes next to the files are clicked. Staged files are ready to be
+committed.</p></li>
+<li><p><strong>Commit</strong> Once the file is staged, you can commit
+the changes by clicking the <strong>Commit</strong> button in the Git
+pane. This will open a new window where you can add a message and then
+hit <strong>Commit</strong> again. Alternatively you can run the command
+<code>git commit -m &quot;Your message here&quot;</code> in the terminal.</p></li>
+</ul>
+</div>
+<div id="updating-lessons09-dge_codebook.rmd" class="section level3">
+<h3>Updating <code>lessons/09-DGE_codebook.Rmd</code></h3>
+<div id="back-up-any-changes" class="section level4">
+<h4>1. Back Up Any Changes</h4>
+<p>If you modified <code>lessons/09-DGE_codebook.Rmd</code>, save it as
+<code>Lastname_09-DGE_codebook.Rmd</code> for submission before
+proceeding.</p>
+</div>
+<div id="check-file-status" class="section level4">
+<h4>2. Check File Status</h4>
+<ul>
+<li>If <code>lessons/09-DGE_codebook.Rmd</code> is
+<strong>unstaged</strong> (modified but not added) you want to overwrite
+it with the remote version to discard local modifications.</li>
+</ul>
 <ol style="list-style-type: decimal">
-<li><p>Open RStudio and select
-<code>File -&gt; New Project -&gt; Version Control -&gt; Git</code>.
-<strong>Note</strong>: If you don’t have git installed on your device,
-you might have to first download and install it from <a href="https://git-scm.com/downloads">github</a>. Close the Rstudio
-before installing git and re-open it afterwards.</p></li>
-<li><p>In the “Repository URL” field, paste the following URL for the
-course material repository:<br />
-<code>https://github.com/gurinina/2024_IntroR_and_RStudio</code></p></li>
-<li><p>Choose a local folder on your computer to store the project
-files. Using the same folder as the one you used for
-2024_IntroR_and_RStudio is recommended.</p></li>
-<li><p>Click “Create Project” to clone the repository.</p></li>
+<li><strong>Discard Local Changes:</strong></li>
 </ol>
-<p>After the repository is cloned, you can sync your local files with
-the GitHub repository by clicking the “Pull” button in the “Git” tab in
-RStudio. This ensures that you always have the latest version of the
-course materials.</p>
+<pre class="bash"><code>
+git checkout -- lessons/09-DGE_codebook.Rmd</code></pre>
+<ol start="2" style="list-style-type: decimal">
+<li><strong>Pull the Latest Changes from the Remote</strong>:</li>
+</ol>
+<p>After discarding the local changes, you can now pull the latest
+version from the remote repository and overwrite the file with the
+remote version.</p>
+<ol start="2" style="list-style-type: decimal">
+<li><strong>Pull Latest Changes:</strong></li>
+</ol>
+<pre class="bash"><code>
+git pull origin main
+</code></pre>
+<ul>
+<li>If <code>lessons/09-DGE_codebook.Rmd</code> is
+<strong>staged</strong> (added to the staging area the git pane in
+RStudio) by clicking the checkbox in RStudio), you need to unstage it
+before you can overwrite it with the remote version. To unstage the
+file, either just unclick it in the git pane in RStudio or run the
+following command in the terminal:</li>
+</ul>
+<ol style="list-style-type: decimal">
+<li><strong>Unstage the file:</strong></li>
+</ol>
+<pre class="bash"><code>
+git reset HEAD lessons/09-DGE_codebook.Rmd</code></pre>
+<ol start="2" style="list-style-type: decimal">
+<li><strong>Discard local changes:</strong></li>
+</ol>
+<pre class="bash"><code>
+git checkout -- lessons/09-DGE_codebook.Rmd
+</code></pre>
+<ol start="3" style="list-style-type: decimal">
+<li><strong>Pull Latest Changes:</strong></li>
+</ol>
+<pre class="bash"><code>git pull origin main</code></pre>
+</div>
+</div>
+<div id="forcing-overwrites" class="section level3">
+<h3>Forcing Overwrites</h3>
+<p>If you face difficulties and wish to forcefully overwrite local
+changes:</p>
+<ol style="list-style-type: decimal">
+<li><strong>Reset to the Remote Version:</strong></li>
+</ol>
+<pre class="bash"><code>
+git fetch origin
+git reset --hard origin/main
+</code></pre>
+</div>
+<div id="working-with-lastname_09-dge_codebook.rmd" class="section level3">
+<h3>Working with <code>Lastname_09-DGE_codebook.Rmd</code></h3>
+<ul>
+<li><strong>If Unstaged (modified but not tracked):</strong></li>
+<li><strong>Stage the File:</strong></li>
+</ul>
+<pre class="bash"><code>
+git add lessons/Lastname_09-DGE_codebook.Rmd
+</code></pre>
+<ul>
+<li><strong>If Staged (ready to be committed):</strong></li>
+<li><strong>Commit the Changes:</strong></li>
+</ul>
+<pre class="bash"><code>
+git commit -m &quot;Updated Lastname_09-DGE_codebook.Rmd&quot;
+</code></pre>
+<ul>
+<li><strong>If Untracked
+(<code>Lastname_09-DGE_codebook.Rmd</code>):</strong></li>
+<li><strong>Add to Git:</strong></li>
+</ul>
+<pre class="bash"><code>
+git add lessons/Lastname_09-DGE_codebook.Rmd
+</code></pre>
+</div>
+<div id="summary-of-commands" class="section level3">
+<h3>Summary of Commands:</h3>
+<ol style="list-style-type: decimal">
+<li><strong>Unstage Changes:</strong></li>
+</ol>
+<pre class="bash"><code>git reset HEAD lessons/09-DGE_codebook.Rmd</code></pre>
+<ol start="2" style="list-style-type: decimal">
+<li><strong>Discard Local Changes:</strong></li>
+</ol>
+<pre class="bash"><code>git checkout -- lessons/09-DGE_codebook.Rmd</code></pre>
+<ol start="3" style="list-style-type: decimal">
+<li><strong>Pull Latest Changes:</strong></li>
+</ol>
+<pre class="bash"><code>git pull origin main</code></pre>
+</div>
+<div id="key-commands" class="section level3">
+<h3>Key Commands:</h3>
+<ul>
+<li><p><strong><code>git checkout -- &lt;file&gt;</code></strong>:
+Discards local changes to the specific file.
+<code>git checkout -- .</code> discards all local changes.</p></li>
+<li><p><strong><code>git reset --hard origin/main</code></strong>:
+Resets the entire branch to match the remote, discarding all local
+changes. git reset –hard resets the entire repository.</p></li>
+</ul>
+</div>
+<div id="when-to-use-each" class="section level3">
+<h3>When to Use Each:</h3>
+<ul>
+<li><p>Use <strong><code>git checkout -- &lt;file&gt;</code></strong> if
+you only want to overwrite the <code>lessons/09-DGE_codebook.Rmd</code>
+file.</p></li>
+<li><p>Use <strong><code>git reset --hard</code></strong> if you want to
+overwrite the entire repository and discard all local changes.</p></li>
+</ul>
+</div>
+<div id="steps-to-watch-my-repository-so-that-you-receive-notifications-whenever-i-update-it" class="section level3">
+<h3>Steps to watch my repository so that you receive notifications
+whenever I update it:</h3>
+<p>Go to my repository: <a href="https://github.com/gurinina/2024_RNA-seq-analysis">2024_RNA-seq-analysis</a>.</p>
+<p>Click the “Watch” button: In the top-right corner of the repository
+page, click the Watch button.</p>
+<p>Select Notification Preferences: Choose Watching to be notified of
+all conversations, commits, and pull requests.</p>
 </div>
 </div>
 

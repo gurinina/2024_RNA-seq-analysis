@@ -421,7 +421,7 @@ Now, we can filter the table to retain only the genes that meet the significance
 ```{r}
 
 sigOE <- res_tableOE_tb %>%
-        filter(padj < padj.cutoff & abs(log2FoldChange) > lfc.cutoff)
+        dplyr::filter(padj < padj.cutoff & abs(log2FoldChange) > lfc.cutoff)
 
 # Save the results for future use
 saveRDS(sigOE,"data/sigOE.RDS")
