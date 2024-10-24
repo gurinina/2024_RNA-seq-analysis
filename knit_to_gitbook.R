@@ -12,8 +12,7 @@ clean_book(clean = TRUE)
 bookdown::render_book("index.Rmd", "bookdown::gitbook")
 
 # opens the GitBook in your browser
-#viewer_path <- normalizePath("_book/index.html")
 rstudioapi::viewer("_book/index.html")
 
-# To see the book in your Viewer pane, open 'index.Rmd' and click the 'Knit' button.
+# To see the book in your Viewer pane, open 'index.Rmd' in your main directory and click the 'Knit' button.
 
