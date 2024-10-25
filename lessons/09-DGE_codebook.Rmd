@@ -1082,7 +1082,7 @@ sig_res <- dplyr::filter(res_df, padj < padj.cutoff & abs(log2FoldChange) > lfc.
 sessionInfo()
 ```
 
-**Exercise/Homework: modify this file to analyze the MOV dataset, starting with Mov10_full_counts.txt in your data folder. Compare the "MOV10_knockdown" to the "control". Include a heatmap and a volcano plot** points = +10
+**Exercise/Homework: modify the `lessons/07-DGE_summarizing_workflow.Rmd` file to analyze the MOV dataset, starting with Mov10_full_counts.txt in your data folder. Compare the "MOV10_knockdown" to the "control". Include a heatmap and a volcano plot**. Make sure you rename the file first to `Lastname_07-DGE_summarizing_workflow.Rmd` and save it in your main directory, not in the lessons folder. points = +10
 
 ## Functional analysis of RNA-seq data
 
