@@ -5,7 +5,7 @@ editor_options:
   chunk_output_type: console
   
 ---
-# Codebook: 
+# Codebook
 
 34 total points
 
