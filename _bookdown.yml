@@ -9,8 +9,8 @@ rmd_files:
   - lessons/05-DGE_DESeq2_analysis2.Rmd
   - lessons/06-DGE_visualizing_results.Rmd
   - lessons/07-DGE_summarizing_workflow.Rmd
-  - lessons/08-GO_enrichment_analysis.Rmd
-  - lessons/09-DGE_codebook.Rmd
+  - lessons/08-GO_enrichment_analysis3.Rmd
+  - lessons/09-DGE_codebook3.Rmd
 delete_merged_file: no
 chapter_name: "Chapter "
 language:
