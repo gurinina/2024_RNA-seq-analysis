@@ -61,10 +61,13 @@ details[open] summary {
 /* This targets pre and code elements together to style code blocks */
 pre code {
   white-space: pre-wrap;            /* Ensures the text wraps within code blocks */
+
+  word-wrap: break-word; /* Wraps long lines */
   font-size: 12px;                  /* Sets the font size to 12px */
   color: black;                     /* Sets the text color to black */
   background-color: #D7DDFD!important; /* Sets a lighter blue background for code blocks */
 }
+
 
 th, td {
         font-size: 12px;

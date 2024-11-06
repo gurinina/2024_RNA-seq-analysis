@@ -69,7 +69,8 @@ display.brewer.all()
 col = brewer.pal(8,"Dark2")
 palette(col)
 
-plotCounts(dds, gene="MOV10", intgroup="sampletype",col = as.numeric(sampletype),pch = 19) 
+plotCounts(dds, gene="MOV10", intgroup="sampletype",
+           col = as.numeric(sampletype),pch = 19) 
 
 ```
 
@@ -82,11 +83,12 @@ We can also use ggplot2 to plot the `MOV10` counts. We can save the output of `p
 
 ```{r}
 # Save `plotCounts()` to a data frame object
-d <- plotCounts(dds, gene="MOV10", intgroup="sampletype", returnData=TRUE)
+d <- plotCounts(dds, gene = "MOV10", intgroup = "sampletype", 
+                returnData=TRUE)
 
 # Plot the MOV10 normalized counts, using the samplenames (rownames of d as labels)
 ggplot(d, aes(x = sampletype, y = count, color = sampletype)) + 
-  geom_point(position=position_jitter(w = 0.1,h = 0)) +
+  geom_point(position = position_jitter(w = 0.1,h = 0)) +
   geom_text_repel(aes(label = rownames(d))) + 
   theme_bw() +
   ggtitle("MOV10") +
@@ -141,7 +143,9 @@ The `pivot_longer()` function in the **tidyr** package will perform this operati
 ```{r}
 # Pivoting the columns to have normalized counts to a single column
 pivoted_top20_sigOE <- top20_sigOE_norm %>%
-  pivot_longer(colnames(top20_sigOE_norm)[2:9], names_to = "samplename", values_to = "normalized_counts")
+  pivot_longer(colnames(top20_sigOE_norm)[2:9], 
+               names_to = "samplename", 
+               values_to = "normalized_counts")
 
 ## Check the column header in the "pivoted" data frame
 head(pivoted_top20_sigOE)
@@ -268,7 +272,8 @@ First, we need to order the res_tableOE tibble by `padj`, and add an additional 
 ```{r}
 ## Create a column to indicate which genes to label
 
-res_tableOE_tb <- res_tableOE_tb %>% arrange(padj) %>%       mutate(genelabels = "")
+res_tableOE_tb <- res_tableOE_tb %>% arrange(padj) %>% 
+  mutate(genelabels = "")
 
 res_tableOE_tb$genelabels[1:10] <- res_tableOE_tb$gene[1:10]
 
