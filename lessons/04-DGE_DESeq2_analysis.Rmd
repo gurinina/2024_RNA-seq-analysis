@@ -46,12 +46,13 @@ design(dds)
 This shows that **sampletype** is the condition of interest and as such is the only covariate. DESeq2 will test for differential expression between the two sample types, adjusting for any other variation.
 
 **Example**  
-If your metadata includes **sex**, **age**, and **treatment** as shown below:
+
+If you want to examine the expression differences between `treatments` as shown below, and you know that major sources of variation include `sex` and `age`, then your design formula would be:
+
+`design <- ~ sex + age + treatment`
 
 ![Alt text](img/meta_example.png){ width=300 }
 
-The design formula would be:
-`design <- ~ sex + age + treatment`
 
 This allows DESeq2 to adjust for **sex** and **age** while testing for differences in **treatment**.
 
@@ -78,9 +79,11 @@ Including known sources of variation (like **sex** and **age**) ensures any gene
 
 - Ans: 
 
+
 3. What would you do if you wanted to include a factor in your design formula that is not in your metadata?
 
 - Ans: 
+  
 
 ### MOV10 Differential Expression Analysis
 
@@ -147,7 +150,6 @@ colSums(counts(dds))
 
 # Your code here
 ```
-
 
 ### Step 2: Estimate Gene-wise Dispersion
 

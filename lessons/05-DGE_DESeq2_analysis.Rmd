@@ -130,6 +130,7 @@ In the DESeq2 workflow, what is the purpose of the design matrix in the context 
 
 - Ans:
 
+
 ### Matrix Multiplication Form:
 If you want to calculate the fitted values for all genes and samples at once, you can express the model as a **matrix multiplication**:
 
@@ -440,11 +441,11 @@ How many genes are differentially expressed in the **Overexpression vs. Control*
 ```
 
 
-
 ### MOV10 Knockdown Analysis: Control vs. Knockdown
 
 Next, let’s perform the same analysis for the **Control vs. Mov10 knockdown** comparison. We’ll use the same thresholds for adjusted p-value (FDR < 0.05) and log2 fold change (|log2FC| > 0.58).
 ```{r}
+
 
 res_tableKD_tb <- res_tableKD %>%
   data.frame() %>%
@@ -463,7 +464,6 @@ saveRDS(sigKD,"data/sigKD.RDS")
 ```{r}
 # Your code here
 ```
-
 
 
 With our subset of significant genes identified, we can now proceed to visualize the results and explore patterns of differential expression.

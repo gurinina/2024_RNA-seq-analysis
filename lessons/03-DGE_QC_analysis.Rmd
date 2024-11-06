@@ -132,7 +132,6 @@ The figure below was generated from a time course experiment with sample groups 
 
 - Ans: 
 
-
 **Do the sample groups separate well?**
 
 - Ans: 
@@ -145,11 +144,11 @@ The figure below was generated from a time course experiment with sample groups 
 **Are there any outliers in the data?**
 
 - Ans:
+  
 
 **Should we have any other concerns regarding the samples in the dataset?**
 
 - Ans: 
-  
 
 ### Recommended Resources
 
@@ -253,6 +252,32 @@ Overall, we observe pretty high correlations across the board ( > 0.999) suggest
 **Exercise** points = +3
 
 The pheatmap function has a number of different arguments that we can alter from default values to enhance the aesthetics of the plot. Try adding the arguments `color`, `border_color`, `fontsize_row`, `fontsize_col`, `show_rownames` and `show_colnames` to your pheatmap. How does your plot change (plot shown below)? Take a look through the help pages (?pheatmap) and identify what each of the added arguments is contributing to the plot.
+
+
+Pheatmap for exercise:
+
+```{r, fig.width=6, fig.height=6, fig.align='center'}
+library(pheatmap)
+library(RColorBrewer)
+heat.colors <- colorRampPalette(brewer.pal(9, "Blues"))(100)
+
+pheatmap(rld_cor, color = colorRampPalette(brewer.pal(9, "Blues"))(100))
+
+```
+
+```{r, fig.width=6, fig.height=6, fig.align='center'}
+library(pheatmap)
+library(RColorBrewer)
+
+pheatmap(rld_cor)
+```
+
+
+
+```{r}
+library(pheatmap)
+pheatmap(rld_cor)
+```
 
 ```{r, fig.width=8, fig.height=8, echo=FALSE}
 # Display all available color palettes
