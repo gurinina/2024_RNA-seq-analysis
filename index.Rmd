@@ -17,6 +17,13 @@ always_allow_html: true
 link-citations: true
 ---
 
+```{r, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  warning = FALSE,    # Suppress all warnings
+)
+
+
 # RNA-seq analysis workshop {-}
 
 <p align="center">
