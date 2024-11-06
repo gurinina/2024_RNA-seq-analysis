@@ -180,6 +180,8 @@ edges <- subset(edges, similarity > 0 & from != to)
 edges <- edges %>% 
   dplyr::filter(similarity >= 0.5)
 
+head(edges)
+
 edges$to <- Term(edges$to)
 edges$from <- Term(edges$from)
 
@@ -187,7 +189,7 @@ head(edges)
 
 ```
 
-Then we can create a network plot to visualize the relationships between the enriched GO terms. We'll use the `igraph` and `ggraph` packages for this purpose.
+Then we can create a network plot to visualize the relationships between the enriched GO terms. We'll use the `igraph` and `ggraph` packages for this purpose. `ggraph` provides a flexible grammar of graphics based on `ggplot` for creating network visualizations, while `igraph` is a powerful library for analyzing and visualizing complex networks.
 ```{r}
 # Create an igraph object from the edges data frame
 g <- graph_from_data_frame(edges, directed = FALSE)
@@ -211,14 +213,16 @@ length(intersect(genes1, genes2)) / length(union(genes1, genes2))
 }
 
 # Create an empty data frame to store edges
-edges <- data.frame(from = character(), to = character(), similarity = numeric())
+edges <- data.frame(from = character(), to = character(), 
+                    similarity = numeric())
   # Compute Jaccard similarity for each pair of terms
   for (i in 1:(length(term_ids) - 1)) {
   for (j in (i + 1):length(term_ids)) {
   similarity <- jaccard_index(gene_lists[[i]], gene_lists[[j]])
   if (similarity > 0) {  # Only keep edges with some overlap
-  edges <- rbind(edges, data.frame(from = term_ids[i], to = term_ids[j], 
-           similarity = similarity))
+  edges <- rbind(edges, data.frame(from = term_ids[i], 
+                                   to = term_ids[j], 
+                                   similarity = similarity))
   }}}
 
 edges <- edges %>% 
@@ -231,6 +235,8 @@ head(edges)
 
 ```
 
+
+Now we can create a network plot to visualize the relationships between the enriched GO terms based on the Jaccard similarity of their gene lists.
 ```{r}
 # Create a graph from the edges
 g <- graph_from_data_frame(edges, directed = FALSE)
@@ -263,7 +269,6 @@ To visualize the relationships between the enriched terms, we can use the `emapp
 This plot is useful because it serves to collapse the GO terms into functional categories by showing the overlap between GO terms.
 
 There are a lot of parameters to play around with in these plots, but we'll just show a few for now. 
-
 ```{r}
 ## Let's limit the categories to 50 so we can see the labels
 
@@ -272,6 +277,7 @@ pwt <- pairwise_termsim(
   method = "JC",
   semData = NULL
 )
+
 # category labels
 emapplot(pwt, showCategory = 20, node_label = "category")
 
@@ -283,6 +289,8 @@ emapplot(pwt, showCategory = 30, node_label = "all",
          cex_label_group = 3, 
          layout.params = list("mds"))
 ```
+
+The downside of these plots is that the number of categories is limited because the node labels are often too small to read. To save any of these figures if they become too cluttered, click on the Export button in the RStudio Plots tab and Save as PDF. In the pop-up window, change the PDF size to 24 x 32 to give a figure of appropriate size for the text labels.
 
 The **`ssplot()`** function generates a spatial map of enriched terms, where each node represents a gene set and the distance between nodes reflects the similarity between gene sets. This plot is useful for identifying clusters of related terms and overall trends in the enrichment results.
 ```{r}
@@ -303,8 +311,6 @@ ssplot(pwt, showCategory = 50,
        theme(legend.position = "none")
 ```
 If you are wanting a general overview of enrichment results and trends, `ssplot()` is more useful. If you want detailed information on the pairwise similarity between enrichment terms and to explore specific **networks of functional relationships**, `emapplot()` is more informative.
-
-The downside of these plots is that the number of categories is limited because the node labels are often too small to read. To save the figure, click on the Export button in the RStudio Plots tab and Save as PDF.... In the pop-up window, change the PDF size to 24 x 32 to give a figure of appropriate size for the text labels.
 
 **cnetplot**
 Finally, the category netplot shows the relationships between the genes associated with the top five most significant GO terms and the fold changes of the significant genes associated with these terms (color). The size of the GO terms reflects the pvalues of the terms, with the more significant terms being larger. This plot is particularly useful for hypothesis generation in identifying genes that may be important to several of the most affected processes.
@@ -331,7 +337,6 @@ cnetplot(ego,
 #### GSEA using clusterProfiler
 
 GSEA uses the entire list of log2 fold changes from all genes. It is based on looking for enrichment of genesets among the large positive or negative fold changes. Thus, rather than setting an arbitrary threshold to identify ‘significant genes’, all genes are considered in the analysis. The gene-level statistics from the dataset are aggregated to generate a single pathway-level statistic and statistical significance of each pathway is reported.
-
 
 Extract and name the fold changes:
 ```{r}
@@ -372,15 +377,11 @@ gseaGO_results <- data.frame(gseaGO)
 ```
 
 We can visualize the results of the GSEA analysis using the `dotplot` function from the `enrichplot` package. This function creates a dot plot of the enriched gene sets, where each dot represents a gene set and the size of the dot reflects the significance of the enrichment. The color of the dot indicates the direction of the enrichment (red for positive enrichment, blue for negative enrichment).
-
-
 ```{r}
 ## Visualize the results
 dotplot(gseaGO, showCategory = 30, font.size = 12) 
 
 ```
-To save the dotplot figure, click on the Export button in the RStudio Plots tab and Save as PDF.... In the pop-up window, change the PDF size width to 24 and the height to 32 to give a figure of appropriate size for the text labels.
-
 
 The emapplot clusters the 50 most significant (by padj) GO terms to visualize relationships between terms
 ```{r}
@@ -404,7 +405,6 @@ ssplot(pwt, showCategory = 50, node_label = "group",
        theme(legend.position = "none")
 
 ```
-To save the emapplot figure, click on the Export button in the RStudio Plots tab and Save as PDF.... In the pop-up window, change the PDF size to 24 x 32 to give a figure of appropriate size for the text labels.
 
 The gseaplot2 function is used to visualize the results of the GSEA analysis (gseaGO) -- e.g. the ranks in the gene list for the top 4 gene sets.
 ```{r}
@@ -413,10 +413,34 @@ gseaplot2(gseaGO, geneSetID = 1:4)
 
 ```
 
+### GSEA using fgsea
+GO annotations are updated regularly, and the GO terms associated with genes can change over time. This can lead to inconsistencies in the results of GO enrichment analyses when using different versions of the GO annotations. To address this issue, the `GOenrichment` package provides `hGOBP.gmt` a recently downloaded version of `BP` GO annotations. This file is a list of GO terms and their associated genes, which is used as input for the enrichment analysis. 
 
+To run GSEA using the `fgsea` package, we need to load the gene sets from the `hGOBP.gmt` file and the gene-level statistics from the `foldchanges` vector. We can then run the GSEA analysis using the `fgseaSimple` function.
+```{r}
 
-We can also use our homemade GO enrichment analysis. To do this we need to load the library GOenrichment:
+# Let's look at the first few lines of the hGOBP.gmt file
+hGOBP.gmt[1:3]
 
+fgseaRes <-  fgsea::fgseaSimple(pathways = hGOBP.gmt, 
+                                stats = foldchanges, 
+                                nperm = 1000, maxSize = 300, 
+                                minSize = 20)
+
+fgsea <- data.frame(fgseaRes,stringsAsFactors = F)
+
+w = which(fgsea$ES > 0)
+
+fposgsea <- fgsea[w,]
+
+fposgsea <- fposgsea %>% arrange(padj)
+
+```
+The `fgseaSimple` function returns a list of enriched gene sets and their associated genes, as well as the normalized enrichment score (NES) and the p-value for each gene set.
+
+We are going to compare these results to running the GO enrichment function `runGORESP`. 
+
+Let's first load the `GOenrichment` package and check the available functions:
 ```{r}
 
 # Uncomment the following if you haven't yet installed GOenrichment.
@@ -428,9 +452,9 @@ library(GOenrichment)
 ls("package:GOenrichment")
 ```
 
-One of the problems with GO enrichment analysis is that the GO annotations are in constant flux. 
+`runGORESP` uses over-representation analysis to identify enriched GO terms, so we need to define a significance cutoff for the `querySet`. `runGORESP` returns a list of enriched GO terms and their associated genes, as well as a matrix of GO term relationships, i.e. edges. 
 
-Here we can use the GO annotations in `hGOBP.gmt` (downloaded recently) to run GSEA using the `fgsea` package to run GSEA:
+`runGORESP` requires a matrix of fitness values, so we'll turn foldchanges into a matrix using `cbind`. We also need to define a query set using the `compSCORE` function. `compSCORE` evaluates a matrix of fitness scores to identify the query gene set with scores above a specified significance threshold.
 
 ```{r}
 
@@ -462,7 +486,6 @@ We'll use a significance cutoff of 0.58, corresponding to a 1.5x change in expre
 args(runGORESP)
 
 # ?runGORESP
-
 
 # Define the query set
 matx <- cbind(foldchanges,foldchanges)
