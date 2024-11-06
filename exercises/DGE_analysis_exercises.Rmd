@@ -63,7 +63,7 @@ total points = 30
 	**e.** Provide the line of code to return the results of a Wald test comparison for `Celltype` categories `typeA` versus `typeB` (i.e the fold changes reported should reflect gene expression changes relative to `typeB`). points = +2
 	 	
 ```{r, eval = FALSE}
-
+# Your code here
 ```
 	
 	**f.** Provide the line of code to return the results with log2 fold change shrinkage performed. points = +1

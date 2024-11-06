@@ -148,26 +148,34 @@ log2_fitted <- beta_coefficients %*% t(X)
 
 This step multiplies the beta coefficients matrix by the transpose of the design matrix to compute the fitted log2 counts.
 
-**Log2 Fold Change and Adjustments**
+### **Log2 Fold Change and Adjustments**
 
-The estimated $\beta$ coefficients represent the log2 fold changes in gene expression between different experimental conditions. However, when gene counts are low, these estimates can be more variable, and additional adjustments may be needed to stabilize the results.
+The estimated $\beta$ coefficients in DESeq2 represent the log2 fold changes (LFC) in gene expression between different experimental conditions. However, when gene counts are low or variability is high, these estimates can be more uncertain, and additional adjustments may be needed to stabilize the results.
 
-## Shrunken log2 foldchanges (LFC)
+## Shrunken Log2 Fold Changes (LFC)
 
-To generate more accurate LFC estimates, DESeq2 allows for the **shrinkage of the LFC estimates toward zero** when the information for a gene is low, which could include:
+To generate more accurate LFC estimates, DESeq2 applies **empirical Bayes shrinkage**, which shrinks LFC estimates toward zero when there is limited information for a gene. This approach is especially helpful in cases such as:
 
-- Low counts
-- High dispersion values
+- **Low counts**: where fewer observations make estimates more variable
+- **High dispersion values**: where greater variability increases uncertainty
+
+**How Does Shrinkage Work?**
+
+First, DESeq2 estimates an overall distribution (the prior) from the observed data across all genes, reflecting the general trend that most genes have small or moderate LFCs. 
+
+This prior distribution is then combined with the observed data for each gene to adjust the LFC estimates:
+
+- **High-confidence estimates** (e.g., from genes with high counts) experience minimal adjustment.
+
+- **Low-confidence estimates** (e.g., from genes with low counts or high dispersion) are more strongly shrunk toward the prior, reducing variability in uncertain cases.
 
 **Why Are Shrunken Log2 Fold Changes Used in DESeq2?**
 
-Shrunken log2 fold changes are used in DESeq2 to provide more reliable estimates of fold changes, especially for genes with low counts or high variability. Without shrinkage, log2 fold changes for these genes can be overestimated or erratic, leading to misleading results.
+Shrunken LFCs provide more reliable fold change estimates, especially for genes with low counts or high variability. Without shrinkage, raw LFC estimates for these genes can be exaggerated or erratic, leading to misleading interpretations.
 
-By applying shrinkage, DESeq2 moderates the large, uncertain fold changes toward more realistic values, reducing noise and improving the overall interpretability of the data. This is particularly important when comparing genes with low expression levels, where the raw fold change estimates tend to be more variable and less accurate.
+By applying shrinkage, DESeq2 moderates large, uncertain fold changes toward more conservative values, reducing noise and enhancing interpretability. This is particularly important for genes with low expression, where unshrunk fold change estimates can be less accurate.
 
-In summary, shrinkage helps stabilize fold change estimates, reducing false positives and allowing for more biologically meaningful conclusions.
-
-Genes with low counts or high dispersion undergo more shrinkage, while genes with more reliable data undergo less.
+In summary, shrinkage stabilizes fold change estimates, reduces false positives, and enables more biologically meaningful conclusions.
 
 ![Alt text](img/deseq2_shrunken_lfc.png){ width=500 }
 

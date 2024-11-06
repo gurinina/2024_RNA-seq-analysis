@@ -532,12 +532,14 @@ contrast_oe <- c("sampletype", "MOV10_overexpression", "control")
 
 # extract results table
 res_tableOE_unshrunken <- results(dds, contrast = contrast_oe, 
-                          alpha = 0.05)
+                                  alpha = 0.05)
 
 resultsNames(dds)
 
 # shrink log2 fold changes
-res_tableOE <- lfcShrink(dds = dds, coef =  "sampletype_MOV10_overexpression_vs_control", res = res_tableOE_unshrunken)
+res_tableOE <- lfcShrink(dds = dds, 
+  coef =  "sampletype_MOV10_overexpression_vs_control", 
+  res = res_tableOE_unshrunken)
 
 # save the results for future use
 saveRDS(res_tableOE, file = "data/res_tableOE.RDS")
@@ -586,9 +588,6 @@ head(res_tableOE)
 names(res_tableOE)
 ```
 
-
-To generate the shrunken log2 fold change estimates, you have to run an additional step on your results object (that we will create below) with the function `lfcShrink()`.
-
 ### MOV10 DE Analysis: **Control vs. Knockdown**
 
 After examining the overexpression results, let's move on to the comparison between **Control vs. Knockdown**. We’ll use contrasts in the `results()` function to extract the results table and store it in the `res_tableKD` variable.
@@ -598,7 +597,8 @@ After examining the overexpression results, let's move on to the comparison betw
 contrast_kd <-  c("sampletype", "MOV10_knockdown", "control")
 
 # extract results table
-res_tableKD_unshrunken <- results(dds, contrast = contrast_kd, alpha = 0.05)
+res_tableKD_unshrunken <- results(dds, contrast = contrast_kd, 
+                                  alpha = 0.05)
 
 resultsNames(dds)
 
@@ -738,7 +738,8 @@ mov10_meta <- meta %>%
   as_tibble()
         
 # you might need to read in normalized_counts if it is not in your current session:
-normalized_counts <-     read.delim("data/normalized_counts.txt", row.names = 1)
+normalized_counts <- read.delim("data/normalized_counts.txt", 
+                                row.names = 1)
 
 # then make sure the colnames of normalized_counts are the same as the mov10_meta$sampname
 
@@ -778,16 +779,18 @@ col = brewer.pal(8,"Dark2")
 palette(col)
 
 plotCounts(dds, gene = "MOV10", intgroup = "sampletype",
-           col = as.numeric(sampletype),pch = 19) 
+           col = as.numeric(sampletype), pch = 19) 
 ```
 
 #### Using ggplot2 to plot expression of a single gene
 
-If you wish to change the appearance of this plot, we can save the output of `plotCounts()` to a variable specifying the `returnData = TRUE` argument, then use `ggplot()`:
+If you wish to change the appearance of this plot, we can save the output of `plotCounts()` to a variable specifying the `returnData = TRUE` argument. This will save the normalized counts for the gene `MOV10` to a data frame object. We can then use ggplot2 to plot the normalized counts for `MOV10` across all samples.
+
 ```{r}
 
 # Save plotcounts to a data frame object
-d <- plotCounts(dds, gene = "MOV10", intgroup = "sampletype", returnData = TRUE)
+d <- plotCounts(dds, gene = "MOV10", intgroup = "sampletype", 
+                returnData = TRUE)
 
 # Plotting the MOV10 normalized counts, using the samplenames (rownames of d as labels)
 ggplot(d, aes(x = sampletype, y = count, color = sampletype)) + 
@@ -828,22 +831,27 @@ The `pivot_longer()` function in the **tidyr** package will perform this operati
 
 ![Alt text](img/melt_wide_to_long_format.png){ width=800 }
 
-
+`Pivot_longer()` takes the data frame and converts it from a wide format to a long format. The `cols` argument specifies the columns that will be pivoted, in this case, the columns containing the normalized counts. The `names_to` argument specifies the name of the column that will contain the column names of the original data frame, and the `values_to` argument specifies the name of the column that will contain the values of the original data frame.
 ```{r}
 # Pivoting the columns to have normalized counts to a single column
 
 pivoted_top20_sigOE <- top20_sigOE_norm %>%
-  pivot_longer(colnames(top20_sigOE_norm)[2:9], names_to = "samplename", values_to = "normalized_counts")
+  pivot_longer(cols = colnames(top20_sigOE_norm)[2:9], 
+  names_to = "samplename", values_to = "normalized_counts")
 
 ## check the column header in the "pivoted" data frame
 head(pivoted_top20_sigOE)
 ```
 
-Now, if we want our counts colored by sample group, then we need to combine the metadata information with the melted normalized counts data into the same data frame for input to `ggplot()`. We can do this using the `inner_join()` function from the **dplyr** package. `inner_join()` will merge 2 data frames by the colname in x that matches a column name in y. 
+Now, if we want our counts colored by sample group, then we need to combine the metadata information with the melted normalized counts data into the same data frame for input to `ggplot()`. We can do this using the `inner_join()` function from the **dplyr** package.
 
+`inner_join()` will merge 2 data frames by the colname in x that matches a column name in y. 
+
+`inner_join(mov10_meta, pivoted_top20_sigOE)` will merge the `mov10_meta` data frame with the `pivoted_top20_sigOE` data frame by the `samplename` column.
 ```{r}
 
-pivoted_top20_sigOE <- inner_join(mov10_meta, pivoted_top20_sigOE, by = "samplename")
+pivoted_top20_sigOE <- inner_join(mov10_meta, pivoted_top20_sigOE, 
+                       by = "samplename")
 
 ```
 
@@ -851,7 +859,8 @@ Now that we have a data frame in a format that can be utilised by ggplot easily,
 ```{r}
 ## plot using ggplot2
 ggplot(pivoted_top20_sigOE) +
-        geom_point(aes(x = gene, y = normalized_counts, color = sampletype)) +
+        geom_point(aes(x = gene, y = normalized_counts, 
+        color = sampletype)) +
         scale_y_log10() +
         xlab("Genes") +
         ylab("log10 Normalized Counts") +
@@ -867,36 +876,46 @@ In addition to plotting subsets, we could also extract the normalized values of 
 ```{r}
 
 sigOE = readRDS("data/sigOE.RDS")
-### Extract normalized expression for significant genes from the OE and control samples c(2:4,7:9), and set the gene column (1) to row names
 
+### Extract normalized expression for significant genes from the OE and control samples c(2:4,7:9), and set the gene column (1) to row names
 norm_OEsig <- normalized_counts[,c(1,2:4,7:9)] %>% 
         filter(gene %in% sigOE$gene) %>% 
 	      data.frame() %>%
 	      column_to_rownames(var = "gene") 
 ```
 
-Now let’s draw the heatmap using pheatmap:
+Now let’s draw the heatmap using pheatmap. We can also add annotations to the heatmap to indicate the sample type. Annotations can be added to the heatmap using the `annotation_row` or `annotation_col` argument in `pheatmap()`. The `annotation_col` argument requires a data frame with the same row names as the column names of the matrix used to generate the heatmap. The `annotation` data frame should contain the annotation information for each sample.
+
+We can also add annotation colors to the heatmap using the `annotation_colors` argument. This argument requires a list with the annotation column name as the list name and the colors as the list values.
 ```{r}
 ### Annotate our heatmap (optional)
 
 annotation <- mov10_meta %>% 
+  filter(samplename %in% colnames(norm_OEsig)) %>%
 	dplyr::select(samplename, sampletype) %>% 
 	data.frame(row.names = "samplename")
+
+annotation$sampletype = factor(annotation$sampletype)
 
 ### Set a color palette
 heat_colors <- brewer.pal(6, "YlOrRd")
 
+ann_colors = list(
+  sampletype = c(control = "navy",
+  MOV10_overexpression = "green"))
+
+
 ### Run pheatmap
 pheatmap(norm_OEsig, 
+         annotation_colors = ann_colors, 
          color = heat_colors, 
          cluster_rows = T, 
          show_rownames = F,
-         annotation = annotation, 
+         annotation_col = annotation, 
          border_color = NA, 
-         fontsize = 10, 
+         fontsize = 12, 
          scale = "row", 
-         fontsize_row = 10, 
-         height = 20)
+         fontsize_col = 12)
 ```
 
 #### Volcano plot
@@ -906,8 +925,8 @@ The above plot would be great to look at the expression levels of a good number 
 To generate a volcano plot (which you have the log transformed adjusted p-values plotted on the y-axis and log2 fold change values on the x-axis), we first need to have a column in our results data indicating whether or not the gene is considered differentially expressed based on p-adjusted values.
 ```{r}
 
-## Obtain logical vector where TRUE values denote padj values < 0.05 and fold change > 1.5 in either direction
 
+# add a column to the res_tableOE tibble to indicate whether the gene is differentially expressed based on the thresholds we set
 res_tableOE_tb <- res_tableOE_tb %>% 
   mutate(threshold_OE = padj < 0.05 & abs(log2FoldChange) >= 0.58)
 
@@ -925,9 +944,10 @@ ggplot(res_tableOE_tb) +
         ggtitle("Mov10 overexpression") +
         xlab("log2 fold change") + 
         ylab("-log10 adjusted p-value") +
-        #scale_y_continuous(limits = c(0,50)) +
+        # scale_y_continuous(limits = c(0,50)) + # if you want to zoom in
+        theme_bw() +
         theme(legend.position = "none",
-        plot.title = element_text(size = rel(1.5),             hjust = 0.5),
+        plot.title = element_text(size = rel(1.5), hjust = 0.5),
         axis.title = element_text(size = rel(1.25)))
 ```
 
@@ -937,7 +957,9 @@ First, we need to order the res_tableOE tibble by padj, and add an additional co
 ```{r}
 
 ## Create a column to indicate which genes to label
-res_tableOE_tb <- res_tableOE_tb %>% arrange(padj) %>% mutate(genelabels = "")
+res_tableOE_tb <- res_tableOE_tb %>% 
+  arrange(padj) %>% 
+  mutate(genelabels = "")
 
 res_tableOE_tb$genelabels[1:10] <- res_tableOE_tb$gene[1:10]
 
@@ -954,8 +976,9 @@ ggplot(res_tableOE_tb, aes(x = log2FoldChange,
         ggtitle("Mov10 overexpression") +
         xlab("log2 fold change") + 
         ylab("-log10 adjusted p-value") +
+        theme_bw() +
         theme(legend.position = "none",
-        plot.title = element_text(size = rel(1.5),             hjust = 0.5),
+        plot.title = element_text(size = rel(1.5), hjust = 0.5),
         axis.title = element_text(size = rel(1.25))) 
 ```
 
@@ -973,11 +996,13 @@ We have detailed the various steps in a differential expression analysis workflo
 ### 1. Import data into dds object:
 ```{r, eval = FALSE}
 
-# Check that the row names of the metadata equal the column names of the **raw counts** data
+# Check that the row names of the metadata equal the column names
+#  of the **raw counts** data
 all(colnames(raw_counts) == rownames(metadata))
 
 # Create DESeq2Dataset object
-dds <- DESeqDataSetFromMatrix(countData = raw_counts, colData = metadata, design = ~ condition)
+dds <- DESeqDataSetFromMatrix(countData = raw_counts, colData = metadata, 
+                              design = ~ condition)
 
 ```
 
@@ -1005,15 +1030,17 @@ pheatmap(rld_cor)
 
 # **Optional step** - Re-create DESeq2 dataset if the design formula has changed after QC analysis in include other sources of variation
 
-dds <- DESeqDataSetFromMatrix(countData = raw_counts, colData = metadata, design = ~ condition)
+dds <- DESeqDataSetFromMatrix(countData = raw_counts, 
+                              colData = metadata, design = ~ condition)
 
 # Run DESeq2 differential expression analysis
 dds <- DESeq(dds)
 
-#  **Optional step** - Output normalized counts to save as a file to access outside RStudio
-    normalized_counts <- counts(dds, normalized = TRUE)
+#  Output normalized counts to save as a file to access outside RStudio
+normalized_counts <- counts(dds, normalized = TRUE)
     
-write.table(normalized_counts, file = "data/normalized_counts.txt", sep = "\t", quote = F, col.names = NA)
+write.table(normalized_counts, file = "data/normalized_counts.txt", 
+            sep = "\t", quote = F, col.names = NA)
 
 ```
 
@@ -1034,7 +1061,8 @@ res <- results(dds, contrast = contrast)
 
 coef = resultsNames(dds)
 
-res_tableOE <- lfcShrink(dds, coef = coef[2], res = res, type = "apeglm")
+res_table <- lfcShrink(dds, coef = coef[2], res = res, 
+                         type = "apeglm")
 ```
 
 ### 6. Output significant results:
@@ -1049,7 +1077,8 @@ res_df <- res %>%
   rownames_to_column(var = "gene") 
 
 # Subset the significant results
-sig_res <- dplyr::filter(res_df, padj < padj.cutoff & abs(log2FoldChange) > lfc.cutoff)
+sig_res <- dplyr::filter(res_df, padj < padj.cutoff &  
+                  abs(log2FoldChange) > lfc.cutoff)
 ```
 
 ### 7. Visualize results: volcano plots, heatmaps, normalized counts plots of top genes, etc.
@@ -1199,16 +1228,14 @@ Then we can create a network plot to visualize the relationships between the enr
 # Create an igraph object from the edges data frame
 g <- graph_from_data_frame(edges, directed = FALSE)
 
-# Check the number of vertices and edges
-cat("Number of vertices:", vcount(g), "\n")
-cat("Number of edges:", ecount(g), "\n")
-# Plot the graph
+# Visualize the graph using ggraph
 ggraph(g, layout = 'fr') +  # Fruchterman-Reingold layout
   geom_edge_link(aes(edge_alpha = 0.5)) +  # Edges with some transparency
-  geom_node_point(aes(size = 5), color = "blue") +  # Nodes sized uniformly
+  geom_node_point(size = 5, color = "blue") +  # Nodes sized uniformly
   geom_node_text(aes(label = name), repel = TRUE, size = 3) +  # Node labels
   theme_void() +  # Clean theme without axes
   labs(title = "GO Terms Network")  # Title for the plot
+
 
 ```
 
@@ -1250,11 +1277,10 @@ g <- graph_from_data_frame(edges, directed = FALSE)
 # Visualize the graph using ggraph
 ggraph(g, layout = 'fr') +  # Fruchterman-Reingold layout
   geom_edge_link(aes(edge_alpha = 0.5)) +  # Edges with some transparency
-  geom_node_point(aes(size = 5), color = "blue") +  # Nodes sized uniformly
+  geom_node_point(size = 5, color = "blue") +  # Nodes sized uniformly
   geom_node_text(aes(label = name), repel = TRUE, size = 3) +  # Node labels
   theme_void() +  # Clean theme without axes
   labs(title = "GO Terms Network")  # Title for the plot
-
 
 ```
 
@@ -1530,19 +1556,4 @@ The network map shows the relationships between the enriched GO terms. The size 
 
 This network analysis is one of the best GO enrichment visualizations available. The network analysis is based on [Cytoscape](https://cytoscape.org/), an open source bioinformatics software platform for visualizing molecular interaction networks. out of all the GO packages.
 
-There are other gene sets available for GSEA analysis in clusterProfiler (Disease Ontology, Reactome pathways, etc.). In addition, it is possible to supply your own gene set GMT file, such as a GMT for MSigDB called c2.
-
-** The C2 subcollection CGP: Chemical and genetic perturbations. Gene sets that represent expression signatures of genetic and chemical perturbations.**
-
-### Other tools and resources
-
-- [GeneMANIA](http://genemania.org/). GeneMANIA finds other genes that are related to a set of input genes, using a very large set of functional association data curated from the literature. Association data include protein and genetic interactions, pathways, co-expression, co-localization and protein domain similarity.
-
-- [ReviGO](http://revigo.irb.hr/). Revigo is an online GO enrichment tool that allows you to copy-paste your significant gene list and your background gene list. The output is a visualization of enriched GO terms in a hierarchical tree.
-
-- [AmiGO](http://amigo.geneontology.org/amigo). AmiGO is the current official web-based set of tools for searching and browsing the Gene Ontology database.
-
-- [DAVID](http://david.abcc.ncifcrf.gov/tools.jsp). The fold enrichment is defined as the ratio of the two proportions; one is the proportion of genes in your list belong to certain pathway, and the other is the proportion of genes in the background information (i.e., universe genes) that belong to that pathway.
-
-- etc.
-
+**Homework: fill in the missing code for the DGE_analysis_exercises.Rmd in the exercises folder.** points = +30.

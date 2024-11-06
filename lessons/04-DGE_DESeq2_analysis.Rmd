@@ -15,7 +15,9 @@ Here’s a more succinct version of your workflow:
 
 4. **Fit Dispersion Trend:** Model the relationship between mean counts and dispersion, either parametrically (default) or non-parametrically.
 
-5. **Shrink Dispersions:** Use empirical Bayes shrinkage to stabilize dispersion estimates, particularly for low-count genes.
+5. **Shrink Dispersions:** Use empirical Bayes shrinkage to stabilize dispersion estimates, particularly for low-count genes. Empirical Bayes is a version of Bayesian statistics where the prior distribution is estimated from the data itself, rather than being set externally.
+In empirical Bayes shrinkage, the idea is to estimate a common pattern or distribution (the prior) across all observations (e.g., all genes) and then use this estimated distribution to influence or "shrink" each individual observation.
+
 
 6. **Fit NB Model:** Fit a negative binomial model using the shrunken dispersion estimates, capturing variability and estimating log-fold changes.
 
