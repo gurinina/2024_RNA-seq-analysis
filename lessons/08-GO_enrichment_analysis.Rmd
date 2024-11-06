@@ -14,15 +14,17 @@ knitr::opts_chunk$set(echo = TRUE)
 ### Ontology and GO Terms
 
 **Ontology**:  
-Ontology refers to a structured system that organizes knowledge into a hierarchical network, providing a standardized vocabulary across different fields. In biology, ontologies are crucial for describing concepts and relationships within a specific domain, facilitating data integration and analysis. 
+Ontology refers to a structured system that organizes knowledge into a hierarchical network, providing a standardized vocabulary across different fields. In biology, ontologies are crucial for describing concepts and relationships within a specific domain, facilitating data integration and analysis. The **Gene Ontology (GO)** provides a standardized vocabulary for describing gene functions, cellular locations, and biological processes.
 
 The **Gene Ontology (GO)** project was initiated in the late 1990s to establish consistent terminology for representing the attributes of genes and gene products across species. This has led to a comprehensive vocabulary describing gene functions.
 
 ### GO Terms (Gene Ontology Terms)
 
-GO terms are explicit labels that describe gene functions, organized into three main categories:
+GO terms are explicit labels that describe gene functions, organized into three main categories in a hierarchical structure:
 
 - **Biological Process**: Refers to the biological objectives achieved by gene products, such as “cell division” or “response to stress.”
+
+![Alt text](img/go_heirarchy.jpg)
 
 - **Molecular Function**: Describes the biochemical activities at the molecular level, such as “enzyme activity” or “DNA binding.”
 
@@ -32,74 +34,31 @@ This structured vocabulary enhances the annotation and analysis of gene function
 
 ### GO Enrichment Methods
 
+![Alt text](img/pathway_analysis.png)
+
 GO enrichment methods help interpret differentially expressed gene lists from RNA-Seq data and include the following:
 
 1. **Overrepresentation Analysis (ORA)**:
-- ORA identifies biological themes that occur more frequently in a list of genes compared to a background set, revealing significant functional categories.
+- ORA identifies biological themes that occur more frequently in a list of genes compared to a background set, revealing significant functional categories. This method assesses whether specific GO terms are overrepresented in a gene list compared to the background of genes (e.g., all genes in the genome or all genes in your experiment).
+
+
+![Alt text](img/go_proportions_table3.png)
+
+![Alt text](img/go_proportions.png)
 
 - **Hypergeometric Test**: A statistical method used to evaluate whether a GO term is overrepresented based on observed counts versus those expected by chance. For example, if 10 out of 100 genes in your dataset are linked to “cell division,” while only 5 out of 1000 in the genome are, the test assesses the statistical significance of this difference.
 
+![Alt text](img/hypergeo.png)
+
 2. **Gene Set Enrichment Analysis (GSEA)**: 
-- GSEA examines all genes in the dataset rather than a specific list. It analyzes the entire ranked list of genes (ranked by expression levels) to determine if genes associated with a particular GO term cluster toward the top or bottom, indicating coordinated changes in expression. This is particularly useful for detecting subtler changes that may not meet a strict significance threshold.
-
-
-
-**GO Terms, Ontology, and GO Enrichment:**
-
-1. **GO Terms** (Gene Ontology Terms):
-
-- **GO terms** are labels or keywords that describe the function of genes. These terms are organized into three main categories:
-  - **Biological Process**: Describes what a gene product does in the larger context of cellular or organismal processes (e.g., "cell division," "response to stress").
-  - **Molecular Function**: Describes the specific activity of a gene product at the molecular level (e.g., "enzyme activity," "DNA binding").
-  - **Cellular Component**: Describes where a gene product is located in the cell (e.g., "nucleus," "mitochondrion").
-  
-
-2. **Ontology:**
-
-- **Ontology** refers to a structured system that organizes knowledge into a hierarchical network. In the case of **Gene Ontology (GO),** it organizes GO terms into a network that shows relationships between terms, from more general terms (like "cellular process") to more specific ones (like "mitosis").
-
-- This **hierarchical structure** helps researchers understand how genes are connected to different biological processes, molecular functions, or cellular components.
-
-3. **GO Enrichment:**
-
-- **GO enrichment** is a technique used to identify whether certain **GO terms** are **overrepresented** in a list of genes. For example, if you're analyzing genes that are highly expressed in a disease condition, GO enrichment can help determine whether specific biological processes, functions, or cellular locations are more common among those genes than you would expect by chance.
-
-- This process helps to identify biological themes or pathways that are important in the condition you're studying.
-
-**Functional Analysis Tools:**
-
-**GO functional analysis tools** are useful in interpreting resulting DGE gene lists from RNAseq, and fall into three main types:
-
-**Overrepresentation Analysis, Hypergeometric Test, and GSEA**
-
-1. **Overrepresentation Analysis (ORA):**
-
-- **Overrepresentation analysis** is used to find biological themes that are more common in a list of genes than expected by chance. The goal is to identify which **GO terms** (or other functional categories) are **overrepresented** in your list of genes compared to the entire background of genes (e.g., all genes in the genome or all genes in your experiment).
-
-- You start with a list of significant genes (e.g., differentially expressed genes), and ORA helps determine if specific biological processes, molecular functions, or cellular components are significantly enriched in that list compared to the genome.
-
-- The test answers the question: Given a certain number of genes in your list associated with a GO term, *how likely is it to observe this many (or more) genes by random chance?*
-
-- Example: If 10 out of 100 genes in your dataset are involved in "cell division," but only 5 out of 1000 genes in the genome are involved in "cell division," the hypergeometric test will tell you if this difference is statistically significant.
-
-2. **Hypergeometric Test:**
-
-- The **hypergeometric test** is a statistical method used in **overrepresentation** analysis to determine whether a GO term (or other category) is **overrepresented** in a list of genes compared to what you’d expect by chance.
-
-- The test answers the question: Given a certain number of genes in your list associated with a GO term, *how likely is it to observe this many (or more) genes by random chance?*
-
-- Example: If 10 out of 100 genes in your dataset are involved in "cell division," but only 5 out of 1000 genes in the genome are involved in "cell division," the hypergeometric test will tell you if this difference is statistically significant.
-
-3. **Gene Set Enrichment Analysis (GSEA):**
-
-- **GSEA** is a more advanced method that looks at all genes in your dataset rather than just a selected list (like in ORA).
-
 - Instead of only considering genes above a certain threshold (e.g., differentially expressed genes), GSEA looks at the **entire ranked list of genes** (e.g., ranked by their expression levels) and checks whether genes associated with a certain GO term are **concentrated toward the top or bottom** of the ranked list.
 
 - This method is helpful when there are subtle but coordinated changes in gene expression that may not meet a strict threshold but are still biologically significant.
 
 -**Example:** GSEA would analyze whether genes related to "immune response" tend to cluster near the top or bottom of your ranked gene list, indicating coordinated up- or down-regulation in response to a treatment.
 
+
+![Alt text](img/gsea_theory.png)
 
 We will be using [clusterProfiler](http://bioconductor.org/packages/release/bioc/html/clusterProfiler.html) first for **overrepresentation analysis**
 
@@ -208,7 +167,8 @@ go_data <- GOSemSim::godata(annoDb="org.Hs.eg.db", ont = "BP",
 
 
 # Compute semantic similarity
-similarity_matrix <- GOSemSim::mgoSim(term_ids, term_ids, semData = go_data, 
+similarity_matrix <- GOSemSim::mgoSim(term_ids, term_ids, 
+                     semData = go_data, 
                      measure = "Wang", combine = NULL)
 
 # Convert similarity matrix to edges
@@ -234,13 +194,10 @@ Then we can create a network plot to visualize the relationships between the enr
 # Create an igraph object from the edges data frame
 g <- graph_from_data_frame(edges, directed = FALSE)
 
-# Check the number of vertices and edges
-cat("Number of vertices:", vcount(g), "\n")
-cat("Number of edges:", ecount(g), "\n")
-# Plot the graph
+# Visualize the graph using ggraph
 ggraph(g, layout = 'fr') +  # Fruchterman-Reingold layout
   geom_edge_link(aes(edge_alpha = 0.5)) +  # Edges with some transparency
-  geom_node_point(aes(size = 5), color = "blue") +  # Nodes sized uniformly
+  geom_node_point(size = 5, color = "blue") +  # Nodes sized uniformly
   geom_node_text(aes(label = name), repel = TRUE, size = 3) +  # Node labels
   theme_void() +  # Clean theme without axes
   labs(title = "GO Terms Network")  # Title for the plot
@@ -285,7 +242,7 @@ g <- graph_from_data_frame(edges, directed = FALSE)
 # Visualize the graph using ggraph
 ggraph(g, layout = 'fr') +  # Fruchterman-Reingold layout
   geom_edge_link(aes(edge_alpha = 0.5)) +  # Edges with some transparency
-  geom_node_point(aes(size = 5), color = "blue") +  # Nodes sized uniformly
+  geom_node_point(size = 5, color = "blue") +  # Nodes sized uniformly
   geom_node_text(aes(label = name), repel = TRUE, size = 3) +  # Node labels
   theme_void() +  # Clean theme without axes
   labs(title = "GO Terms Network")  # Title for the plot

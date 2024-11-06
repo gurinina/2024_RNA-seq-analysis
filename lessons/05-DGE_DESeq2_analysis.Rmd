@@ -148,51 +148,53 @@ log2_fitted <- beta_coefficients %*% t(X)
 
 This step multiplies the beta coefficients matrix by the transpose of the design matrix to compute the fitted log2 counts.
 
+**Log2 Fold Change and Adjustments**
+
+The estimated $\beta$ coefficients represent the log2 fold changes in gene expression between different experimental conditions. However, when gene counts are low, these estimates can be more variable, and additional adjustments may be needed to stabilize the results.
+
+## Shrunken log2 foldchanges (LFC)
+
+To generate more accurate LFC estimates, DESeq2 allows for the **shrinkage of the LFC estimates toward zero** when the information for a gene is low, which could include:
+
+- Low counts
+- High dispersion values
+
+**Why Are Shrunken Log2 Fold Changes Used in DESeq2?**
+
+Shrunken log2 fold changes are used in DESeq2 to provide more reliable estimates of fold changes, especially for genes with low counts or high variability. Without shrinkage, log2 fold changes for these genes can be overestimated or erratic, leading to misleading results.
+
+By applying shrinkage, DESeq2 moderates the large, uncertain fold changes toward more realistic values, reducing noise and improving the overall interpretability of the data. This is particularly important when comparing genes with low expression levels, where the raw fold change estimates tend to be more variable and less accurate.
+
+In summary, shrinkage helps stabilize fold change estimates, reducing false positives and allowing for more biologically meaningful conclusions.
+
+Genes with low counts or high dispersion undergo more shrinkage, while genes with more reliable data undergo less.
+
+![Alt text](img/deseq2_shrunken_lfc.png){ width=500 }
+
+*Illustration taken from the [DESeq2 paper](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-014-0550-8).*
+
+For example, in the figure above, the green gene and purple gene have the same mean values for the two sample groups (C57BL/6J and DBA/2J), but the green gene has little variation while the purple gene has high levels of variation. For the green gene with low variation, the **unshrunken LFC estimate** (vertex of the green **solid line**) is very similar to the shrunken LFC estimate (vertex of the green dotted line), but the LFC estimates for the purple gene are quite different due to the high dispersion. So even though two genes can have similar normalized count values, they can have differing degrees of LFC shrinkage. Notice the **LFC estimates are shrunken toward the prior (black solid line)**.
+
+**Generating Shrunken LFC Estimates**
+
+To generate the shrunken log2 fold change estimates, you have to run an additional step on your results object (that we will create below) with the function `lfcShrink()`.
+
+
 ### Hypothesis Testing
 
 In DESeq2, hypothesis testing evaluates whether changes in gene expression between conditions are statistically significant. The **null hypothesis** assumes no differential expression between groups, meaning the log2 fold change is zero (\( LFC = 0 \)).
 
-To test this, DESeq2 uses the **Wald test**, which compares the estimated log2 fold change (LFC) to its standard error.
+## Statistical test for LFC estimates: Wald test
 
-### Wald Test for Log2 Fold Change
+In DESeq2, the Wald test is the default used for hypothesis testing when comparing two groups. The Wald test is a test usually performed on the LFC estimates.
 
-The **Wald test** assesses whether the log2 fold change is significantly different from zero:
+DESeq2 implements the Wald test by:
 
-1. The log2 fold change is divided by its standard error to compute a **z-statistic**.
+* Taking the LFC and dividing it by its standard error, resulting in a z-statistic
 
-2. The z-statistic is compared to a standard normal distribution to obtain the p-value.
+* The z-statistic is compared to a standard normal distribution, and a p-value is computed reporting the probability that a z-statistic at least as extreme as the observed value would be selected at random
 
-3. A small p-value indicates evidence of differential expression.
-
-
-### Multiple Testing Correction
-
-When testing many genes, using raw **p-values** increases the chance of false positives (genes appearing significant by chance). If we used the `p-value` directly from the Wald test with a significance cut-off of p < 0.05, that means there is a 5% chance it is a false positives. Each p-value is the result of a single test (single gene). The more genes we test, the more we inflate the false positive rate. This issue is the known as the **multiple testing problem.** For example, testing 20,000 genes with p < 0.05 could result in 1,000 genes being falsely labeled as significant.
-
-DESeq2 addresses this by removing genes with low counts or outliers before testing and by applying the **Benjamini-Hochberg (BH)** method to control the **false discovery rate (FDR)**. 
-
-The **BH-adjusted p-value** is calculated as:
-
-1. Sort p-values from smallest to largest.
-
-2. Assign ranks to each p-value \( p_i \).
-
-3. Compute the adjusted p-value: 
-
-$$p_{i}^{adj} = p_{i} \times \frac{m}{i}$$
-
-Where:
-
-- \( p_{i} \) is the raw p-value
-
-- \( m \) is the total number of genes tested
-
-- \( i \) is the rank of the p-value.
-
-**Adjusted p-values** are compared to a significance threshold (e.g., 0.05) to identify significant genes. The **Bonferroni method**, another correction, is more conservative and less commonly used due to a higher risk of false negatives.
-
-In most cases, we should use the **adjusted p-values** (BH-corrected) to identify significant genes.
-
+* If the p-value is small we reject the null hypothesis (LFC = 0) and state that there is evidence against the null (i.e. the gene is differentially expressed).
 
 ## MOV10 Differential Expression Analysis: Control versus Overexpression
 
@@ -203,6 +205,7 @@ We have three sample classes so we can make three possible pairwise comparisons:
 3. Mov10 knockdown vs. Mov10 overexpression
 
 **We are really only interested in #1 and #2 from above**. Using the design formula we provided `~ sampletype`, indicating that this is our main factor of interest.
+
 
 ### Creating Contrasts for Hypothesis Testing
 
@@ -286,6 +289,14 @@ Let's go through some of the columns in the results table to get a better idea o
 mcols(res_tableOE, use.names = T)
 ```
 
+* `baseMean`: mean of normalized counts for all samples
+* `log2FoldChange`: log2 fold change
+* `lfcSE`: standard error
+* `stat`: Wald statistic
+* `pvalue`: Wald test p-value
+* `padj`: BH adjusted p-values
+ 
+
 Now let's take a look at what information is stored in the results:
 ```{r}
 head(res_tableOE)
@@ -302,36 +313,36 @@ In some cases, p-values or adjusted p-values may be set to NA for a gene. This h
 
 3. **Low counts:** If a gene is filtered out by independent filtering for having a low mean normalized count, only the adjusted p-value will be set to NA.
 
-**Log2 Fold Change and Adjustments**
 
-The estimated $\beta$ coefficients represent the log2 fold changes in gene expression between different experimental conditions. However, when gene counts are low, these estimates can be more variable, and additional adjustments may be needed to stabilize the results.
+### Multiple Testing Correction
 
-## Shrunken log2 foldchanges (LFC)
+When testing many genes, using raw **p-values** increases the chance of false positives (genes appearing significant by chance). If we used the `p-value` directly from the Wald test with a significance cut-off of p < 0.05, that means there is a 5% chance it is a false positives. Each p-value is the result of a single test (single gene). The more genes we test, the more we inflate the false positive rate. This issue is the known as the **multiple testing problem.** For example, testing 20,000 genes with p < 0.05 could result in 1,000 genes being falsely labeled as significant.
 
-To generate more accurate LFC estimates, DESeq2 allows for the **shrinkage of the LFC estimates toward zero** when the information for a gene is low, which could include:
+DESeq2 addresses this by removing genes with low counts or outliers before testing and by applying the **Benjamini-Hochberg (BH)** method to control the **false discovery rate (FDR)**. 
 
-- Low counts
-- High dispersion values
+The **BH-adjusted p-value** is calculated as:
 
-**Why Are Shrunken Log2 Fold Changes Used in DESeq2?**
+1. Sort p-values from smallest to largest.
 
-Shrunken log2 fold changes are used in DESeq2 to provide more reliable estimates of fold changes, especially for genes with low counts or high variability. Without shrinkage, log2 fold changes for these genes can be overestimated or erratic, leading to misleading results.
+2. Assign ranks to each p-value \( p_i \).
 
-By applying shrinkage, DESeq2 moderates the large, uncertain fold changes toward more realistic values, reducing noise and improving the overall interpretability of the data. This is particularly important when comparing genes with low expression levels, where the raw fold change estimates tend to be more variable and less accurate.
+3. Compute the adjusted p-value: 
 
-In summary, shrinkage helps stabilize fold change estimates, reducing false positives and allowing for more biologically meaningful conclusions.
+$$p_{i}^{adj} = p_{i} \times \frac{m}{i}$$
 
-Genes with low counts or high dispersion undergo more shrinkage, while genes with more reliable data undergo less.
+Where:
 
-![Alt text](img/deseq2_shrunken_lfc.png){ width=500 }
+- \( p_{i} \) is the raw p-value
 
-*Illustration taken from the [DESeq2 paper](https://genomebiology.biomedcentral.com/articles/10.1186/s13059-014-0550-8).*
+- \( m \) is the total number of genes tested
 
-For example, in the figure above, the green gene and purple gene have the same mean values for the two sample groups (C57BL/6J and DBA/2J), but the green gene has little variation while the purple gene has high levels of variation. For the green gene with low variation, the **unshrunken LFC estimate** (vertex of the green **solid line**) is very similar to the shrunken LFC estimate (vertex of the green dotted line), but the LFC estimates for the purple gene are quite different due to the high dispersion. So even though two genes can have similar normalized count values, they can have differing degrees of LFC shrinkage. Notice the **LFC estimates are shrunken toward the prior (black solid line)**.
+- \( i \) is the rank of the p-value.
 
-**Generating Shrunken LFC Estimates**
+**Adjusted p-values** are compared to a significance threshold (e.g., 0.05) to identify significant genes. The **Bonferroni method**, another correction, is more conservative and less commonly used due to a higher risk of false negatives.
 
-To generate the shrunken log2 fold change estimates, you have to run an additional step on your results object (that we will create below) with the function `lfcShrink()`.
+In most cases, we should use the **adjusted p-values** (BH-corrected) to identify significant genes.
+
+
 
 ### MOV10 DE Analysis: **Control vs. Knockdown**
 
@@ -400,7 +411,7 @@ Now, we can filter the table to retain only the genes that meet the significance
 ```{r}
 
 sigOE <- res_tableOE_tb %>%
-        dplyr::filter(padj < padj.cutoff & abs(log2FoldChange) > lfc.cutoff)
+  dplyr::filter(padj < padj.cutoff & abs(log2FoldChange) > lfc.cutoff)
 
 # Save the results for future use
 saveRDS(sigOE,"data/sigOE.RDS")
@@ -414,10 +425,12 @@ How many genes are differentially expressed in the **Overexpression vs. Control*
 # Your code here
 ```
 
+  
 **Does this reduce our results?** 
 ```{r}
 # Your code here
 ```
+
 
 
 ### MOV10 Knockdown Analysis: Control vs. Knockdown
@@ -442,6 +455,18 @@ saveRDS(sigKD,"data/sigKD.RDS")
 ```{r}
 # Your code here
 ```
+
+```{r, echo = FALSE}
+# The code to be executed
+code_text <- '
+nrow(sigKD)
+'
+
+# Evaluate the code and capture the output
+evaluated_output <- capture.output(eval(parse(text = code_text)))
+
+```
+
 
 With our subset of significant genes identified, we can now proceed to visualize the results and explore patterns of differential expression.
 

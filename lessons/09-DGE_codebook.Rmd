@@ -531,7 +531,8 @@ To build the results table, we use the `results()` function. You can specify the
 contrast_oe <- c("sampletype", "MOV10_overexpression", "control")
 
 # extract results table
-res_tableOE_unshrunken <- results(dds, contrast = contrast_oe, alpha = 0.05)
+res_tableOE_unshrunken <- results(dds, contrast = contrast_oe, 
+                          alpha = 0.05)
 
 resultsNames(dds)
 
