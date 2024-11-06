@@ -456,16 +456,6 @@ saveRDS(sigKD,"data/sigKD.RDS")
 # Your code here
 ```
 
-```{r, echo = FALSE}
-# The code to be executed
-code_text <- '
-nrow(sigKD)
-'
-
-# Evaluate the code and capture the output
-evaluated_output <- capture.output(eval(parse(text = code_text)))
-
-```
 
 
 With our subset of significant genes identified, we can now proceed to visualize the results and explore patterns of differential expression.
