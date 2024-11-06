@@ -72,13 +72,12 @@ palette(col)
 plotCounts(dds, gene="MOV10", intgroup="sampletype",col = as.numeric(sampletype),pch = 19) 
 
 ```
-![topgene](img/topgen_plot.png)
 
 **This function only allows for plotting the counts of a single gene at a time.** 
 
 #### **Using ggplot2 to plot expression of a single gene**
 
-We can also use ggplot2 to plot the `MOV10` counts. We can save the output of `plotCounts()` to a variable specifying the `returnData=TRUE` argument, then use `ggplot()`:
+We can also use ggplot2 to plot the `MOV10` counts. We can save the output of `plotCounts()` to a variable specifying the `returnData=TRUE` argument. This will save the normalized counts for the gene `MOV10` to a data frame object. We can then use ggplot2 to plot the normalized counts for `MOV10` across all samples.
 
 
 ```{r}
@@ -138,6 +137,7 @@ The `pivot_longer()` function in the **tidyr** package will perform this operati
 
 ![Alt text](img/melt_wide_to_long_format.png){ width=800 }
 
+`Pivot_longer()` takes the data frame and converts it from a wide format to a long format. The `cols` argument specifies the columns that will be pivoted, in this case, the columns containing the normalized counts. The `names_to` argument specifies the name of the column that will contain the column names of the original data frame, and the `values_to` argument specifies the name of the column that will contain the values of the original data frame.
 ```{r}
 # Pivoting the columns to have normalized counts to a single column
 pivoted_top20_sigOE <- top20_sigOE_norm %>%
@@ -150,6 +150,8 @@ head(pivoted_top20_sigOE)
 Now, if we want our counts colored by sample group, then we need to combine the metadata information with the melted normalized counts data into the same data frame for input to `ggplot()`:
 
 `inner_join(x,y)` will merge 2 data frames by the colname in x that matches a column name in y.
+
+`inner_join(mov10_meta, pivoted_top20_sigOE)` will merge the `mov10_meta` data frame with the `pivoted_top20_sigOE` data frame by the `samplename` column.
 
 ```{r}
 
@@ -188,32 +190,38 @@ norm_OEsig <- normalized_counts[,c(1,2:4,7:9)] %>%
 
 ```
 
-Now let's draw the heatmap using `pheatmap`:
-
-```{r, fig.width=6, fig.height=6}
-
+Now let’s draw the heatmap using pheatmap. We can also add annotations to the heatmap to indicate the sample type. Annotations can be added to the heatmap using the `annotation_row` or `annotation_col` argument in `pheatmap()`. The `annotation_col` argument requires a data frame with the same row names as the column names of the matrix used to generate the heatmap. The `annotation` data frame should contain the annotation information for each sample.
+```{r}
 ### Annotate our heatmap (optional)
+
 annotation <- mov10_meta %>% 
+  filter(samplename %in% colnames(norm_OEsig)) %>%
 	dplyr::select(samplename, sampletype) %>% 
 	data.frame(row.names = "samplename")
+
+annotation$sampletype = factor(annotation$sampletype)
 
 ### Set a color palette
 heat_colors <- brewer.pal(6, "YlOrRd")
 
+ann_colors = list(
+  sampletype = c(control="navy",
+  MOV10_overexpression= "green"))
+
+
 ### Run pheatmap
 pheatmap(norm_OEsig, 
+         annotation_colors = ann_colors, 
          color = heat_colors, 
          cluster_rows = T, 
          show_rownames = F,
-         annotation = annotation, 
+         annotation_col = annotation, 
          border_color = NA, 
-         fontsize = 10, 
+         fontsize = 12, 
          scale = "row", 
-         fontsize_row = 10, 
-         height = 20)
-
+         fontsize_col = 12)
 ```
-           
+
 
 > *NOTE:* There are several additional arguments we have included in the function for aesthetics. One important one is `scale="row"`, in which Z-scores are plotted, rather than the actual normalized count value. 
 >
@@ -244,9 +252,10 @@ ggplot(res_tableOE_tb) +
         ggtitle("Mov10 overexpression") +
         xlab("log2 fold change") + 
         ylab("-log10 adjusted p-value") +
-        #scale_y_continuous(limits = c(0,50)) +
+        # scale_y_continuous(limits = c(0,50)) + # if you want to zoom in
+        theme_bw() +      
         theme(legend.position = "none",
-        plot.title = element_text(size = rel(1.5),             hjust = 0.5),
+        plot.title = element_text(size = rel(1.5), hjust = 0.5),
         axis.title = element_text(size = rel(1.25)))  
 ```
 
@@ -275,11 +284,11 @@ ggplot(res_tableOE_tb, aes(x = log2FoldChange,
         ggtitle("Mov10 overexpression") +
         xlab("log2 fold change") + 
         ylab("-log10 adjusted p-value") +
+        theme_bw() +
         theme(legend.position = "none",
-        plot.title = element_text(size = rel(1.5),             hjust = 0.5),
+        plot.title = element_text(size = rel(1.5), hjust = 0.5),
         axis.title = element_text(size = rel(1.25))) 
 ```
-![Alt text](img/volcano_plot_new2.png){ width=500 } 
 
 ***
 
