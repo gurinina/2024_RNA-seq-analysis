@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
   echo = TRUE,
   warning = FALSE,    # Suppress all warnings
 )
-
+```
 
 # RNA-seq analysis workshop {-}
 
