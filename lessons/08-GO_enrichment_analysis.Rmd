@@ -32,10 +32,11 @@ GO enrichment methods help interpret differentially expressed gene lists from RN
 1. **Overrepresentation Analysis (ORA)**:
 - ORA assesses whether specific GO terms are over-represented in a gene list compared to the background set of genes (e.g., all genes in the genome). Over-represented GO terms indicate biological functions or processes that are significantly associated with the genes of interest.
 
+
 ![Alt text](img/go_proportions.png){ width=600 }
 
 
-![Alt text](img/go_proportions_table3.png){ width=600 }
+![Alt text](img/go_proportions_table3.png){ width=600 }`
 
 - **Hypergeometric Test**: 
 The hypergeometric test in GO enrichment analysis is used to determine whether a set of genes is enriched for specific GO terms compared to the background set of genes. The test calculates the probability of observing the overlap between the query gene set and the gene set associated with a particular GO term, given the total number of genes in the dataset and the number of genes in the background set.
@@ -95,7 +96,7 @@ The GSEA enrichment plot provides a graphical view of the enrichment score for a
 ```{r, message=FALSE}
 
 # Uncomment the following if you haven't yet installed the required packages
-# BiocManager::install(c("ggraph", "igrapgh", "visNetwork", "GO.db", "GOSemSim", "AnnotationDbi"))
+# BiocManager::install(c("ggraph", "igrapgh", "visNetwork", "GO.db", "GOSemSim, "AnnotationDbi"))
 
 ## Load required libraries
 library(org.Hs.eg.db)#
@@ -108,7 +109,7 @@ library(ggraph)
 library(visNetwork)
 library(GO.db)
 library(GOSemSim)
-    
+library(GOenrichment)
 ```
 
 #### Running clusterProfiler: we first need to load the results of the differential expression analysis.
