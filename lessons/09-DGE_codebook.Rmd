@@ -1111,13 +1111,14 @@ sessionInfo()
 ### Over-representation Analysis (ORA) using `clusterProfiler`
 ```{r, message=FALSE}
 
+
 # Uncomment the following if you haven't yet installed the required packages
-# BiocManager::install(c("ggraph", "igrapgh", "visNetwork", "GO.db", "GOSemSim", "AnnotationDbi"))
+# BiocManager::install(c("ggraph", "igraph", "visNetwork", 
+# "GO.db", "GOSemSim"), force = TRUE)
 
-
-# Uncomment the following if you haven't yet installed GOenrichment.
-
-# devtools::install_github("gurinina/GOenrichment")
+# IMPORTANT!!! Uncomment the following to update the GOenrichment package
+# remove.package("GOenrichment")
+# devtools::install_github("gurinina/GOenrichment", force = TRUE)
 
 ## Load required libraries
 library(org.Hs.eg.db)#

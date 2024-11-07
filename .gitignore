@@ -71,3 +71,5 @@ po/*~
 rsconnect/
 
 .DS_store
+
+shared-files/
