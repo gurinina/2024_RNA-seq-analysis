@@ -98,6 +98,10 @@ The GSEA enrichment plot provides a graphical view of the enrichment score for a
 # Uncomment the following if you haven't yet installed the required packages
 # BiocManager::install(c("ggraph", "igrapgh", "visNetwork", "GO.db", "GOSemSim, "AnnotationDbi"))
 
+# Uncomment the following if you haven't yet installed GOenrichment.
+
+# devtools::install_github("gurinina/GOenrichment")
+
 ## Load required libraries
 library(org.Hs.eg.db)#
 library(clusterProfiler)#

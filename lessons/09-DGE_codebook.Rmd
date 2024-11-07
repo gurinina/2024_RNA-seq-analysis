@@ -1114,6 +1114,11 @@ sessionInfo()
 # Uncomment the following if you haven't yet installed the required packages
 # BiocManager::install(c("ggraph", "igrapgh", "visNetwork", "GO.db", "GOSemSim", "AnnotationDbi"))
 
+
+# Uncomment the following if you haven't yet installed GOenrichment.
+
+# devtools::install_github("gurinina/GOenrichment")
+
 ## Load required libraries
 library(org.Hs.eg.db)#
 library(clusterProfiler)#
@@ -1452,10 +1457,6 @@ We are going to compare these results to running the GO enrichment function `run
 
 Let's first load the `GOenrichment` package and check the available functions:
 ```{r}
-
-# Uncomment the following if you haven't yet installed GOenrichment.
-
-# devtools::install_github("gurinina/GOenrichment")
 
 library(GOenrichment)
 
