@@ -92,6 +92,30 @@ The GSEA enrichment plot provides a graphical view of the enrichment score for a
 
 - The bottom portion of the plot shows the value of the ranking metric (such as log2FoldChange) as you move down the list of ranked genes. 
 
+
+Run this if you update your R version or need to install the required packages:
+```{r}
+# Install the "GOenrichment" package from GitHub
+# if (!requireNamespace("devtools", quietly = TRUE)) {
+#     install.packages("devtools")
+# }
+# 
+# devtools::install_github("gurinina/GOenrichment", force = TRUE)
+# 
+# # Install Bioconductor packages using BiocManager
+# if (!requireNamespace("BiocManager", quietly = TRUE)) {
+#     install.packages("BiocManager")
+# }
+# 
+# # Install required Bioconductor and CRAN packages
+# BiocManager::install(c(
+#     "bookdown", "clusterProfiler", "DESeq2", "dplyr", "enrichplot", "fgsea", 
+#     "ggplot2", "ggrepel", "gplots", "knitr", "org.Hs.eg.db", "pheatmap", 
+#     "purrr", "RColorBrewer", "rmarkdown", "rsconnect", "tidyverse")
+# )
+```
+
+
 ### Over-representation Analysis (ORA) using `clusterProfiler`
 ```{r, message=FALSE}
 
