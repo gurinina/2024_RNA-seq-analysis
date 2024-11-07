@@ -1111,22 +1111,21 @@ sessionInfo()
 ### Over-representation Analysis (ORA) using `clusterProfiler`
 ```{r, message=FALSE}
 
+
+# Uncomment the following if you haven't yet installed the required packages
+# BiocManager::install(c("ggraph", "igrapgh", "visNetwork", "GO.db", "GOSemSim", "AnnotationDbi"))
+
 ## Load required libraries
-library(org.Hs.eg.db)
-library(clusterProfiler)
+library(org.Hs.eg.db)#
+library(clusterProfiler)#
 library(tidyverse)
-library(enrichplot)
-library(fgsea) 
+library(enrichplot)#
+library(fgsea) #
 library(igraph)
 library(ggraph)
-library(tidygraph)
-library(purrr)
-library(rlang)
 library(visNetwork)
 library(GO.db)
-library(GOenrichment)
 library(GOSemSim)
-library(AnnotationDbi)
 
 ```
 
