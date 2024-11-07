@@ -7,14 +7,13 @@ editor_options:
 
 ### Ontology and GO Terms
 
-**Ontology**:  
-Ontology refers to a structured system that organizes knowledge into a hierarchical network, providing a standardized vocabulary across different fields. In biology, ontologies are crucial for describing concepts and relationships within a specific domain, facilitating data integration and analysis. The **Gene Ontology (GO)** provides a standardized vocabulary for describing gene functions, cellular locations, and biological processes.
-
-The **Gene Ontology (GO)** project was initiated in the late 1990s to establish consistent terminology for representing the attributes of genes and gene products across species. This has led to a comprehensive vocabulary describing gene functions.
+**Ontology**: 
+An ontology is a representation of something we know about. Ontologies consist of representations of things that are detectable or directly observable and the relationships between those things. 
+The **Gene Ontology (GO)** project provides an ontology of defined terms representing gene product properties. These terms are connected to each other via formally defined relationships, allowing for consistent annotation and analysis of gene functions across different species and research areas.
 
 ### GO Terms (Gene Ontology Terms)
 
-GO terms are explicit labels that describe gene functions, organized into three main categories in a hierarchical structure:
+The GO terms describe three aspects of gene products:
 
 - **Biological Process**: Refers to the biological objectives achieved by gene products, such as “cell division” or “response to stress.”
 
@@ -24,15 +23,13 @@ GO terms are explicit labels that describe gene functions, organized into three 
 
 - **Cellular Component**: Indicates where gene products are located within the cell, like “nucleus” or “mitochondrion.”
 
-This structured vocabulary enhances the annotation and analysis of gene functions, improving our understanding of biological data.
-
 ### GO Enrichment Methods
 
 ![Alt text](img/pathway_analysis.png)
 
 GO enrichment methods help interpret differentially expressed gene lists from RNA-Seq data and include the following:
 
-1. **over-representation Analysis (ORA)**:
+1. **Overrepresentation Analysis (ORA)**:
 - ORA assesses whether specific GO terms are over-represented in a gene list compared to the background set of genes (e.g., all genes in the genome). Over-represented GO terms indicate biological functions or processes that are significantly associated with the genes of interest.
 
 ![Alt text](img/go_proportions.png)
@@ -69,7 +66,6 @@ q <- 30            # Observed number of successes (overlap with GO term)
 # Perform the hypergeometric test (upper-tail probability)
 p_value <- phyper(q - 1, m, N - m, k, lower.tail = FALSE)
 p_value
-
 ```
 
 2. **Gene Set Enrichment Analysis (GSEA)**: 
@@ -96,7 +92,6 @@ The GSEA enrichment plot provides a graphical view of the enrichment score for a
 - The bottom portion of the plot shows the value of the ranking metric (such as log2FoldChange) as you move down the list of ranked genes. 
 
 ### Over-representation Analysis (ORA) using `clusterProfiler`
-
 ```{r, message=FALSE}
 
 ## Load required libraries
@@ -115,7 +110,6 @@ library(GO.db)
 library(GOenrichment)
 library(GOSemSim)
 library(AnnotationDbi)
-
 ```
 
 #### Running clusterProfiler: we first need to load the results of the differential expression analysis.
@@ -129,7 +123,7 @@ res_tableOE_tb <- res_tableOE %>%
 
 ```
 
-To perform the over-representation analysis, we need a list of background genes and a list of significant genes. For our background dataset we will use all genes tested for differential expression (all genes in our results table). For our significant gene list we will use genes with p-adjusted values less than 0.05 (we could include a fold change threshold too if we have many DE genes).
+To perform the over-representation analysis, we need a list of background genes and a list of significant genes:
 ```{r}
 
 ## background set of genes
@@ -143,21 +137,7 @@ sigOE_genes = sigOE$gene
 
 ```
 
-The`enrichGO()` function from the `clusterProfiler` package performs the over-representation analysis for the significant genes of interest (`sigOE_genes`) compared to the background gene list (`allOE_genes`), using the specified parameters.
-
-**Parameters**:
-- `gene`: Vector of significant genes of interest (`sigOE_genes`).
-- `universe`: Background gene list for comparison (`allOE_genes`).
-- `keyType`: Specifies the type of gene identifiers being used (in this case, "SYMBOL").
-- `OrgDb`: Database for the organism (e.g., human in this case).
-- `minGSSize` and `maxGSSize`: Minimum and maximum size of gene sets for analysis.
-- `ont`: Type of ontology to use (e.g., "BP" for biological process).
-- `pAdjustMethod`: Method for adjusting p-values (e.g., Benjamini-Hochberg).
-- `qvalueCutoff`: Cutoff for significance based on q-values.
-- `readable`: Whether to return gene names in a readable format.
-
-`enrichGO()` returns the enrichment GO categories after FDR control.
-
+The`enrichGO()` function performs the ORA for the significant genes of interest (`sigOE_genes`) compared to the background gene list (`allOE_genes`) and returns the enriched GO terms and their associated p-values. 
 ```{r}
 
 ## Run GO enrichment analysis
@@ -174,7 +154,7 @@ ego <- enrichGO(gene = sigOE_genes,
 
 ```
 
-The `ego` object contains information about the enriched GO terms, including the term ID, description, gene list, and statistical information. We can extract the `ego` object as a data frame for further analysis and visualization.
+We can extract the gene lists associated with each enriched GO term from the `ego` object to create edges between terms based on shared genes.
 ```{r}
 # Extract the result as a data frame
 enrich_df <- as.data.frame(ego)
@@ -182,20 +162,26 @@ enrich_df <- as.data.frame(ego)
 names(enrich_df)
 head(enrich_df)
 
-# Extract GO term IDs and associated gene lists
-term_ids <- enrich_df$ID   # GO term IDs
+# GO term IDs 
+term_ids <- enrich_df$ID  
 
-gene_lists <- strsplit(enrich_df$geneID, "/")  # Genes in each GO term
-names(gene_lists) <- term_ids  # Assign term IDs as names
+# Split gene lists by "/" and assign term IDs as names
+gene_lists <- strsplit(enrich_df$geneID, "/") 
+
+# Assign term IDs as names
+names(gene_lists) <- term_ids  
 
 ```
 
-Now we have the gene lists for each GO term, we can calculate the semantic similarity between the terms based on the shared genes and visualize them in a network. To visualize the network we need to calculate edges.
+Using the gene lists associated with each GO term, we can create edges between terms based on the shared genes.
 ```{r}
 
 # Load GO data for semantic similarity calculation
-go_data <- GOSemSim::godata(annoDb="org.Hs.eg.db", ont = "BP",
-           keytype = "SYMBOL", computeIC = TRUE)
+go_data <- GOSemSim::godata(annoDb = "org.Hs.eg.db", 
+                            ont = "BP", 
+                            keytype = "SYMBOL",
+                            computeIC = TRUE)
+            
 
 # Compute semantic similarity
 similarity_matrix <- GOSemSim::mgoSim(term_ids, term_ids, 
@@ -203,8 +189,10 @@ similarity_matrix <- GOSemSim::mgoSim(term_ids, term_ids,
                      measure = "Wang", combine = NULL)
 
 # Convert similarity matrix to edges
-edges <- data.frame(from = rep(term_ids, each = length(term_ids)),
-                    to = rep(term_ids, times = length(term_ids)),
+edges <- data.frame(from = rep(term_ids, 
+                    each = length(term_ids)),
+                    to = rep(term_ids, 
+                    times = length(term_ids)),
                     similarity = as.vector(similarity_matrix))
 
 # Filter out edges with zero similarity or self-loops
@@ -213,8 +201,8 @@ edges <- subset(edges, similarity > 0 & from != to)
 edges <- edges %>% 
   dplyr::filter(similarity >= 0.5)
 
-head(edges)
 
+# Convert term IDs to names
 edges$to <- Term(edges$to)
 edges$from <- Term(edges$from)
 
@@ -222,7 +210,7 @@ head(edges)
 
 ```
 
-Using the edges data frame, we can create a network plot to visualize the relationships between the enriched GO terms based on their semantic similarity. The nodes represent GO terms, and the edges indicate the strength of the similarity between terms. 
+Now we can create a network plot to visualize the relationships between the enriched GO terms based on their semantic similarity.
 ```{r}
 # Create an igraph object from the edges data frame
 g <- graph_from_data_frame(edges, directed = FALSE)
@@ -237,7 +225,7 @@ ggraph(g, layout = 'fr') +  # Fruchterman-Reingold layout
 
 ```
 
-We can also define edges based on the Jaccard similarity between the gene lists of each pair of GO terms. The Jaccard similarity is defined as the size of the intersection divided by the size of the union of the GO terms. 
+Edges based can also be defined by Jaccard similarity; defined as the size of the intersection each pair of GO terms divided by the size of their union 
 ```{r}
 
 # Define a function to compute Jaccard similarity
@@ -261,13 +249,11 @@ edges <- data.frame(from = character(), to = character(),
 edges <- edges %>% 
   dplyr::filter(similarity >= 0.5)
 
+# Convert term IDs to names
 edges$to <- Term(edges$to)
 edges$from <- Term(edges$from)
 
-head(edges)
-
 ```
-
 
 Now we can create a network plot to visualize the relationships between the enriched GO terms based on the Jaccard similarity of their gene lists.
 ```{r}
@@ -277,21 +263,17 @@ g <- graph_from_data_frame(edges, directed = FALSE)
 # Visualize the graph using ggraph
 ggraph(g, layout = 'fr') +  # Fruchterman-Reingold layout
   geom_edge_link(aes(edge_alpha = 0.5)) +  # Edges with some transparency
-  geom_node_point(size = 5, color = "blue") +  # Nodes sized uniformly
-  geom_node_text(aes(label = name), repel = TRUE, size = 3) +  # Node labels
+  geom_node_point(size = 5, 
+                  color = "blue") + 
+  geom_node_text(aes(label = name), 
+                 repel = TRUE, 
+                 size = 3) +  # Node labels
   theme_void() +  # Clean theme without axes
-  labs(title = "GO Terms Jaccard Overlap Network")  # Title for the plot
+  labs(title = "GO Terms Jaccard Overlap Network") 
 
 ```
 
-The resulting network plots shows the relationships between the enriched GO terms based on either Semantic or Jaccard similarity of their gene lists. The nodes represent GO terms, and the edges indicate the strength of the similarity between terms. This visualization helps identify clusters of related terms and provides insights into the functional relationships between biological processes.
-
-### Summary
-
-1. **Perform GO enrichment analysis** and filter for significant terms.
-2. **Extract gene-to-GO associations** from the results.
-3. **Create edges** based on shared genes between GO terms.
-4. **Visualize the network** to explore relationships between enriched GO terms.
+The resulting network plots shows the relationships between the enriched GO terms based on either Semantic or Jaccard similarity of their gene lists. 
 
 ### Visualizing Enrichment Results
 
@@ -306,17 +288,19 @@ pwt <- pairwise_termsim(
 )
 
 # category labels
-emapplot(pwt, showCategory = 30, node_label = "category", 
+emapplot(pwt, showCategory = 30, 
+         node_label = "category", 
          cex_label_group = 3, 
          layout.params = list("mds")) +
          theme(legend.position = "none")
 
 # group labels 
-emapplot(pwt, showCategory = 150, node_label = "group") +
-       theme(legend.position = "none")
+emapplot(pwt, showCategory = 150, 
+         node_label = "group") +
+         theme(legend.position = "none")
 
 ```
-The downside of these plots is that the number of categories is limited because the node labels are often too small to read. To save any of these figures if they become too cluttered, click on the Export button in the RStudio Plots tab and Save as PDF. In the pop-up window, change the PDF size to 24 x 32 to give a figure of appropriate size for the text labels.
+To save any of these figures if they become too cluttered, click on the Export button in the RStudio Plots tab and Save as PDF. In the pop-up window, change the PDF size to 24 x 32 to give a figure of appropriate size for the text labels.
 
 The **`ssplot()`** function generates a spatial map of enriched terms, where each node represents a gene set and the distance between nodes reflects the similarity between gene sets. This plot is useful for identifying clusters of related terms and overall trends in the enrichment results.
 ```{r}
@@ -427,8 +411,9 @@ GO annotations are updated regularly, and the GO terms associated with genes can
 To run GSEA using the `fgsea` package, we need to load the gene sets from the `hGOBP.gmt` file and the gene-level statistics from the `foldchanges` vector. We can then run the GSEA analysis using the `fgseaSimple` function.
 ```{r}
 
-# Let's look at the first few lines of the hGOBP.gmt file
-hGOBP.gmt[1:3]
+
+# Let's look at the hGOBP.gmt file
+hGOBP.gmt[1]
 
 fgseaRes <-  fgsea::fgseaSimple(pathways = hGOBP.gmt, 
                                 stats = foldchanges, 
@@ -442,6 +427,8 @@ w = which(fgsea$ES > 0)
 fposgsea <- fgsea[w,]
 
 fposgsea <- fposgsea %>% arrange(padj)
+
+plotEnrichment(hGOBP.gmt[["EXTRACELLULAR MATRIX ORGANIZATION"]], foldchanges)
 
 ```
 The `fgseaSimple` function returns a list of enriched gene sets and the enrichment score (ES).
@@ -464,7 +451,7 @@ ls("package:GOenrichment")
 
 `runGORESP` uses over-representation analysis to identify enriched GO terms and returns two `data.frames`; of enriched GO terms (nodes) and GO term relationships (edges). 
 
-`compSCORE` evaluates a matrix of fitness scores to identify the `querySet` with scores above a specified significance threshold.
+`compSCORE`evaluates a matrix of fitness scores to identify the `querySet` with scores above a specified significance threshold.
 
 We'll use a significance cutoff of 0.58, corresponding to a 1.5x change in expression.
 ```{r}
@@ -512,14 +499,15 @@ We can visualize the results of the GO enrichment analysis using the `visNetwork
 
 The equivalent function in the `GOenrichment` package is `runNetwork`:
 
-We first need to set up the visualization using the `visSetup` function, which prepares the data for network visualization. We then run the `runNetwork` function to generate the interactive network plot.
-```{r, echo=FALSE, results='asis'}
+We use the`visSetup` function to prepare the data for network visualization. We then run the `runNetwork` function to generate the interactive network plot.
 
+```{r, echo=FALSE, results='asis'}
 
 vis = visSetup(hresp$enrichInfo,hresp$edgeMat)
 GOenrichment::runNetwork(vis$nodes, vis$edges)
 
 ```
+
 
 This network analysis is based on [Cytoscape](https://cytoscape.org/), an open source bioinformatics software platform for visualizing molecular interaction networks. out of all the GO packages.
 

@@ -124,12 +124,12 @@ The expected mean \( \mu_{ij} \) on the original count scale is obtained by expo
 $$
 \mu_{ij} = 2^{\beta_i X_j}
 $$
+
 **Exercise** points = +1
 
 In the DESeq2 workflow, what is the purpose of the design matrix in the context of fitting the Negative Binomial model for each gene?
 
 - Ans:
-
 
 ### Matrix Multiplication Form:
 If you want to calculate the fitted values for all genes and samples at once, you can express the model as a **matrix multiplication**:
@@ -151,32 +151,16 @@ This step multiplies the beta coefficients matrix by the transpose of the design
 
 ### **Log2 Fold Change and Adjustments**
 
-The estimated $\beta$ coefficients in DESeq2 represent the log2 fold changes (LFC) in gene expression between different experimental conditions. However, when gene counts are low or variability is high, these estimates can be more uncertain, and additional adjustments may be needed to stabilize the results.
+The $\beta$ coefficents are the estimates for the **log2 fold changes** for each sample group. However, **log2 fold changes** are inherently noisier when counts are low due to the large dispersion we observe with low read counts. To avoid this, the **log2 fold changes calculated by the model need to be adjusted**. 
 
-## Shrunken Log2 Fold Changes (LFC)
+## Shrunken log2 foldchanges (LFC)
 
-To generate more accurate LFC estimates, DESeq2 applies **empirical Bayes shrinkage**, which shrinks LFC estimates toward zero when there is limited information for a gene. This approach is especially helpful in cases such as:
+To generate more accurate LFC estimates, DESeq2 allows for the **shrinkage of the LFC estimates toward zero** when the information for a gene is low, which could include:
 
-- **Low counts**: where fewer observations make estimates more variable
-- **High dispersion values**: where greater variability increases uncertainty
+- Low counts
+- High dispersion values
 
-**How Does Shrinkage Work?**
-
-First, DESeq2 estimates an overall distribution (the prior) from the observed data across all genes, reflecting the general trend that most genes have small or moderate LFCs. 
-
-This prior distribution is then combined with the observed data for each gene to adjust the LFC estimates:
-
-- **High-confidence estimates** (e.g., from genes with high counts) experience minimal adjustment.
-
-- **Low-confidence estimates** (e.g., from genes with low counts or high dispersion) are more strongly shrunk toward the prior, reducing variability in uncertain cases.
-
-**Why Are Shrunken Log2 Fold Changes Used in DESeq2?**
-
-Shrunken LFCs provide more reliable fold change estimates, especially for genes with low counts or high variability. Without shrinkage, raw LFC estimates for these genes can be exaggerated or erratic, leading to misleading interpretations.
-
-By applying shrinkage, DESeq2 moderates large, uncertain fold changes toward more conservative values, reducing noise and enhancing interpretability. This is particularly important for genes with low expression, where unshrunk fold change estimates can be less accurate.
-
-In summary, shrinkage stabilizes fold change estimates, reduces false positives, and enables more biologically meaningful conclusions.
+As with the shrinkage of dispersion estimates, LFC shrinkage uses **information from all genes** to generate more accurate estimates. Specifically, the distribution of LFC estimates for all genes is used (as a prior) to shrink the LFC estimates of genes with little information or high dispersion toward more likely (lower) LFC estimates. 
 
 ![Alt text](img/deseq2_shrunken_lfc.png){ width=500 }
 
@@ -185,9 +169,7 @@ In summary, shrinkage stabilizes fold change estimates, reduces false positives,
 For example, in the figure above, the green gene and purple gene have the same mean values for the two sample groups (C57BL/6J and DBA/2J), but the green gene has little variation while the purple gene has high levels of variation. For the green gene with low variation, the **unshrunken LFC estimate** (vertex of the green **solid line**) is very similar to the shrunken LFC estimate (vertex of the green dotted line), but the LFC estimates for the purple gene are quite different due to the high dispersion. So even though two genes can have similar normalized count values, they can have differing degrees of LFC shrinkage. Notice the **LFC estimates are shrunken toward the prior (black solid line)**.
 
 **Generating Shrunken LFC Estimates**
-
-To generate the shrunken log2 fold change estimates, you have to run an additional step on your results object (that we will create below) with the function `lfcShrink()`.
-
+To generate the shrunken log2 fold change estimates, you have to run an additional step on your results object (that we will create below) with the function `lfcShrink()`
 
 ### Hypothesis Testing
 
@@ -224,37 +206,26 @@ In DESeq2, **contrasts** specify which groups to compare for differential expres
   
 2. **Manual Specification:** You can manually specify the comparison using the `contrast` argument in the `results()` function. The `contrast` argument takes a vector of three elements. The first element is the name of the factor (design). The second and third elements listed in the contrast are the names of the numerator and denominator level for the fold change, respectively.
 
-The order of the contrast defines the direction of the fold change (see below). A positive log2 fold change means expression is higher in the "treated" group than in "control," and a negative fold change means expression is lower.
-
-```{r, eval = FALSE}
-	
-# DO NOT RUN!
-
-
-contrast <- c("treatment", "treated", "control")
-
-contrast <- c("condition", "level_to_compare", "base_level")
-
-results(dds, contrast = contrast, alpha = alpha_threshold)
-	
-```
-
-In DESeq2, the `alpha` parameter sets the significance threshold for adjusted p-values (FDR) when identifying differentially expressed genes. By default, it is set to 0.1, meaning genes with an adjusted p-value (FDR) below 0.1 are considered significant. You can lower `alpha` to be more stringent (e.g., 0.05) to reduce false positives, but this might also reduce the number of significant genes detected.
-
 **Building the Results Table**
 
 To build the results table, we use the `results()` function. You can specify the `contrast` to be tested using the contrast argument. In this example, we’ll save the unshrunken and shrunken results of **Control vs. Mov10 overexpression** to different variables. We’ll also set the `alpha` to 0.05, which is more stringent than the default value of 0.1.
 ```{r}
 # define contrasts
-contrast_oe <- c("sampletype", "MOV10_overexpression", "control")
+contrast_oe <- c("sampletype", 
+                 "MOV10_overexpression", 
+                 "control")
 
 # extract results table
-res_tableOE_unshrunken <- results(dds, contrast = contrast_oe, alpha = 0.05)
+res_tableOE_unshrunken <- results(dds, 
+                                  contrast = contrast_oe, 
+                                  alpha = 0.05)
 
 resultsNames(dds)
 
 # shrink log2 fold changes
-res_tableOE <- lfcShrink(dds = dds, coef =  "sampletype_MOV10_overexpression_vs_control", res = res_tableOE_unshrunken)
+res_tableOE <- lfcShrink(dds = dds, 
+               coef = "sampletype_MOV10_overexpression_vs_control", 
+               res = res_tableOE_unshrunken)
 
 # save the results for future use
 saveRDS(res_tableOE, file = "data/res_tableOE.RDS")
@@ -262,13 +233,11 @@ saveRDS(res_tableOE, file = "data/res_tableOE.RDS")
 ```
 
 
-**MA Plot**
+**The order of the names determines the direction of fold change that is reported.** The name provided in the second element is the level that is used as baseline. So for example, if we observe a log2 fold change of -2 this would mean the gene expression is lower in Mov10_oe relative to the control. 
 
-A **MA plot** visualizes the relationship between the **mean expression** (on the x-axis) and the **log2 fold change** (on the y-axis) for all genes in a dataset. Genes that are significantly differentially expressed are highlighted, while most other genes cluster around zero log2 fold change. 
+### MA Plot
 
-When **shrinkage** is applied, as in DESeq2, large log2 fold change estimates for genes with low counts or high variability are pulled toward more moderate values, reducing the noise in the plot. This helps focus attention on the more reliable fold changes and makes the plot cleaner, especially for low-expression genes that tend to have more variable LFC estimates without shrinkage.
-
-This plot is also a great way to illustrate the effect of LFC shrinkage. DESeq2 provides a simple function to generate an MA plot.
+A plot that can be useful to exploring our results is the MA plot. The MA plot shows the mean of the normalized counts versus the log2 foldchanges for all genes tested. The genes that are significantly DE are colored to be easily identified. This is also a great way to illustrate the effect of LFC shrinkage. The DESeq2 package offers a simple function to generate an MA plot. 
 
 **Shrunken & Unshrunken Results:**
 ```{r}
@@ -298,14 +267,6 @@ Let's go through some of the columns in the results table to get a better idea o
 mcols(res_tableOE, use.names = T)
 ```
 
-* `baseMean`: mean of normalized counts for all samples
-* `log2FoldChange`: log2 fold change
-* `lfcSE`: standard error
-* `stat`: Wald statistic
-* `pvalue`: Wald test p-value
-* `padj`: BH adjusted p-values
- 
-
 Now let's take a look at what information is stored in the results:
 ```{r}
 head(res_tableOE)
@@ -325,9 +286,11 @@ In some cases, p-values or adjusted p-values may be set to NA for a gene. This h
 
 ### Multiple Testing Correction
 
-When testing many genes, using raw **p-values** increases the chance of false positives (genes appearing significant by chance). If we used the `p-value` directly from the Wald test with a significance cut-off of p < 0.05, that means there is a 5% chance it is a false positives. Each p-value is the result of a single test (single gene). The more genes we test, the more we inflate the false positive rate. This issue is the known as the **multiple testing problem.** For example, testing 20,000 genes with p < 0.05 could result in 1,000 genes being falsely labeled as significant.
+When testing many genes, using raw **p-values** increases the chance of false positives (genes appearing significant by chance). If we used the `p-value` directly from the Wald test with a significance cut-off of p < 0.05, that means there is a 5% chance it is a false positives. Each p-value is the result of a single test (single gene). The more genes we test, the more we inflate the false positive rate. This issue is the known as the **multiple testing problem.** FFor example, if we test 20,000 genes for differential expression, at p < 0.05 we would expect to find 1,000 genes by chance. If we found 3000 genes to be differentially expressed total, 150 of our genes are false positives. We would not want to sift through our "significant" genes to identify which ones are true positives.
 
 DESeq2 addresses this by removing genes with low counts or outliers before testing and by applying the **Benjamini-Hochberg (BH)** method to control the **false discovery rate (FDR)**. 
+
+### Benjamini-Hochberg Adjustment
 
 The **BH-adjusted p-value** is calculated as:
 
@@ -351,31 +314,31 @@ Where:
 
 In most cases, we should use the **adjusted p-values** (BH-corrected) to identify significant genes.
 
-
-
 ### MOV10 DE Analysis: **Control vs. Knockdown**
 
-After examining the overexpression results, let's move on to the comparison between **Control vs. Knockdown**. We’ll use contrasts in the `results()` function to extract the results table and store it in the `res_tableKD` variable.
+After examining the overexpression results, let's move on to the comparison between **Control vs. Knockdown**. We’ll use contrasts in the `results()` function to extract the results table and store it in the `res_tableKD` variable. You can also use `coef` to specify the contrast directly in the `lfcShrink()` function.
 ```{r}
 
 # define contrast
-contrast_kd <-  c("sampletype", "MOV10_knockdown", "control")
+contrast_kd <-  c("sampletype", 
+                  "MOV10_knockdown",
+                  "control")
 
 # extract results table
-res_tableKD_unshrunken <- results(dds, contrast = contrast_kd, alpha = 0.05)
+res_tableKD_unshrunken <- results(dds, 
+                                  contrast = contrast_kd, 
+                                  alpha = 0.05)
 
 resultsNames(dds)
 
-# We can also specify contrasts using `coef` argument in `lfcShrink()`
-
-# shrink log2 fold changes
-res_tableKD <- lfcShrink(dds, coef = 2, res = res_tableKD_unshrunken)
+# use the `coef` argument to specify the contrast directly
+res_tableKD <- lfcShrink(dds, coef = 2, 
+                         res = res_tableKD_unshrunken)
 
 ## Save results for future use
 saveRDS(res_tableKD, file = "data/res_tableKD.RDS")
 
 ```
-
 
 ## Summarizing Results
 
@@ -420,7 +383,8 @@ Now, we can filter the table to retain only the genes that meet the significance
 ```{r}
 
 sigOE <- res_tableOE_tb %>%
-  dplyr::filter(padj < padj.cutoff & abs(log2FoldChange) > lfc.cutoff)
+  dplyr::filter(padj < padj.cutoff & 
+                abs(log2FoldChange) > lfc.cutoff)
 
 # Save the results for future use
 saveRDS(sigOE,"data/sigOE.RDS")
@@ -434,18 +398,15 @@ How many genes are differentially expressed in the **Overexpression vs. Control*
 # Your code here
 ```
 
-  
 **Does this reduce our results?** 
 ```{r}
 # Your code here
 ```
 
-
 ### MOV10 Knockdown Analysis: Control vs. Knockdown
 
 Next, let’s perform the same analysis for the **Control vs. Mov10 knockdown** comparison. We’ll use the same thresholds for adjusted p-value (FDR < 0.05) and log2 fold change (|log2FC| > 0.58).
 ```{r}
-
 
 res_tableKD_tb <- res_tableKD %>%
   data.frame() %>%
@@ -464,7 +425,6 @@ saveRDS(sigKD,"data/sigKD.RDS")
 ```{r}
 # Your code here
 ```
-
 
 With our subset of significant genes identified, we can now proceed to visualize the results and explore patterns of differential expression.
 

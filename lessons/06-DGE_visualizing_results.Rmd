@@ -1,9 +1,8 @@
 # Visualizing RNA-seq results
 
-During this lesson, we will get you started with some basic and more advanced plots commonly used when exploring differential gene expression data.
+During this lesson, we will get you started with some basic and more advanced visualization techniques to explore and interpret the results of your differential expression analysis.
 
-Let's start by loading a few libraries (if not already loaded):
-
+Let's start by loading a few libraries:
 ```{r, message = FALSE}
 # load libraries
 library(tidyverse)
@@ -14,9 +13,6 @@ library(DESeq2)
 library(pheatmap)
 library(dplyr)
 ```
-
-> **NOTE:** Since we are using the `tidyverse` suite of packages, we may run into conflicts with functions that have the same name but are part of different packages (i.e `filter`). If you run the code and run into an error try re-running the code using syntax where you specify package explicitly (i.e `dplyr::filter`).
-
 We will be working with three different data objects we have already created in earlier lessons:
 
 - Metadata for our samples (a dataframe): `meta`
@@ -29,12 +25,16 @@ Check to make sure the column names of the `normalized_counts` matrix are the sa
 
 ```{r}
 
+# Read in the metadata
+meta <- read.table("data/Mov10_full_meta.txt", 
+                   header=T, row.names=1)
+
 # Create a tibble for meta data
 mov10_meta <- meta %>% 
   rownames_to_column(var="samplename") %>% 
   as_tibble()
         
-# you might need to read in normalized_counts if it is not in your current session:
+# read in the normalized counts
 normalized_counts <- read.delim("data/normalized_counts.txt", row.names=1)
 
 all(mov10_meta$samplename == colnames(normalized_counts))
@@ -56,10 +56,11 @@ To pick out a specific gene of interest to plot, for example Mov10, we can use t
 
 ```{r}
 
-plotCounts(dds, gene="MOV10", intgroup="sampletype") 
+plotCounts(dds, 
+           gene="MOV10", 
+           intgroup="sampletype") 
 
-# we can give it some color and filled points:
-
+# We can also color the points by sample type
 sampletype = as.factor(mov10_meta$sampletype)
 
 library(RColorBrewer)
@@ -69,8 +70,10 @@ display.brewer.all()
 col = brewer.pal(8,"Dark2")
 palette(col)
 
-plotCounts(dds, gene="MOV10", intgroup="sampletype",
-           col = as.numeric(sampletype),pch = 19) 
+plotCounts(dds, gene="MOV10", 
+           intgroup="sampletype",
+           col = as.numeric(sampletype),
+           pch = 19) 
 
 ```
 
@@ -80,13 +83,12 @@ plotCounts(dds, gene="MOV10", intgroup="sampletype",
 
 We can also use ggplot2 to plot the `MOV10` counts. We can save the output of `plotCounts()` to a variable specifying the `returnData=TRUE` argument. This will save the normalized counts for the gene `MOV10` to a data frame object. We can then use ggplot2 to plot the normalized counts for `MOV10` across all samples.
 
-
 ```{r}
 # Save `plotCounts()` to a data frame object
 d <- plotCounts(dds, gene = "MOV10", intgroup = "sampletype", 
                 returnData=TRUE)
 
-# Plot the MOV10 normalized counts, using the samplenames (rownames of d as labels)
+# Plot using ggplot2
 ggplot(d, aes(x = sampletype, y = count, color = sampletype)) + 
   geom_point(position = position_jitter(w = 0.1,h = 0)) +
   geom_text_repel(aes(label = rownames(d))) + 
@@ -128,7 +130,7 @@ top20_sigOE_genes <- res_tableOE_tb %>%
 Then, we can extract the normalized count values for these top 20 genes:
 
 ```{r}
-## normalized counts for top 20 significant genes
+## Normalized counts for top 20 significant genes
 top20_sigOE_norm <- normalized_counts %>%
         filter(gene %in% top20_sigOE_genes)
 ```
@@ -139,9 +141,8 @@ The `pivot_longer()` function in the **tidyr** package will perform this operati
 
 ![Alt text](img/melt_wide_to_long_format.png){ width=800 }
 
-`Pivot_longer()` takes the data frame and converts it from a wide format to a long format. The `cols` argument specifies the columns that will be pivoted, in this case, the columns containing the normalized counts. The `names_to` argument specifies the name of the column that will contain the column names of the original data frame, and the `values_to` argument specifies the name of the column that will contain the values of the original data frame.
 ```{r}
-# Pivoting the columns to have normalized counts to a single column
+# Pivot the data frame
 pivoted_top20_sigOE <- top20_sigOE_norm %>%
   pivot_longer(colnames(top20_sigOE_norm)[2:9], 
                names_to = "samplename", 
@@ -153,18 +154,16 @@ head(pivoted_top20_sigOE)
 
 Now, if we want our counts colored by sample group, then we need to combine the metadata information with the melted normalized counts data into the same data frame for input to `ggplot()`:
 
-`inner_join(x,y)` will merge 2 data frames by the colname in x that matches a column name in y.
-
-`inner_join(mov10_meta, pivoted_top20_sigOE)` will merge the `mov10_meta` data frame with the `pivoted_top20_sigOE` data frame by the `samplename` column.
-
+`inner_join(x,y)` will merge 2 data frames by the colname in x that matches a column name in y in this case `samplename` column.
 ```{r}
 
-pivoted_top20_sigOE <- inner_join(mov10_meta, pivoted_top20_sigOE)
+pivoted_top20_sigOE <- inner_join(
+  mov10_meta, 
+  pivoted_top20_sigOE)
 ```
 
 
 Now that we have a data frame in a format that can be utilised by ggplot easily, let's plot! 
-
 ```{r}
 ## plot using ggplot2
 ggplot(pivoted_top20_sigOE) +
@@ -175,15 +174,15 @@ ggplot(pivoted_top20_sigOE) +
         ylab("log10 Normalized Counts") +
         ggtitle("Top 20 Significant DE Genes") +
         theme_bw() +
-      	theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+      	theme(axis.text.x = element_text(angle = 45, 
+      	                                 hjust = 1)) +
       	theme(plot.title = element_text(hjust = 0.5))
 ```
 
 
 ### Heatmap
 
-In addition to plotting subsets, we could also extract the normalized values of *all* the significant genes from **Control vs. Mov10 overexpression** (control and overexpression) and plot a heatmap of their expression using `pheatmap()`.
-
+We will plot a heatmap of the `sigOE` genes to visualize their expression across all samples using `pheatmap()`.
 ```{r}
 
 sigOE = readRDS("data/sigOE.RDS")
@@ -195,10 +194,9 @@ norm_OEsig <- normalized_counts[,c(1,2:4,7:9)] %>%
 
 ```
 
-Now let’s draw the heatmap using pheatmap. We can also add annotations to the heatmap to indicate the sample type. Annotations can be added to the heatmap using the `annotation_row` or `annotation_col` argument in `pheatmap()`. The `annotation_col` argument requires a data frame with the same row names as the column names of the matrix used to generate the heatmap. The `annotation` data frame should contain the annotation information for each sample.
+Now let’s draw the heatmap using pheatmap. We can also add annotations to the heatmap to indicate the sample type. The `annotation_col` argument in `pheatmap()`requires a data frame with the same row names as the column names of the matrix used to generate the heatmap. 
 ```{r}
 ### Annotate our heatmap (optional)
-
 annotation <- mov10_meta %>% 
   filter(samplename %in% colnames(norm_OEsig)) %>%
 	dplyr::select(samplename, sampletype) %>% 
@@ -209,10 +207,10 @@ annotation$sampletype = factor(annotation$sampletype)
 ### Set a color palette
 heat_colors <- brewer.pal(6, "YlOrRd")
 
+### Set annotation colors
 ann_colors = list(
   sampletype = c(control="navy",
   MOV10_overexpression= "green"))
-
 
 ### Run pheatmap
 pheatmap(norm_OEsig, 
@@ -229,27 +227,21 @@ pheatmap(norm_OEsig,
 
 
 > *NOTE:* There are several additional arguments we have included in the function for aesthetics. One important one is `scale="row"`, in which Z-scores are plotted, rather than the actual normalized count value. 
->
-> Z-scores are computed on a gene-by-gene basis by subtracting the mean and then dividing by the standard deviation. The Z-scores are computed **after the clustering**, so that it only affects the graphical aesthetics and the color visualization is improved.
 
-### Volcano plot
+### Volcano plots
 
-The above plot would be great to look at the expression levels of a good number of genes, but for more of a global view there are other plots we can draw. A commonly used one is a volcano plot; in which you have the log transformed adjusted p-values plotted on the y-axis and log2 fold change values on the x-axis. 
+A commonly used plot in RNA-seq analysis is the **volcano plot**. in which you have the log transformed adjusted p-values plotted on the y-axis and log2 fold change values on the x-axis. 
 
 To generate a volcano plot, we first need to have a column in our results data indicating whether or not the gene is considered differentially expressed based on p-adjusted values.
-
 ```{r}
-## Obtain logical vector where TRUE values denote padj values < 0.05 and fold change > 1.5 in either direction
-
+## create a column for thresholding in the results table
 res_tableOE_tb <- res_tableOE_tb %>% 
                   mutate(threshold_OE = padj < 0.05 & 
                   abs(log2FoldChange) >= 0.58)
 ```
 
 Now we can start plotting. The `geom_point` object is most applicable, as this is essentially a scatter plot:
-
 ```{r}
-## Volcano plot
 
 ggplot(res_tableOE_tb) +
         geom_point(aes(x = log2FoldChange, 
@@ -257,22 +249,20 @@ ggplot(res_tableOE_tb) +
         ggtitle("Mov10 overexpression") +
         xlab("log2 fold change") + 
         ylab("-log10 adjusted p-value") +
-        # scale_y_continuous(limits = c(0,50)) + # if you want to zoom in
         theme_bw() +      
         theme(legend.position = "none",
-        plot.title = element_text(size = rel(1.5), hjust = 0.5),
+        plot.title = element_text(size = rel(1.5), 
+                                  hjust = 0.5),
         axis.title = element_text(size = rel(1.25)))  
 ```
 
-
-This is a great way to get an overall picture of what is going on, but what if we also wanted to know where the top 10 genes (lowest padj) in our DE list are located on this plot? We could label those dots with the gene name on the Volcano plot using `geom_text_repel()`.
+What if we also wanted to know where the top 10 genes (lowest padj) in our DE list are located on this plot? We could label those dots with the gene name on the volcano plot using `geom_text_repel()`.
 
 First, we need to order the res_tableOE tibble by `padj`, and add an additional column to it, to include on those gene names we want to use to label the plot.
- 
 ```{r}
 ## Create a column to indicate which genes to label
-
-res_tableOE_tb <- res_tableOE_tb %>% arrange(padj) %>% 
+res_tableOE_tb <- res_tableOE_tb %>% 
+  arrange(padj) %>% 
   mutate(genelabels = "")
 
 res_tableOE_tb$genelabels[1:10] <- res_tableOE_tb$gene[1:10]
@@ -281,7 +271,6 @@ head(res_tableOE_tb)
 ```
 
 Next, we plot it as before with an additiona layer for `geom_text_repel()` wherein we can specify the column of gene labels we just created. 
-
 ```{r}
 ggplot(res_tableOE_tb, aes(x = log2FoldChange, 
         y = -log10(padj))) +
@@ -292,7 +281,8 @@ ggplot(res_tableOE_tb, aes(x = log2FoldChange,
         ylab("-log10 adjusted p-value") +
         theme_bw() +
         theme(legend.position = "none",
-        plot.title = element_text(size = rel(1.5), hjust = 0.5),
+        plot.title = element_text(size = rel(1.5), 
+                                  hjust = 0.5),
         axis.title = element_text(size = rel(1.25))) 
 ```
 
