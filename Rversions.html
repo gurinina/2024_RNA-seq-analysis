@@ -163,7 +163,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div id="header">
 <h1 class="title">R versions</h1>
 </div>
-<p><strong>Subject</strong>: Important: R Installation Instructions for Our Course</p>
+<p><strong>Subject</strong>: Important: R Installation Instructions for 2024_RNA-seq-analysis</p>
 <p><strong>Please read this entire message carefully.</strong></p>
 <p><strong>For those of you who are on a Mac, please install the x86_64 version of R, even if you are using an M1 Mac.</strong> This is important for compatibility with the packages we will be using, especially Bioconductor (e.g. <code>igraph</code>).</p>
 <p>Here’s how to do it:</p>
@@ -179,7 +179,9 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><strong>Installing R</strong>:</li>
 </ol>
 <ul>
-<li>Open the downloaded <code>.pkg</code> file and follow the installation instructions.</li>
+<li><p>Make sure you have the latest version of RStudio installed on your computer. You can download it <a href="https://www.rstudio.com/products/rstudio/download/">here</a>.</p></li>
+<li><p>Make sure you quit RStudio before installing R.</p></li>
+<li><p>Open the downloaded <code>.pkg</code> file and follow the installation instructions.</p></li>
 </ul>
 <ol start="3" style="list-style-type: decimal">
 <li><strong>Using Rosetta for those of you using an M1 Mac</strong>:</li>
@@ -191,12 +193,26 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><p>If you are using an M1 Mac, you may need to install Rosetta 2 to run the x86_64 version of R. Here’s how to do it:</p></li>
 <li><p>When you first open RStudio, you may see a message asking if you want to install Rosetta 2. Click “Install” to proceed.</p></li>
 <li><p>If you have the option, ensure that your terminal or RStudio is running under Rosetta 2. To do this:</p></li>
-<li><p>Select <strong>Get Info</strong>.</p></li>
+<li><p>Right-click on the RStudio icon in the Applications folder. Select <strong>Get Info</strong>.</p></li>
 <li><p>Check <strong>Open using Rosetta</strong></p></li>
 </ul>
 <p>After installation, please check that you are using the x86_64 version of R by running the following command in your R console:</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a></span>
-<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>R.version</span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>R.version</span></code></pre></div>
+<pre><code>##                _                           
+## platform       x86_64-apple-darwin20       
+## arch           x86_64                      
+## os             darwin20                    
+## system         x86_64, darwin20            
+## status                                     
+## major          4                           
+## minor          4.2                         
+## year           2024                        
+## month          10                          
+## day            31                          
+## svn rev        87279                       
+## language       R                           
+## version.string R version 4.4.2 (2024-10-31)
+## nickname       Pile of Leaves</code></pre>
 <p>It should return something like this:</p>
 <p>platform x86_64-apple-darwin20<br />
 arch x86_64<br />
@@ -225,56 +241,58 @@ nickname Pile of Leaves</p>
 <li><p>Choose a local folder on your computer to store the project files.</p></li>
 <li><p>Click “Create Project” to clone the repository.</p></li>
 </ol>
-<p>After the repository is cloned, you can sync your local files with the GitHub repository by clicking the “Pull” button in the “Git” tab in RStudio. This ensures that you always have the latest version of the course materials.</p>
+<p>After the repository is cloned, you can sync your copy of 2024_RNA-seq-analysis with the GitHub course repository 2024_RNA-seq-analysis by clicking the “Pull” button in the “Git” tab in RStudio. This ensures that you have the latest version of the course materials.</p>
 </div>
 <div id="installing-required-r-packages" class="section level2 hasAnchor" number="2">
 <h2><span class="header-section-number">2</span> Installing Required R Packages<a href="#installing-required-r-packages" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>Once you have R, RStudio, and the course repository set up, you will need to install some R packages to work with the course material.</p>
 <p>Copy and paste the following command into the RStudio console to install all the required packages:</p>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># Install the &quot;GOenrichment&quot; package from GitHub</span></span>
-<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">requireNamespace</span>(<span class="st">&quot;devtools&quot;</span>, <span class="at">quietly =</span> <span class="cn">TRUE</span>)) {</span>
-<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a> <span class="fu">install.packages</span>(<span class="st">&quot;devtools&quot;</span>)</span>
-<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>}</span>
-<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a></span>
-<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;gurinina/GOenrichment&quot;</span>, <span class="at">force =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a></span>
-<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co"># Install Bioconductor packages using BiocManager</span></span>
-<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">requireNamespace</span>(<span class="st">&quot;BiocManager&quot;</span>, <span class="at">quietly =</span> <span class="cn">TRUE</span>)) {</span>
-<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a> <span class="fu">install.packages</span>(<span class="st">&quot;BiocManager&quot;</span>)</span>
-<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>}</span>
-<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a></span>
-<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="co"># Install required Bioconductor and CRAN packages</span></span>
-<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a>BiocManager<span class="sc">::</span><span class="fu">install</span>(<span class="fu">c</span>(</span>
-<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a> <span class="st">&quot;bookdown&quot;</span>, <span class="st">&quot;clusterProfiler&quot;</span>, <span class="st">&quot;DESeq2&quot;</span>, <span class="st">&quot;dplyr&quot;</span>, <span class="st">&quot;enrichplot&quot;</span>, <span class="st">&quot;fgsea&quot;</span>, </span>
-<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a> <span class="st">&quot;ggplot2&quot;</span>, <span class="st">&quot;ggrepel&quot;</span>, <span class="st">&quot;gplots&quot;</span>, <span class="st">&quot;knitr&quot;</span>, <span class="st">&quot;org.Hs.eg.db&quot;</span>, <span class="st">&quot;pheatmap&quot;</span>, </span>
-<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a> <span class="st">&quot;purrr&quot;</span>, <span class="st">&quot;RColorBrewer&quot;</span>, <span class="st">&quot;rmarkdown&quot;</span>, <span class="st">&quot;rsconnect&quot;</span>, <span class="st">&quot;tidyverse&quot;</span>, <span class="st">&quot;ggraph&quot;</span>, <span class="st">&quot;igraph&quot;</span>, <span class="st">&quot;visNetwork&quot;</span>, <span class="st">&quot;GO.db&quot;</span>, <span class="st">&quot;GOSemSim&quot;</span></span>
-<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a>))</span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">remove.packages</span>(<span class="st">&quot;GOenrichment&quot;</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="co"># Install the &quot;GOenrichment&quot; package from GitHub</span></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">requireNamespace</span>(<span class="st">&quot;devtools&quot;</span>, <span class="at">quietly =</span> <span class="cn">TRUE</span>)) {</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a> <span class="fu">install.packages</span>(<span class="st">&quot;devtools&quot;</span>)</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>}</span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;gurinina/GOenrichment&quot;</span>, <span class="at">force =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a></span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="co"># Install Bioconductor packages using BiocManager</span></span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">requireNamespace</span>(<span class="st">&quot;BiocManager&quot;</span>, <span class="at">quietly =</span> <span class="cn">TRUE</span>)) {</span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a> <span class="fu">install.packages</span>(<span class="st">&quot;BiocManager&quot;</span>)</span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a>}</span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a><span class="co"># Install required Bioconductor and CRAN packages</span></span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a>BiocManager<span class="sc">::</span><span class="fu">install</span>(<span class="fu">c</span>(</span>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a> <span class="st">&quot;bookdown&quot;</span>, <span class="st">&quot;clusterProfiler&quot;</span>, <span class="st">&quot;DESeq2&quot;</span>, <span class="st">&quot;dplyr&quot;</span>, <span class="st">&quot;enrichplot&quot;</span>, <span class="st">&quot;fgsea&quot;</span>, <span class="st">&quot;apeglm&quot;</span>,</span>
+<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a> <span class="st">&quot;ggplot2&quot;</span>, <span class="st">&quot;ggrepel&quot;</span>, <span class="st">&quot;gplots&quot;</span>, <span class="st">&quot;knitr&quot;</span>, <span class="st">&quot;org.Hs.eg.db&quot;</span>, <span class="st">&quot;pheatmap&quot;</span>, </span>
+<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a> <span class="st">&quot;purrr&quot;</span>, <span class="st">&quot;RColorBrewer&quot;</span>, <span class="st">&quot;rmarkdown&quot;</span>, <span class="st">&quot;rsconnect&quot;</span>, <span class="st">&quot;tidyverse&quot;</span>, <span class="st">&quot;ggraph&quot;</span>, <span class="st">&quot;igraph&quot;</span>, <span class="st">&quot;visNetwork&quot;</span>, <span class="st">&quot;GO.db&quot;</span>, <span class="st">&quot;GOSemSim&quot;</span></span>
+<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a>), <span class="at">force =</span> <span class="cn">TRUE</span>)</span></code></pre></div>
 </div>
 <div id="verifying-your-installation" class="section level2 hasAnchor" number="3">
 <h2><span class="header-section-number">3</span> Verifying Your Installation<a href="#verifying-your-installation" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>To verify that everything is installed correctly, load the packages by copying and pasting this into your RStudio console:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="fu">library</span>(pheatmap)</span>
-<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="fu">library</span>(bookdown)</span>
-<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="fu">library</span>(DESeq2)</span>
-<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="fu">library</span>(RColorBrewer)</span>
-<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
-<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a><span class="fu">library</span>(gplots)</span>
-<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a><span class="fu">library</span>(ggrepel)</span>
-<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a><span class="fu">library</span>(GOenrichment)</span>
-<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a><span class="fu">library</span>(GO.db)</span>
-<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a><span class="fu">library</span>(fgsea)</span>
-<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a><span class="fu">library</span>(enrichplot)</span>
-<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a><span class="fu">library</span>(clusterProfiler)</span>
-<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a><span class="fu">library</span>(org.Hs.eg.db)</span>
-<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a><span class="fu">library</span>(purrr)</span>
-<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a><span class="fu">library</span>(rmarkdown)</span>
-<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a><span class="fu">library</span>(GOSemSim)</span>
-<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a><span class="fu">library</span>(visNetwork)</span>
-<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a><span class="fu">library</span>(igraph)</span>
-<span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a><span class="fu">library</span>(ggraph)</span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="fu">library</span>(pheatmap)</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="fu">library</span>(bookdown)</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="fu">library</span>(DESeq2)</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="fu">library</span>(RColorBrewer)</span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="fu">library</span>(gplots)</span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="fu">library</span>(ggrepel)</span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="fu">library</span>(GOenrichment)</span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="fu">library</span>(GO.db)</span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="fu">library</span>(fgsea)</span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="fu">library</span>(enrichplot)</span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a><span class="fu">library</span>(clusterProfiler)</span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a><span class="fu">library</span>(org.Hs.eg.db)</span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a><span class="fu">library</span>(purrr)</span>
+<span id="cb4-18"><a href="#cb4-18" tabindex="-1"></a><span class="fu">library</span>(rmarkdown)</span>
+<span id="cb4-19"><a href="#cb4-19" tabindex="-1"></a><span class="fu">library</span>(GOSemSim)</span>
+<span id="cb4-20"><a href="#cb4-20" tabindex="-1"></a><span class="fu">library</span>(visNetwork)</span>
+<span id="cb4-21"><a href="#cb4-21" tabindex="-1"></a><span class="fu">library</span>(igraph)</span>
+<span id="cb4-22"><a href="#cb4-22" tabindex="-1"></a><span class="fu">library</span>(ggraph)</span></code></pre></div>
 <p>If the libraries load without any error messages, everything is set up correctly.</p>
 <div id="running-r-code-compiling-the-book" class="section level3 hasAnchor" number="3.1">
 <h3><span class="header-section-number">3.1</span> Running R code; compiling the book<a href="#running-r-code-compiling-the-book" class="anchor-section" aria-label="Anchor link to header"></a></h3>
@@ -288,21 +306,21 @@ nickname Pile of Leaves</p>
 <li><strong>Compile the book:</strong></li>
 </ol>
 <ul>
-<li>Run the following code in the R console to compile the book:</li>
+<li>Copy and paste the following code in the R console to compile the book:</li>
 </ul>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co"># load the bookdown package</span></span>
-<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a><span class="fu">library</span>(bookdown)</span>
-<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a></span>
-<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a><span class="co"># removes all files from the _book  directory</span></span>
-<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="fu">clean_book</span>(<span class="at">clean =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a></span>
-<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co"># renders the book in GitBook format</span></span>
-<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>bookdown<span class="sc">::</span><span class="fu">render_book</span>(<span class="st">&quot;index.Rmd&quot;</span>, <span class="st">&quot;bookdown::gitbook&quot;</span>)</span>
-<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a></span>
-<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co"># opens the GitBook in your browser</span></span>
-<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>rstudioapi<span class="sc">::</span><span class="fu">viewer</span>(<span class="st">&quot;_book/index.html&quot;</span>)</span>
-<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a></span>
-<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co"># To see the book in your Viewer pane, open &#39;index.Rmd&#39; and click the &#39;Knit&#39; button.</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="co"># load the bookdown package</span></span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="fu">library</span>(bookdown)</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="co"># removes all files from the _book  directory</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a><span class="fu">clean_book</span>(<span class="at">clean =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a><span class="co"># renders the book in GitBook format</span></span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>bookdown<span class="sc">::</span><span class="fu">render_book</span>(<span class="st">&quot;index.Rmd&quot;</span>, <span class="st">&quot;bookdown::gitbook&quot;</span>)</span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="co"># opens the GitBook in your browser</span></span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a>rstudioapi<span class="sc">::</span><span class="fu">viewer</span>(<span class="st">&quot;_book/index.html&quot;</span>)</span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a></span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a><span class="co"># To see the book in your Viewer pane, open &#39;index.Rmd&#39; in your main directory and click the &#39;Knit&#39; button.</span></span></code></pre></div>
 </div>
 </div>
 <div id="resyncing-with-the-course-repository" class="section level2 hasAnchor" number="4">
@@ -320,12 +338,12 @@ nickname Pile of Leaves</p>
 <ul>
 <li>In the terminal, run:</li>
 </ul>
-<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a></span>
-<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="fu">git</span> fetch origin</span>
-<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a><span class="fu">git</span> reset <span class="at">--hard</span> origin/main</span>
-<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>     </span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="fu">git</span> fetch origin</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="fu">git</span> reset <span class="at">--hard</span> origin/main</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>     </span></code></pre></div>
 <ul>
-<li><p>These commands will update your 2024_RNA-seq-analysis copy to match the remote <code>main</code> branch, discarding your changes.</p></li>
+<li><p>These commands will update your 2024_RNA-seq-analysis copy to match the remote 2024_RNA-seq-analysis course <code>main</code> branch, discarding your changes.</p></li>
 <li><p>If you have any questions or need assistance with any part of the above, please let me know, and I will help you troubleshoot. I would like to hear from each of you to confirm that you have successfully knitted the bookdown file.</p></li>
 </ul>
 <p>Please email me either way regardless of what computer you are using.</p>
