@@ -117,6 +117,7 @@ library(visNetwork)
 library(GO.db)
 library(GOSemSim)
 library(GOenrichment)
+library(tidyr)
 ```
 
 #### Running clusterProfiler: we first need to load the results of the differential expression analysis.
@@ -184,7 +185,7 @@ Using the gene lists associated with each GO term, we can create edges between t
 ```{r}
 
 # Load GO data for semantic similarity calculation
-go_data <- GOSemSim::godata(annoDb = "org.Hs.eg.db", 
+go_data <- GOSemSim::godata(OrgDb = "org.Hs.eg.db", 
                             ont = "BP", 
                             keytype = "SYMBOL",
                             computeIC = TRUE)
@@ -309,22 +310,6 @@ emapplot(pwt, showCategory = 150,
 ```
 To save any of these figures if they become too cluttered, click on the Export button in the RStudio Plots tab and Save as PDF. In the pop-up window, change the PDF size to 24 x 32 to give a figure of appropriate size for the text labels.
 
-The **`ssplot()`** function generates a spatial map of enriched terms, where each node represents a gene set and the distance between nodes reflects the similarity between gene sets. This plot is useful for identifying clusters of related terms and overall trends in the enrichment results.
-```{r}
-
-ssplot(pwt, showCategory = 50, node_label = "category", 
-       with_edge = FALSE, group_category = TRUE) +
-       theme(legend.position = "none")
-
-
-ssplot(pwt, showCategory = 50, node_label = "group", 
-       with_edge = FALSE, group_category = TRUE) +
-       theme(legend.position = "none")
-
-
-```
-If you are wanting a general overview of enrichment results and trends, `ssplot()` is more useful. If you want detailed information on the pairwise similarity between enrichment terms and to explore specific **networks of functional relationships**, `emapplot()` is more informative.
-
 **cnetplot**: Visualizes connections between genes and top GO terms, highlighting shared pathways.This plot is particularly useful for hypothesis generation in identifying genes that may be important to several of the most affected processes.
 ```{r}
 
@@ -404,11 +389,6 @@ emapplot(pwt, showCategory = 30, node_label = "all",
          theme(legend.position = "none")
 
 
-ssplot(pwt, showCategory = 150, node_label = "group", 
-       with_edge = FALSE, 
-       group_category = TRUE,
-       layout.params = list("mds")) +
-       theme(legend.position = "none")
 
 ```
 
