@@ -1,13 +1,7 @@
 # bookdown
-_book
-_bookdown_files
+
 _pdf
 _epub
-data/res_tableOE.RDS
-data/res_tableKD.RDS
-data/sigOE.RDS
-data/sigKD.RDS
-data/normalized_counts.txt
 2024_RNA-seq-analysis.Rmd
 2024_RNA-seq-analysis_files/
 # Ignore everything in the results folder

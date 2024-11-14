@@ -49,9 +49,9 @@ Where:
 
 **`q`**: The **number of genes in your list of interest that are annotated with a specific GO term** (e.g., genes in your differential expression results that are associated with "cell cycle regulation").
 
-**`m`**: The *total number of genes in the background set (e.g., all genes in the genome) that are annotated with the specific GO term* (e.g., all genes associated with "cell cycle regulation" in the entire dataset or genome).
+**`m`**: The **total number of genes in the background set (e.g., all genes in the genome) that are annotated with the specific GO term** (e.g., all genes associated with "cell cycle regulation" in the entire dataset or genome).
 
-**`n`**: The **number of genes in the background that are not annotated with the specific GO term**. It can be calculated as \( N m \), where \( N \) is the total number of genes in the background set.
+**`N`**: The **total number of genes in the background set.**
 
 **`k`**: The **total number of genes in your gene list of interest** 
 

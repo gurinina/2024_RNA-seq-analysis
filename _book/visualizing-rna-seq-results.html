@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 6 Visualizing RNA-seq results | 2024_RNA-seq-analysis</title>
+  <meta name="description" content="Chapter 6 Visualizing RNA-seq results | 2024_RNA-seq-analysis" />
+  <meta name="generator" content="bookdown 0.41 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 6 Visualizing RNA-seq results | 2024_RNA-seq-analysis" />
+  <meta property="og:type" content="book" />
+  <meta property="og:image" content="https://bookdown.org/ggiaever/2024_RNA-seq-analysis/img/football.png" />
+  
+  <meta name="github-repo" content="gurinina/2024_RNA-seq-analysis" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 6 Visualizing RNA-seq results | 2024_RNA-seq-analysis" />
+  
+  
+  <meta name="twitter:image" content="https://bookdown.org/ggiaever/2024_RNA-seq-analysis/img/football.png" />
+
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="negative-binomial-model-fitting.html"/>
+<link rel="next" href="summary-of-dge-workflow.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<script src="libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<link href="libs/vis-9.1.0/vis-network.min.css" rel="stylesheet" />
+<script src="libs/vis-9.1.0/vis-network.min.js"></script>
+<script src="libs/visNetwork-binding-2.1.2/visNetwork.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+
+<link rel="stylesheet" href="css/git.css" type="text/css" />
+<link rel="stylesheet" href="css/toc.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>RNA-seq analysis workshop</a></li>
+<li class="chapter" data-level="1" data-path="differential-gene-expression-dge-analysis-overview.html"><a href="differential-gene-expression-dge-analysis-overview.html"><i class="fa fa-check"></i><b>1</b> Differential gene expression (DGE) analysis overview</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="differential-gene-expression-dge-analysis-overview.html"><a href="differential-gene-expression-dge-analysis-overview.html#review-of-the-dataset"><i class="fa fa-check"></i><b>1.1</b> Review of the dataset</a></li>
+<li class="chapter" data-level="1.2" data-path="differential-gene-expression-dge-analysis-overview.html"><a href="differential-gene-expression-dge-analysis-overview.html#setting-up"><i class="fa fa-check"></i><b>1.2</b> Setting up</a>
+<ul>
+<li class="chapter" data-level="1.2.1" data-path="differential-gene-expression-dge-analysis-overview.html"><a href="differential-gene-expression-dge-analysis-overview.html#loading-libraries"><i class="fa fa-check"></i><b>1.2.1</b> Loading libraries</a></li>
+<li class="chapter" data-level="1.2.2" data-path="differential-gene-expression-dge-analysis-overview.html"><a href="differential-gene-expression-dge-analysis-overview.html#loading-data"><i class="fa fa-check"></i><b>1.2.2</b> Loading data</a></li>
+<li class="chapter" data-level="1.2.3" data-path="differential-gene-expression-dge-analysis-overview.html"><a href="differential-gene-expression-dge-analysis-overview.html#viewing-data"><i class="fa fa-check"></i><b>1.2.3</b> Viewing data</a></li>
+</ul></li>
+<li class="chapter" data-level="1.3" data-path="differential-gene-expression-dge-analysis-overview.html"><a href="differential-gene-expression-dge-analysis-overview.html#differential-gene-expression-analysis-overview"><i class="fa fa-check"></i><b>1.3</b> Differential gene expression analysis overview</a>
+<ul>
+<li class="chapter" data-level="1.3.1" data-path="differential-gene-expression-dge-analysis-overview.html"><a href="differential-gene-expression-dge-analysis-overview.html#rna-seq-count-distribution"><i class="fa fa-check"></i><b>1.3.1</b> RNA-seq count distribution</a></li>
+<li class="chapter" data-level="1.3.2" data-path="differential-gene-expression-dge-analysis-overview.html"><a href="differential-gene-expression-dge-analysis-overview.html#modeling-count-data"><i class="fa fa-check"></i><b>1.3.2</b> Modeling count data</a></li>
+<li class="chapter" data-level="1.3.3" data-path="differential-gene-expression-dge-analysis-overview.html"><a href="differential-gene-expression-dge-analysis-overview.html#improving-mean-estimates-i.e.-reducing-variance-with-biological-replicates"><i class="fa fa-check"></i><b>1.3.3</b> Improving mean estimates (i.e. reducing variance) with biological replicates</a></li>
+<li class="chapter" data-level="1.3.4" data-path="differential-gene-expression-dge-analysis-overview.html"><a href="differential-gene-expression-dge-analysis-overview.html#differential-expression-analysis-workflow"><i class="fa fa-check"></i><b>1.3.4</b> Differential expression analysis workflow</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="count-normalization.html"><a href="count-normalization.html"><i class="fa fa-check"></i><b>2</b> Count normalization</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="count-normalization.html"><a href="count-normalization.html#normalization"><i class="fa fa-check"></i><b>2.1</b> Normalization</a>
+<ul>
+<li class="chapter" data-level="2.1.1" data-path="count-normalization.html"><a href="count-normalization.html#common-normalization-methods"><i class="fa fa-check"></i><b>2.1.1</b> Common normalization methods</a></li>
+<li class="chapter" data-level="2.1.2" data-path="count-normalization.html"><a href="count-normalization.html#tpm-not-recommended"><i class="fa fa-check"></i><b>2.1.2</b> TPM (Not Recommended)</a></li>
+<li class="chapter" data-level="2.1.3" data-path="count-normalization.html"><a href="count-normalization.html#rpkmfpkm-not-recommended"><i class="fa fa-check"></i><b>2.1.3</b> RPKM/FPKM (Not Recommended)</a></li>
+<li class="chapter" data-level="2.1.4" data-path="count-normalization.html"><a href="count-normalization.html#deseq2-normalization-median-of-ratios-method"><i class="fa fa-check"></i><b>2.1.4</b> DESeq2 Normalization: Median of Ratios Method</a></li>
+<li class="chapter" data-level="2.1.5" data-path="count-normalization.html"><a href="count-normalization.html#summary-of-key-reasons-for-using-deseq2"><i class="fa fa-check"></i><b>2.1.5</b> Summary of Key Reasons for Using DESeq2</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="count-normalization.html"><a href="count-normalization.html#count-normalization-of-mov10"><i class="fa fa-check"></i><b>2.2</b> Count normalization of Mov10</a>
+<ul>
+<li class="chapter" data-level="2.2.1" data-path="count-normalization.html"><a href="count-normalization.html#match-the-metadata-and-counts-data"><i class="fa fa-check"></i><b>2.2.1</b> 1. Match the metadata and counts data</a></li>
+<li class="chapter" data-level="2.2.2" data-path="count-normalization.html"><a href="count-normalization.html#create-deseq2-object"><i class="fa fa-check"></i><b>2.2.2</b> 2. Create DESEq2 object</a></li>
+<li class="chapter" data-level="2.2.3" data-path="count-normalization.html"><a href="count-normalization.html#generate-the-mov10-normalized-counts"><i class="fa fa-check"></i><b>2.2.3</b> 3. Generate the Mov10 normalized counts</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="quality-control.html"><a href="quality-control.html"><i class="fa fa-check"></i><b>3</b> Quality Control</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="quality-control.html"><a href="quality-control.html#sample-level-qc"><i class="fa fa-check"></i><b>3.1</b> Sample-level QC</a>
+<ul>
+<li class="chapter" data-level="3.1.1" data-path="quality-control.html"><a href="quality-control.html#recommended-resources"><i class="fa fa-check"></i><b>3.1.1</b> Recommended Resources</a></li>
+<li class="chapter" data-level="3.1.2" data-path="quality-control.html"><a href="quality-control.html#hierarchical-clustering-heatmap"><i class="fa fa-check"></i><b>3.1.2</b> Hierarchical Clustering Heatmap</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="quality-control.html"><a href="quality-control.html#gene-level-qc"><i class="fa fa-check"></i><b>3.2</b> Gene-level QC</a></li>
+<li class="chapter" data-level="3.3" data-path="quality-control.html"><a href="quality-control.html#mov10-quality-assessment-and-exploratory-analysis-using-deseq2"><i class="fa fa-check"></i><b>3.3</b> Mov10 quality assessment and exploratory analysis using DESeq2</a>
+<ul>
+<li class="chapter" data-level="3.3.1" data-path="quality-control.html"><a href="quality-control.html#transform-normalized-counts-using-the-rlog-transformation"><i class="fa fa-check"></i><b>3.3.1</b> Transform normalized counts using the rlog transformation</a></li>
+<li class="chapter" data-level="3.3.2" data-path="quality-control.html"><a href="quality-control.html#principal-components-analysis-pca"><i class="fa fa-check"></i><b>3.3.2</b> Principal components analysis (PCA)</a></li>
+<li class="chapter" data-level="3.3.3" data-path="quality-control.html"><a href="quality-control.html#hierarchical-clustering"><i class="fa fa-check"></i><b>3.3.3</b> Hierarchical Clustering</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="dge-analysis-workflow.html"><a href="dge-analysis-workflow.html"><i class="fa fa-check"></i><b>4</b> DGE analysis workflow</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="dge-analysis-workflow.html"><a href="dge-analysis-workflow.html#running-deseq2"><i class="fa fa-check"></i><b>4.1</b> Running DESeq2</a>
+<ul>
+<li class="chapter" data-level="4.1.1" data-path="dge-analysis-workflow.html"><a href="dge-analysis-workflow.html#set-the-design-formula"><i class="fa fa-check"></i><b>4.1.1</b> Set the Design Formula</a></li>
+<li class="chapter" data-level="4.1.2" data-path="dge-analysis-workflow.html"><a href="dge-analysis-workflow.html#mov10-differential-expression-analysis"><i class="fa fa-check"></i><b>4.1.2</b> MOV10 Differential Expression Analysis</a></li>
+</ul></li>
+<li class="chapter" data-level="4.2" data-path="dge-analysis-workflow.html"><a href="dge-analysis-workflow.html#deseq2-differential-gene-expression-analysis-workflow"><i class="fa fa-check"></i><b>4.2</b> DESeq2 differential gene expression analysis workflow</a>
+<ul>
+<li class="chapter" data-level="4.2.1" data-path="dge-analysis-workflow.html"><a href="dge-analysis-workflow.html#step-1-estimate-size-factors"><i class="fa fa-check"></i><b>4.2.1</b> Step 1: Estimate size factors</a></li>
+<li class="chapter" data-level="4.2.2" data-path="dge-analysis-workflow.html"><a href="dge-analysis-workflow.html#step-2-estimate-gene-wise-dispersion"><i class="fa fa-check"></i><b>4.2.2</b> Step 2: Estimate Gene-wise Dispersion</a></li>
+<li class="chapter" data-level="4.2.3" data-path="dge-analysis-workflow.html"><a href="dge-analysis-workflow.html#step-3-fit-curve-to-gene-wise-dispersion-estimates"><i class="fa fa-check"></i><b>4.2.3</b> Step 3: Fit Curve to Gene-wise Dispersion Estimates</a></li>
+<li class="chapter" data-level="4.2.4" data-path="dge-analysis-workflow.html"><a href="dge-analysis-workflow.html#step-4-assessing-model-fit-with-dispersion-plots"><i class="fa fa-check"></i><b>4.2.4</b> Step 4: Assessing Model Fit with Dispersion Plots</a></li>
+<li class="chapter" data-level="4.2.5" data-path="dge-analysis-workflow.html"><a href="dge-analysis-workflow.html#assessing-and-addressing-issues"><i class="fa fa-check"></i><b>4.2.5</b> Assessing and Addressing Issues</a></li>
+<li class="chapter" data-level="4.2.6" data-path="dge-analysis-workflow.html"><a href="dge-analysis-workflow.html#mov10-differential-expression-analysis-exploring-dispersion-estimates"><i class="fa fa-check"></i><b>4.2.6</b> MOV10 Differential Expression Analysis: Exploring Dispersion Estimates</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html"><i class="fa fa-check"></i><b>5</b> Negative Binomial model fitting</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#generalized-linear-model-fit-for-each-gene"><i class="fa fa-check"></i><b>5.1</b> Generalized Linear Model fit for each gene</a>
+<ul>
+<li class="chapter" data-level="5.1.1" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#negative-binomial-model-formula"><i class="fa fa-check"></i><b>5.1.1</b> Negative Binomial Model Formula</a></li>
+<li class="chapter" data-level="5.1.2" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#estimating-beta-coefficients-using-the-design-matrix"><i class="fa fa-check"></i><b>5.1.2</b> Estimating Beta Coefficients Using the Design Matrix</a></li>
+<li class="chapter" data-level="5.1.3" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#step-by-step-process"><i class="fa fa-check"></i><b>5.1.3</b> Step-by-Step Process:</a></li>
+<li class="chapter" data-level="5.1.4" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#example"><i class="fa fa-check"></i><b>5.1.4</b> Example:</a></li>
+<li class="chapter" data-level="5.1.5" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#calculation"><i class="fa fa-check"></i><b>5.1.5</b> Calculation:</a></li>
+<li class="chapter" data-level="5.1.6" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#matrix-multiplication-form"><i class="fa fa-check"></i><b>5.1.6</b> Matrix Multiplication Form:</a></li>
+<li class="chapter" data-level="5.1.7" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#log2-fold-change-and-adjustments"><i class="fa fa-check"></i><b>5.1.7</b> <strong>Log2 Fold Change and Adjustments</strong></a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#shrunken-log2-foldchanges-lfc"><i class="fa fa-check"></i><b>5.2</b> Shrunken log2 foldchanges (LFC)</a>
+<ul>
+<li class="chapter" data-level="5.2.1" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#hypothesis-testing"><i class="fa fa-check"></i><b>5.2.1</b> Hypothesis Testing</a></li>
+</ul></li>
+<li class="chapter" data-level="5.3" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#statistical-test-for-lfc-estimates-wald-test"><i class="fa fa-check"></i><b>5.3</b> Statistical test for LFC estimates: Wald test</a></li>
+<li class="chapter" data-level="5.4" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#mov10-differential-expression-analysis-control-versus-overexpression"><i class="fa fa-check"></i><b>5.4</b> MOV10 Differential Expression Analysis: Control versus Overexpression</a>
+<ul>
+<li class="chapter" data-level="5.4.1" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#creating-contrasts-for-hypothesis-testing"><i class="fa fa-check"></i><b>5.4.1</b> Creating Contrasts for Hypothesis Testing</a></li>
+<li class="chapter" data-level="5.4.2" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#ma-plot"><i class="fa fa-check"></i><b>5.4.2</b> MA Plot</a></li>
+<li class="chapter" data-level="5.4.3" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#multiple-testing-correction"><i class="fa fa-check"></i><b>5.4.3</b> Multiple Testing Correction</a></li>
+<li class="chapter" data-level="5.4.4" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#benjamini-hochberg-adjustment"><i class="fa fa-check"></i><b>5.4.4</b> Benjamini-Hochberg Adjustment</a></li>
+<li class="chapter" data-level="5.4.5" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#mov10-de-analysis-control-vs.-knockdown"><i class="fa fa-check"></i><b>5.4.5</b> MOV10 DE Analysis: <strong>Control vs. Knockdown</strong></a></li>
+</ul></li>
+<li class="chapter" data-level="5.5" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#summarizing-results"><i class="fa fa-check"></i><b>5.5</b> Summarizing Results</a>
+<ul>
+<li class="chapter" data-level="5.5.1" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#extracting-significant-differentially-expressed-genes"><i class="fa fa-check"></i><b>5.5.1</b> Extracting Significant Differentially Expressed Genes</a></li>
+<li class="chapter" data-level="5.5.2" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#mov10-knockdown-analysis-control-vs.-knockdown"><i class="fa fa-check"></i><b>5.5.2</b> MOV10 Knockdown Analysis: Control vs. Knockdown</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="visualizing-rna-seq-results.html"><a href="visualizing-rna-seq-results.html"><i class="fa fa-check"></i><b>6</b> Visualizing RNA-seq results</a>
+<ul>
+<li class="chapter" data-level="6.0.1" data-path="visualizing-rna-seq-results.html"><a href="visualizing-rna-seq-results.html#plotting-signicant-de-genes"><i class="fa fa-check"></i><b>6.0.1</b> Plotting signicant DE genes</a></li>
+<li class="chapter" data-level="6.0.2" data-path="visualizing-rna-seq-results.html"><a href="visualizing-rna-seq-results.html#heatmap"><i class="fa fa-check"></i><b>6.0.2</b> Heatmap</a></li>
+<li class="chapter" data-level="6.0.3" data-path="visualizing-rna-seq-results.html"><a href="visualizing-rna-seq-results.html#volcano-plots"><i class="fa fa-check"></i><b>6.0.3</b> Volcano plots</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="summary-of-dge-workflow.html"><a href="summary-of-dge-workflow.html"><i class="fa fa-check"></i><b>7</b> Summary of DGE workflow</a>
+<ul>
+<li class="chapter" data-level="7.0.1" data-path="summary-of-dge-workflow.html"><a href="summary-of-dge-workflow.html#import-data-into-dds-object"><i class="fa fa-check"></i><b>7.0.1</b> 1. Import data into dds object:</a></li>
+<li class="chapter" data-level="7.0.2" data-path="summary-of-dge-workflow.html"><a href="summary-of-dge-workflow.html#exploratory-data-analysis-pca-heirarchical-clustering---identifying-outliers-and-sources-of-variation-in-the-data"><i class="fa fa-check"></i><b>7.0.2</b> 2. Exploratory data analysis (PCA &amp; heirarchical clustering) - identifying outliers and sources of variation in the data:</a></li>
+<li class="chapter" data-level="7.0.3" data-path="summary-of-dge-workflow.html"><a href="summary-of-dge-workflow.html#run-deseq2"><i class="fa fa-check"></i><b>7.0.3</b> 3. Run DESeq2:</a></li>
+<li class="chapter" data-level="7.0.4" data-path="summary-of-dge-workflow.html"><a href="summary-of-dge-workflow.html#check-the-fit-of-the-dispersion-estimates"><i class="fa fa-check"></i><b>7.0.4</b> 4. Check the fit of the dispersion estimates:</a></li>
+<li class="chapter" data-level="7.0.5" data-path="summary-of-dge-workflow.html"><a href="summary-of-dge-workflow.html#create-contrasts-to-perform-wald-testing-on-the-shrunken-log2-foldchanges-between-specific-conditions"><i class="fa fa-check"></i><b>7.0.5</b> 5. Create contrasts to perform Wald testing on the shrunken log2 foldchanges between specific conditions:</a></li>
+<li class="chapter" data-level="7.0.6" data-path="summary-of-dge-workflow.html"><a href="summary-of-dge-workflow.html#output-significant-results"><i class="fa fa-check"></i><b>7.0.6</b> 6. Output significant results:</a></li>
+<li class="chapter" data-level="7.0.7" data-path="summary-of-dge-workflow.html"><a href="summary-of-dge-workflow.html#visualize-results-volcano-plots-heatmaps-normalized-counts-plots-of-top-genes-etc."><i class="fa fa-check"></i><b>7.0.7</b> 7. Visualize results: volcano plots, heatmaps, normalized counts plots of top genes, etc.</a></li>
+<li class="chapter" data-level="7.0.8" data-path="summary-of-dge-workflow.html"><a href="summary-of-dge-workflow.html#make-sure-to-output-the-versions-of-all-tools-used-in-the-de-analysis"><i class="fa fa-check"></i><b>7.0.8</b> 8. Make sure to output the versions of all tools used in the DE analysis:</a></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="functional-analysis-of-rnaseq-data.html"><a href="functional-analysis-of-rnaseq-data.html"><i class="fa fa-check"></i><b>8</b> Functional analysis of RNAseq data</a>
+<ul>
+<li class="chapter" data-level="8.0.1" data-path="functional-analysis-of-rnaseq-data.html"><a href="functional-analysis-of-rnaseq-data.html#ontology-and-go-terms"><i class="fa fa-check"></i><b>8.0.1</b> Ontology and GO Terms</a></li>
+<li class="chapter" data-level="8.0.2" data-path="functional-analysis-of-rnaseq-data.html"><a href="functional-analysis-of-rnaseq-data.html#go-terms-gene-ontology-terms"><i class="fa fa-check"></i><b>8.0.2</b> GO Terms (Gene Ontology Terms)</a></li>
+<li class="chapter" data-level="8.0.3" data-path="functional-analysis-of-rnaseq-data.html"><a href="functional-analysis-of-rnaseq-data.html#go-enrichment-methods"><i class="fa fa-check"></i><b>8.0.3</b> GO Enrichment Methods</a></li>
+<li class="chapter" data-level="8.0.4" data-path="functional-analysis-of-rnaseq-data.html"><a href="functional-analysis-of-rnaseq-data.html#example-1"><i class="fa fa-check"></i><b>8.0.4</b> Example</a></li>
+<li class="chapter" data-level="8.0.5" data-path="functional-analysis-of-rnaseq-data.html"><a href="functional-analysis-of-rnaseq-data.html#over-representation-analysis-ora-using-clusterprofiler"><i class="fa fa-check"></i><b>8.0.5</b> Over-representation Analysis (ORA) using <code>clusterProfiler</code></a></li>
+<li class="chapter" data-level="8.0.6" data-path="functional-analysis-of-rnaseq-data.html"><a href="functional-analysis-of-rnaseq-data.html#visualizing-enrichment-results"><i class="fa fa-check"></i><b>8.0.6</b> Visualizing Enrichment Results</a></li>
+<li class="chapter" data-level="8.0.7" data-path="functional-analysis-of-rnaseq-data.html"><a href="functional-analysis-of-rnaseq-data.html#gsea-using-clusterprofiler-and-fgsea"><i class="fa fa-check"></i><b>8.0.7</b> GSEA Using clusterProfiler and fgsea</a></li>
+<li class="chapter" data-level="8.0.8" data-path="functional-analysis-of-rnaseq-data.html"><a href="functional-analysis-of-rnaseq-data.html#visualizing-gsea-results"><i class="fa fa-check"></i><b>8.0.8</b> Visualizing GSEA Results</a></li>
+<li class="chapter" data-level="8.0.9" data-path="functional-analysis-of-rnaseq-data.html"><a href="functional-analysis-of-rnaseq-data.html#gsea-using-fgsea"><i class="fa fa-check"></i><b>8.0.9</b> GSEA using fgsea</a></li>
+<li class="chapter" data-level="8.0.10" data-path="functional-analysis-of-rnaseq-data.html"><a href="functional-analysis-of-rnaseq-data.html#goenrichment-package-analysis"><i class="fa fa-check"></i><b>8.0.10</b> <code>GOenrichment</code> Package Analysis</a></li>
+<li class="chapter" data-level="8.0.11" data-path="functional-analysis-of-rnaseq-data.html"><a href="functional-analysis-of-rnaseq-data.html#other-tools-and-resources"><i class="fa fa-check"></i><b>8.0.11</b> Other tools and resources</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="codebook.html"><a href="codebook.html"><i class="fa fa-check"></i><b>9</b> Codebook</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="codebook.html"><a href="codebook.html#dge-analysis-overview"><i class="fa fa-check"></i><b>9.1</b> DGE analysis overview</a>
+<ul>
+<li class="chapter" data-level="9.1.1" data-path="codebook.html"><a href="codebook.html#setting-up-1"><i class="fa fa-check"></i><b>9.1.1</b> Setting up</a></li>
+<li class="chapter" data-level="9.1.2" data-path="codebook.html"><a href="codebook.html#dge-analysis-workflow-1"><i class="fa fa-check"></i><b>9.1.2</b> DGE analysis workflow</a></li>
+</ul></li>
+<li class="chapter" data-level="9.2" data-path="codebook.html"><a href="codebook.html#count-normalization-1"><i class="fa fa-check"></i><b>9.2</b> Count normalization</a>
+<ul>
+<li class="chapter" data-level="9.2.1" data-path="codebook.html"><a href="codebook.html#match-the-metadata-and-counts-data-1"><i class="fa fa-check"></i><b>9.2.1</b> 1. Match the metadata and counts data</a></li>
+<li class="chapter" data-level="9.2.2" data-path="codebook.html"><a href="codebook.html#create-deseq2-object-1"><i class="fa fa-check"></i><b>9.2.2</b> 2. Create DESEq2 object</a></li>
+<li class="chapter" data-level="9.2.3" data-path="codebook.html"><a href="codebook.html#generate-the-mov10-normalized-counts-1"><i class="fa fa-check"></i><b>9.2.3</b> 3. Generate the Mov10 normalized counts</a></li>
+</ul></li>
+<li class="chapter" data-level="9.3" data-path="codebook.html"><a href="codebook.html#quality-control-1"><i class="fa fa-check"></i><b>9.3</b> Quality Control</a>
+<ul>
+<li class="chapter" data-level="9.3.1" data-path="codebook.html"><a href="codebook.html#principal-components-analysis-pca-1"><i class="fa fa-check"></i><b>9.3.1</b> Principal components analysis (PCA)</a></li>
+<li class="chapter" data-level="9.3.2" data-path="codebook.html"><a href="codebook.html#hierarchical-clustering-1"><i class="fa fa-check"></i><b>9.3.2</b> Hierarchical Clustering</a></li>
+</ul></li>
+<li class="chapter" data-level="9.4" data-path="codebook.html"><a href="codebook.html#dge-analysis-workflow-2"><i class="fa fa-check"></i><b>9.4</b> DGE analysis workflow</a>
+<ul>
+<li class="chapter" data-level="9.4.1" data-path="codebook.html"><a href="codebook.html#set-the-design-formula-1"><i class="fa fa-check"></i><b>9.4.1</b> Set the Design Formula</a></li>
+<li class="chapter" data-level="9.4.2" data-path="codebook.html"><a href="codebook.html#mov10-differential-expression-analysis-1"><i class="fa fa-check"></i><b>9.4.2</b> MOV10 Differential Expression Analysis</a></li>
+<li class="chapter" data-level="9.4.3" data-path="codebook.html"><a href="codebook.html#deseq2-differential-gene-expression-analysis-workflow-1"><i class="fa fa-check"></i><b>9.4.3</b> DESeq2 differential gene expression analysis workflow</a></li>
+<li class="chapter" data-level="9.4.4" data-path="codebook.html"><a href="codebook.html#mov10-differential-expression-analysis-exploring-dispersion-estimates-1"><i class="fa fa-check"></i><b>9.4.4</b> MOV10 Differential Expression Analysis: Exploring Dispersion Estimates</a></li>
+</ul></li>
+<li class="chapter" data-level="9.5" data-path="codebook.html"><a href="codebook.html#negative-binomial-model-fitting-1"><i class="fa fa-check"></i><b>9.5</b> Negative Binomial model fitting</a>
+<ul>
+<li class="chapter" data-level="9.5.1" data-path="codebook.html"><a href="codebook.html#example-2"><i class="fa fa-check"></i><b>9.5.1</b> Example:</a></li>
+<li class="chapter" data-level="9.5.2" data-path="codebook.html"><a href="codebook.html#calculation-1"><i class="fa fa-check"></i><b>9.5.2</b> Calculation:</a></li>
+<li class="chapter" data-level="9.5.3" data-path="codebook.html"><a href="codebook.html#matrix-multiplication-form-1"><i class="fa fa-check"></i><b>9.5.3</b> Matrix Multiplication Form:</a></li>
+</ul></li>
+<li class="chapter" data-level="9.6" data-path="codebook.html"><a href="codebook.html#mov10-differential-expression-analysis-2"><i class="fa fa-check"></i><b>9.6</b> MOV10 Differential Expression Analysis:</a>
+<ul>
+<li class="chapter" data-level="9.6.1" data-path="codebook.html"><a href="codebook.html#mov10-de-analysis-control-vs.-knockdown-1"><i class="fa fa-check"></i><b>9.6.1</b> MOV10 DE Analysis: <strong>Control vs. Knockdown</strong></a></li>
+</ul></li>
+<li class="chapter" data-level="9.7" data-path="codebook.html"><a href="codebook.html#summarizing-results-1"><i class="fa fa-check"></i><b>9.7</b> Summarizing Results</a>
+<ul>
+<li class="chapter" data-level="9.7.1" data-path="codebook.html"><a href="codebook.html#extracting-significant-differentially-expressed-genes-1"><i class="fa fa-check"></i><b>9.7.1</b> Extracting Significant Differentially Expressed Genes</a></li>
+<li class="chapter" data-level="9.7.2" data-path="codebook.html"><a href="codebook.html#mov10-knockdown-analysis-control-vs.-knockdown-1"><i class="fa fa-check"></i><b>9.7.2</b> MOV10 Knockdown Analysis: Control vs. Knockdown</a></li>
+</ul></li>
+<li class="chapter" data-level="9.8" data-path="codebook.html"><a href="codebook.html#visualizing-rna-seq-results-1"><i class="fa fa-check"></i><b>9.8</b> Visualizing RNA-seq results</a>
+<ul>
+<li class="chapter" data-level="9.8.1" data-path="codebook.html"><a href="codebook.html#heatmap-1"><i class="fa fa-check"></i><b>9.8.1</b> Heatmap</a></li>
+<li class="chapter" data-level="9.8.2" data-path="codebook.html"><a href="codebook.html#volcano-plots-1"><i class="fa fa-check"></i><b>9.8.2</b> Volcano plots</a></li>
+</ul></li>
+<li class="chapter" data-level="9.9" data-path="codebook.html"><a href="codebook.html#summary-of-dge-workflow-1"><i class="fa fa-check"></i><b>9.9</b> Summary of DGE workflow</a>
+<ul>
+<li class="chapter" data-level="9.9.1" data-path="codebook.html"><a href="codebook.html#import-data-into-dds-object-1"><i class="fa fa-check"></i><b>9.9.1</b> 1. Import data into dds object:</a></li>
+<li class="chapter" data-level="9.9.2" data-path="codebook.html"><a href="codebook.html#exploratory-data-analysis-pca-heirarchical-clustering---identifying-outliers-and-sources-of-variation-in-the-data-1"><i class="fa fa-check"></i><b>9.9.2</b> 2. Exploratory data analysis (PCA &amp; heirarchical clustering) - identifying outliers and sources of variation in the data:</a></li>
+<li class="chapter" data-level="9.9.3" data-path="codebook.html"><a href="codebook.html#run-deseq2-1"><i class="fa fa-check"></i><b>9.9.3</b> 3. Run DESeq2:</a></li>
+<li class="chapter" data-level="9.9.4" data-path="codebook.html"><a href="codebook.html#check-the-fit-of-the-dispersion-estimates-1"><i class="fa fa-check"></i><b>9.9.4</b> 4. Check the fit of the dispersion estimates:</a></li>
+<li class="chapter" data-level="9.9.5" data-path="codebook.html"><a href="codebook.html#create-contrasts-to-perform-wald-testing-on-the-shrunken-log2-foldchanges-between-specific-conditions-1"><i class="fa fa-check"></i><b>9.9.5</b> 5. Create contrasts to perform Wald testing on the shrunken log2 foldchanges between specific conditions:</a></li>
+<li class="chapter" data-level="9.9.6" data-path="codebook.html"><a href="codebook.html#output-significant-results-1"><i class="fa fa-check"></i><b>9.9.6</b> 6. Output significant results:</a></li>
+<li class="chapter" data-level="9.9.7" data-path="codebook.html"><a href="codebook.html#visualize-results-volcano-plots-heatmaps-normalized-counts-plots-of-top-genes-etc.-1"><i class="fa fa-check"></i><b>9.9.7</b> 7. Visualize results: volcano plots, heatmaps, normalized counts plots of top genes, etc.</a></li>
+<li class="chapter" data-level="9.9.8" data-path="codebook.html"><a href="codebook.html#make-sure-to-output-the-versions-of-all-tools-used-in-the-de-analysis-1"><i class="fa fa-check"></i><b>9.9.8</b> 8. Make sure to output the versions of all tools used in the DE analysis:</a></li>
+</ul></li>
+<li class="chapter" data-level="9.10" data-path="codebook.html"><a href="codebook.html#functional-analysis-of-rna-seq-data"><i class="fa fa-check"></i><b>9.10</b> Functional analysis of RNA-seq data</a>
+<ul>
+<li class="chapter" data-level="9.10.1" data-path="codebook.html"><a href="codebook.html#over-representation-analysis-ora-using-clusterprofiler-1"><i class="fa fa-check"></i><b>9.10.1</b> Over-representation Analysis (ORA) using <code>clusterProfiler</code></a></li>
+<li class="chapter" data-level="9.10.2" data-path="codebook.html"><a href="codebook.html#visualizing-enrichment-results-1"><i class="fa fa-check"></i><b>9.10.2</b> Visualizing Enrichment Results</a></li>
+<li class="chapter" data-level="9.10.3" data-path="codebook.html"><a href="codebook.html#gsea-using-clusterprofiler-and-fgsea-1"><i class="fa fa-check"></i><b>9.10.3</b> GSEA Using clusterProfiler and fgsea</a></li>
+<li class="chapter" data-level="9.10.4" data-path="codebook.html"><a href="codebook.html#visualizing-gsea-results-1"><i class="fa fa-check"></i><b>9.10.4</b> Visualizing GSEA Results</a></li>
+<li class="chapter" data-level="9.10.5" data-path="codebook.html"><a href="codebook.html#gsea-using-fgsea-1"><i class="fa fa-check"></i><b>9.10.5</b> GSEA using fgsea</a></li>
+<li class="chapter" data-level="9.10.6" data-path="codebook.html"><a href="codebook.html#goenrichment-package-analysis-1"><i class="fa fa-check"></i><b>9.10.6</b> <code>GOenrichment</code> Package Analysis</a></li>
+</ul></li>
+</ul></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">2024_RNA-seq-analysis</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="visualizing-rna-seq-results" class="section level1 hasAnchor" number="6">
+<h1><span class="header-section-number">Chapter 6</span> Visualizing RNA-seq results<a href="visualizing-rna-seq-results.html#visualizing-rna-seq-results" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>During this lesson, we will get you started with some basic and more advanced visualization techniques to explore and interpret the results of your differential expression analysis.</p>
+<p>Let’s start by loading a few libraries:</p>
+<div class="sourceCode" id="cb103"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb103-1"><a href="visualizing-rna-seq-results.html#cb103-1" tabindex="-1"></a><span class="co"># load libraries</span></span>
+<span id="cb103-2"><a href="visualizing-rna-seq-results.html#cb103-2" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb103-3"><a href="visualizing-rna-seq-results.html#cb103-3" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb103-4"><a href="visualizing-rna-seq-results.html#cb103-4" tabindex="-1"></a><span class="fu">library</span>(ggrepel)</span>
+<span id="cb103-5"><a href="visualizing-rna-seq-results.html#cb103-5" tabindex="-1"></a><span class="fu">library</span>(RColorBrewer)</span>
+<span id="cb103-6"><a href="visualizing-rna-seq-results.html#cb103-6" tabindex="-1"></a><span class="fu">library</span>(DESeq2)</span>
+<span id="cb103-7"><a href="visualizing-rna-seq-results.html#cb103-7" tabindex="-1"></a><span class="fu">library</span>(pheatmap)</span>
+<span id="cb103-8"><a href="visualizing-rna-seq-results.html#cb103-8" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span></code></pre></div>
+<p>We will be working with three different data objects we have already created in earlier lessons:</p>
+<ul>
+<li>Metadata for our samples (a dataframe): <code>meta</code></li>
+<li>Normalized expression data for every gene in each of our samples (a matrix): <code>normalized_counts</code></li>
+<li>Tibble versions of the DESeq2 results we generated in the last lesson: <code>res_tableOE_tb</code> and <code>res_tableKD_tb</code></li>
+</ul>
+<p>Let’s create tibble objects from the <code>meta</code> and <code>normalized_counts</code> data frames before we start plotting. This will enable us to use the <code>tidyverse</code> functionality more easily.</p>
+<p>Check to make sure the column names of the <code>normalized_counts</code> matrix are the same as the row names of the <code>meta</code> data frame. If they are not, you will need to reorder the columns of <code>normalized_counts</code> to match the row names of <code>meta</code>.</p>
+<div class="sourceCode" id="cb104"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb104-1"><a href="visualizing-rna-seq-results.html#cb104-1" tabindex="-1"></a><span class="co"># Read in the metadata</span></span>
+<span id="cb104-2"><a href="visualizing-rna-seq-results.html#cb104-2" tabindex="-1"></a>meta <span class="ot">&lt;-</span> <span class="fu">read.table</span>(<span class="st">&quot;data/Mov10_full_meta.txt&quot;</span>, </span>
+<span id="cb104-3"><a href="visualizing-rna-seq-results.html#cb104-3" tabindex="-1"></a>                   <span class="at">header=</span>T, <span class="at">row.names=</span><span class="dv">1</span>)</span>
+<span id="cb104-4"><a href="visualizing-rna-seq-results.html#cb104-4" tabindex="-1"></a></span>
+<span id="cb104-5"><a href="visualizing-rna-seq-results.html#cb104-5" tabindex="-1"></a><span class="co"># Create a tibble for meta data</span></span>
+<span id="cb104-6"><a href="visualizing-rna-seq-results.html#cb104-6" tabindex="-1"></a>mov10_meta <span class="ot">&lt;-</span> meta <span class="sc">%&gt;%</span> </span>
+<span id="cb104-7"><a href="visualizing-rna-seq-results.html#cb104-7" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="at">var=</span><span class="st">&quot;samplename&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb104-8"><a href="visualizing-rna-seq-results.html#cb104-8" tabindex="-1"></a>  <span class="fu">as_tibble</span>()</span>
+<span id="cb104-9"><a href="visualizing-rna-seq-results.html#cb104-9" tabindex="-1"></a>        </span>
+<span id="cb104-10"><a href="visualizing-rna-seq-results.html#cb104-10" tabindex="-1"></a><span class="co"># read in the normalized counts</span></span>
+<span id="cb104-11"><a href="visualizing-rna-seq-results.html#cb104-11" tabindex="-1"></a>normalized_counts <span class="ot">&lt;-</span> <span class="fu">read.delim</span>(<span class="st">&quot;data/normalized_counts.txt&quot;</span>, <span class="at">row.names=</span><span class="dv">1</span>)</span>
+<span id="cb104-12"><a href="visualizing-rna-seq-results.html#cb104-12" tabindex="-1"></a></span>
+<span id="cb104-13"><a href="visualizing-rna-seq-results.html#cb104-13" tabindex="-1"></a><span class="fu">all</span>(mov10_meta<span class="sc">$</span>samplename <span class="sc">==</span> <span class="fu">colnames</span>(normalized_counts))</span></code></pre></div>
+<pre><code>## [1] TRUE</code></pre>
+<div class="sourceCode" id="cb106"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb106-1"><a href="visualizing-rna-seq-results.html#cb106-1" tabindex="-1"></a><span class="co"># Create a tibble for normalized_counts</span></span>
+<span id="cb106-2"><a href="visualizing-rna-seq-results.html#cb106-2" tabindex="-1"></a>normalized_counts <span class="ot">&lt;-</span> normalized_counts <span class="sc">%&gt;%</span> </span>
+<span id="cb106-3"><a href="visualizing-rna-seq-results.html#cb106-3" tabindex="-1"></a>  <span class="fu">data.frame</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb106-4"><a href="visualizing-rna-seq-results.html#cb106-4" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="at">var=</span><span class="st">&quot;gene&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb106-5"><a href="visualizing-rna-seq-results.html#cb106-5" tabindex="-1"></a>  <span class="fu">as_tibble</span>()</span></code></pre></div>
+<div id="plotting-signicant-de-genes" class="section level3 hasAnchor" number="6.0.1">
+<h3><span class="header-section-number">6.0.1</span> Plotting signicant DE genes<a href="visualizing-rna-seq-results.html#plotting-signicant-de-genes" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>One way to visualize results would be to simply plot the expression data for a handful of genes. We could do that by picking out specific genes of interest or selecting a range of genes.</p>
+<div id="using-deseq2-plotcounts-to-plot-expression-of-a-single-gene" class="section level4 hasAnchor" number="6.0.1.1">
+<h4><span class="header-section-number">6.0.1.1</span> <strong>Using DESeq2 <code>plotCounts()</code> to plot expression of a single gene</strong><a href="visualizing-rna-seq-results.html#using-deseq2-plotcounts-to-plot-expression-of-a-single-gene" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>To pick out a specific gene of interest to plot, for example Mov10, we can use the <code>plotCounts()</code> from DESeq2. <code>plotCounts()</code> is a function that allows us to plot the normalized counts for a single gene across all samples.</p>
+<div class="sourceCode" id="cb107"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb107-1"><a href="visualizing-rna-seq-results.html#cb107-1" tabindex="-1"></a><span class="fu">plotCounts</span>(dds, </span>
+<span id="cb107-2"><a href="visualizing-rna-seq-results.html#cb107-2" tabindex="-1"></a>           <span class="at">gene=</span><span class="st">&quot;MOV10&quot;</span>, </span>
+<span id="cb107-3"><a href="visualizing-rna-seq-results.html#cb107-3" tabindex="-1"></a>           <span class="at">intgroup=</span><span class="st">&quot;sampletype&quot;</span>) </span></code></pre></div>
+<p><img src="2024_RNA-seq-analysis_files/figure-html/unnamed-chunk-63-1.png" width="672" /></p>
+<div class="sourceCode" id="cb108"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb108-1"><a href="visualizing-rna-seq-results.html#cb108-1" tabindex="-1"></a><span class="co"># We can also color the points by sample type</span></span>
+<span id="cb108-2"><a href="visualizing-rna-seq-results.html#cb108-2" tabindex="-1"></a>sampletype <span class="ot">=</span> <span class="fu">as.factor</span>(mov10_meta<span class="sc">$</span>sampletype)</span>
+<span id="cb108-3"><a href="visualizing-rna-seq-results.html#cb108-3" tabindex="-1"></a></span>
+<span id="cb108-4"><a href="visualizing-rna-seq-results.html#cb108-4" tabindex="-1"></a><span class="fu">library</span>(RColorBrewer)</span>
+<span id="cb108-5"><a href="visualizing-rna-seq-results.html#cb108-5" tabindex="-1"></a></span>
+<span id="cb108-6"><a href="visualizing-rna-seq-results.html#cb108-6" tabindex="-1"></a><span class="fu">display.brewer.all</span>()</span></code></pre></div>
+<p><img src="2024_RNA-seq-analysis_files/figure-html/unnamed-chunk-63-2.png" width="672" /></p>
+<div class="sourceCode" id="cb109"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb109-1"><a href="visualizing-rna-seq-results.html#cb109-1" tabindex="-1"></a>col <span class="ot">=</span> <span class="fu">brewer.pal</span>(<span class="dv">8</span>,<span class="st">&quot;Dark2&quot;</span>)</span>
+<span id="cb109-2"><a href="visualizing-rna-seq-results.html#cb109-2" tabindex="-1"></a><span class="fu">palette</span>(col)</span>
+<span id="cb109-3"><a href="visualizing-rna-seq-results.html#cb109-3" tabindex="-1"></a></span>
+<span id="cb109-4"><a href="visualizing-rna-seq-results.html#cb109-4" tabindex="-1"></a><span class="fu">plotCounts</span>(dds, <span class="at">gene=</span><span class="st">&quot;MOV10&quot;</span>, </span>
+<span id="cb109-5"><a href="visualizing-rna-seq-results.html#cb109-5" tabindex="-1"></a>           <span class="at">intgroup=</span><span class="st">&quot;sampletype&quot;</span>,</span>
+<span id="cb109-6"><a href="visualizing-rna-seq-results.html#cb109-6" tabindex="-1"></a>           <span class="at">col =</span> <span class="fu">as.numeric</span>(sampletype),</span>
+<span id="cb109-7"><a href="visualizing-rna-seq-results.html#cb109-7" tabindex="-1"></a>           <span class="at">pch =</span> <span class="dv">19</span>) </span></code></pre></div>
+<p><img src="2024_RNA-seq-analysis_files/figure-html/unnamed-chunk-63-3.png" width="672" /></p>
+<p><strong>This function only allows for plotting the counts of a single gene at a time.</strong></p>
+</div>
+<div id="using-ggplot2-to-plot-expression-of-a-single-gene" class="section level4 hasAnchor" number="6.0.1.2">
+<h4><span class="header-section-number">6.0.1.2</span> <strong>Using ggplot2 to plot expression of a single gene</strong><a href="visualizing-rna-seq-results.html#using-ggplot2-to-plot-expression-of-a-single-gene" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>We can also use ggplot2 to plot the <code>MOV10</code> counts. We can save the output of <code>plotCounts()</code> to a variable specifying the <code>returnData=TRUE</code> argument. This will save the normalized counts for the gene <code>MOV10</code> to a data frame object. We can then use ggplot2 to plot the normalized counts for <code>MOV10</code> across all samples.</p>
+<div class="sourceCode" id="cb110"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb110-1"><a href="visualizing-rna-seq-results.html#cb110-1" tabindex="-1"></a><span class="co"># Save `plotCounts()` to a data frame object</span></span>
+<span id="cb110-2"><a href="visualizing-rna-seq-results.html#cb110-2" tabindex="-1"></a>d <span class="ot">&lt;-</span> <span class="fu">plotCounts</span>(dds, <span class="at">gene =</span> <span class="st">&quot;MOV10&quot;</span>, <span class="at">intgroup =</span> <span class="st">&quot;sampletype&quot;</span>, </span>
+<span id="cb110-3"><a href="visualizing-rna-seq-results.html#cb110-3" tabindex="-1"></a>                <span class="at">returnData=</span><span class="cn">TRUE</span>)</span>
+<span id="cb110-4"><a href="visualizing-rna-seq-results.html#cb110-4" tabindex="-1"></a></span>
+<span id="cb110-5"><a href="visualizing-rna-seq-results.html#cb110-5" tabindex="-1"></a><span class="co"># Plot using ggplot2</span></span>
+<span id="cb110-6"><a href="visualizing-rna-seq-results.html#cb110-6" tabindex="-1"></a><span class="fu">ggplot</span>(d, <span class="fu">aes</span>(<span class="at">x =</span> sampletype, <span class="at">y =</span> count, <span class="at">color =</span> sampletype)) <span class="sc">+</span> </span>
+<span id="cb110-7"><a href="visualizing-rna-seq-results.html#cb110-7" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">position =</span> <span class="fu">position_jitter</span>(<span class="at">w =</span> <span class="fl">0.1</span>,<span class="at">h =</span> <span class="dv">0</span>)) <span class="sc">+</span></span>
+<span id="cb110-8"><a href="visualizing-rna-seq-results.html#cb110-8" tabindex="-1"></a>  <span class="fu">geom_text_repel</span>(<span class="fu">aes</span>(<span class="at">label =</span> <span class="fu">rownames</span>(d))) <span class="sc">+</span> </span>
+<span id="cb110-9"><a href="visualizing-rna-seq-results.html#cb110-9" tabindex="-1"></a>  <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb110-10"><a href="visualizing-rna-seq-results.html#cb110-10" tabindex="-1"></a>  <span class="fu">ggtitle</span>(<span class="st">&quot;MOV10&quot;</span>) <span class="sc">+</span></span>
+<span id="cb110-11"><a href="visualizing-rna-seq-results.html#cb110-11" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>))</span></code></pre></div>
+<p><img src="2024_RNA-seq-analysis_files/figure-html/unnamed-chunk-64-1.png" width="672" /></p>
+<blockquote>
+<p>Note that in the plot below (code above), we are using <code>geom_text_repel()</code> from the <code>ggrepel</code> package to label our individual points on the plot.</p>
+</blockquote>
+</div>
+<div id="using-ggplot2-to-plot-multiple-genes-e.g.-top-20" class="section level4 hasAnchor" number="6.0.1.3">
+<h4><span class="header-section-number">6.0.1.3</span> Using <code>ggplot2</code> to plot multiple genes (e.g. top 20)<a href="visualizing-rna-seq-results.html#using-ggplot2-to-plot-multiple-genes-e.g.-top-20" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>Often it is helpful to check the expression of multiple genes of interest at the same time. This often first requires some data wrangling.</p>
+<p>We are going to plot the normalized count values for the <strong>top 20 differentially expressed genes (by padj values)</strong>.</p>
+<p>To do this, we first need to determine the gene names of our top 20 genes by ordering our results and extracting the top 20 genes (by padj values):</p>
+<div class="sourceCode" id="cb111"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb111-1"><a href="visualizing-rna-seq-results.html#cb111-1" tabindex="-1"></a>res_tableOE <span class="ot">&lt;-</span> <span class="fu">readRDS</span>(<span class="st">&quot;data/res_tableOE.RDS&quot;</span>)</span>
+<span id="cb111-2"><a href="visualizing-rna-seq-results.html#cb111-2" tabindex="-1"></a></span>
+<span id="cb111-3"><a href="visualizing-rna-seq-results.html#cb111-3" tabindex="-1"></a>res_tableOE_tb <span class="ot">&lt;-</span> res_tableOE <span class="sc">%&gt;%</span></span>
+<span id="cb111-4"><a href="visualizing-rna-seq-results.html#cb111-4" tabindex="-1"></a>  <span class="fu">data.frame</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb111-5"><a href="visualizing-rna-seq-results.html#cb111-5" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="at">var=</span><span class="st">&quot;gene&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb111-6"><a href="visualizing-rna-seq-results.html#cb111-6" tabindex="-1"></a>  <span class="fu">as_tibble</span>()</span>
+<span id="cb111-7"><a href="visualizing-rna-seq-results.html#cb111-7" tabindex="-1"></a></span>
+<span id="cb111-8"><a href="visualizing-rna-seq-results.html#cb111-8" tabindex="-1"></a><span class="do">## Order results by padj values</span></span>
+<span id="cb111-9"><a href="visualizing-rna-seq-results.html#cb111-9" tabindex="-1"></a>top20_sigOE_genes <span class="ot">&lt;-</span> res_tableOE_tb <span class="sc">%&gt;%</span> </span>
+<span id="cb111-10"><a href="visualizing-rna-seq-results.html#cb111-10" tabindex="-1"></a>        <span class="fu">arrange</span>(padj) <span class="sc">%&gt;%</span>   </span>
+<span id="cb111-11"><a href="visualizing-rna-seq-results.html#cb111-11" tabindex="-1"></a><span class="co">#Arrange rows by padj values</span></span>
+<span id="cb111-12"><a href="visualizing-rna-seq-results.html#cb111-12" tabindex="-1"></a>        <span class="fu">pull</span>(gene) <span class="sc">%&gt;%</span>      </span>
+<span id="cb111-13"><a href="visualizing-rna-seq-results.html#cb111-13" tabindex="-1"></a><span class="co">#Extract character vector of ordered genes</span></span>
+<span id="cb111-14"><a href="visualizing-rna-seq-results.html#cb111-14" tabindex="-1"></a>        <span class="fu">head</span>(<span class="at">n=</span><span class="dv">20</span>)      </span>
+<span id="cb111-15"><a href="visualizing-rna-seq-results.html#cb111-15" tabindex="-1"></a><span class="co">#Extract the first 20 genes</span></span></code></pre></div>
+<p>Then, we can extract the normalized count values for these top 20 genes:</p>
+<div class="sourceCode" id="cb112"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb112-1"><a href="visualizing-rna-seq-results.html#cb112-1" tabindex="-1"></a><span class="do">## Normalized counts for top 20 significant genes</span></span>
+<span id="cb112-2"><a href="visualizing-rna-seq-results.html#cb112-2" tabindex="-1"></a>top20_sigOE_norm <span class="ot">&lt;-</span> normalized_counts <span class="sc">%&gt;%</span></span>
+<span id="cb112-3"><a href="visualizing-rna-seq-results.html#cb112-3" tabindex="-1"></a>        <span class="fu">filter</span>(gene <span class="sc">%in%</span> top20_sigOE_genes)</span></code></pre></div>
+<p>Now that we have the normalized counts for each of the top 20 genes for all 8 samples, to plot using <code>ggplot()</code>, we need to <code>pivot_longer</code> top20_sigOE_norm from a wide format to a long format so the counts for all samples will be in a single column to allow us to give ggplot the one column with the values we want it to plot.</p>
+<p>The <code>pivot_longer()</code> function in the <strong>tidyr</strong> package will perform this operation and will output the normalized counts for all genes for <em>Mov10_oe_1</em> listed in the first 20 rows, followed by the normalized counts for <em>Mov10_oe_2</em> in the next 20 rows, so on and so forth.</p>
+<p><img src="img/melt_wide_to_long_format.png" width="800" alt="Alt text" /></p>
+<div class="sourceCode" id="cb113"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb113-1"><a href="visualizing-rna-seq-results.html#cb113-1" tabindex="-1"></a><span class="co"># Pivot the data frame</span></span>
+<span id="cb113-2"><a href="visualizing-rna-seq-results.html#cb113-2" tabindex="-1"></a>pivoted_top20_sigOE <span class="ot">&lt;-</span> top20_sigOE_norm <span class="sc">%&gt;%</span></span>
+<span id="cb113-3"><a href="visualizing-rna-seq-results.html#cb113-3" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">colnames</span>(top20_sigOE_norm)[<span class="dv">2</span><span class="sc">:</span><span class="dv">9</span>], </span>
+<span id="cb113-4"><a href="visualizing-rna-seq-results.html#cb113-4" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="st">&quot;samplename&quot;</span>, </span>
+<span id="cb113-5"><a href="visualizing-rna-seq-results.html#cb113-5" tabindex="-1"></a>               <span class="at">values_to =</span> <span class="st">&quot;normalized_counts&quot;</span>)</span>
+<span id="cb113-6"><a href="visualizing-rna-seq-results.html#cb113-6" tabindex="-1"></a></span>
+<span id="cb113-7"><a href="visualizing-rna-seq-results.html#cb113-7" tabindex="-1"></a><span class="do">## Check the column header in the &quot;pivoted&quot; data frame</span></span>
+<span id="cb113-8"><a href="visualizing-rna-seq-results.html#cb113-8" tabindex="-1"></a><span class="fu">head</span>(pivoted_top20_sigOE)</span></code></pre></div>
+<div class="kable-table">
+<table>
+<thead>
+<tr class="header">
+<th align="left">gene</th>
+<th align="left">samplename</th>
+<th align="right">normalized_counts</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">ADAMTS1</td>
+<td align="left">Irrel_kd_1</td>
+<td align="right">6717.735</td>
+</tr>
+<tr class="even">
+<td align="left">ADAMTS1</td>
+<td align="left">Irrel_kd_2</td>
+<td align="right">6454.641</td>
+</tr>
+<tr class="odd">
+<td align="left">ADAMTS1</td>
+<td align="left">Irrel_kd_3</td>
+<td align="right">6801.543</td>
+</tr>
+<tr class="even">
+<td align="left">ADAMTS1</td>
+<td align="left">Mov10_kd_2</td>
+<td align="right">6869.168</td>
+</tr>
+<tr class="odd">
+<td align="left">ADAMTS1</td>
+<td align="left">Mov10_kd_3</td>
+<td align="right">8730.977</td>
+</tr>
+<tr class="even">
+<td align="left">ADAMTS1</td>
+<td align="left">Mov10_oe_1</td>
+<td align="right">13252.239</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Now, if we want our counts colored by sample group, then we need to combine the metadata information with the melted normalized counts data into the same data frame for input to <code>ggplot()</code>:</p>
+<p><code>inner_join(x,y)</code> will merge 2 data frames by the colname in x that matches a column name in y in this case <code>samplename</code> column.</p>
+<div class="sourceCode" id="cb114"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb114-1"><a href="visualizing-rna-seq-results.html#cb114-1" tabindex="-1"></a>pivoted_top20_sigOE <span class="ot">&lt;-</span> <span class="fu">inner_join</span>(</span>
+<span id="cb114-2"><a href="visualizing-rna-seq-results.html#cb114-2" tabindex="-1"></a>  mov10_meta, </span>
+<span id="cb114-3"><a href="visualizing-rna-seq-results.html#cb114-3" tabindex="-1"></a>  pivoted_top20_sigOE)</span></code></pre></div>
+<pre><code>## Joining with `by = join_by(samplename)`</code></pre>
+<p>Now that we have a data frame in a format that can be utilised by ggplot easily, let’s plot!</p>
+<div class="sourceCode" id="cb116"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb116-1"><a href="visualizing-rna-seq-results.html#cb116-1" tabindex="-1"></a><span class="do">## plot using ggplot2</span></span>
+<span id="cb116-2"><a href="visualizing-rna-seq-results.html#cb116-2" tabindex="-1"></a><span class="fu">ggplot</span>(pivoted_top20_sigOE) <span class="sc">+</span></span>
+<span id="cb116-3"><a href="visualizing-rna-seq-results.html#cb116-3" tabindex="-1"></a>        <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> gene, <span class="at">y =</span> normalized_counts, </span>
+<span id="cb116-4"><a href="visualizing-rna-seq-results.html#cb116-4" tabindex="-1"></a>          <span class="at">color =</span> sampletype)) <span class="sc">+</span></span>
+<span id="cb116-5"><a href="visualizing-rna-seq-results.html#cb116-5" tabindex="-1"></a>        <span class="fu">scale_y_log10</span>() <span class="sc">+</span></span>
+<span id="cb116-6"><a href="visualizing-rna-seq-results.html#cb116-6" tabindex="-1"></a>        <span class="fu">xlab</span>(<span class="st">&quot;Genes&quot;</span>) <span class="sc">+</span></span>
+<span id="cb116-7"><a href="visualizing-rna-seq-results.html#cb116-7" tabindex="-1"></a>        <span class="fu">ylab</span>(<span class="st">&quot;log10 Normalized Counts&quot;</span>) <span class="sc">+</span></span>
+<span id="cb116-8"><a href="visualizing-rna-seq-results.html#cb116-8" tabindex="-1"></a>        <span class="fu">ggtitle</span>(<span class="st">&quot;Top 20 Significant DE Genes&quot;</span>) <span class="sc">+</span></span>
+<span id="cb116-9"><a href="visualizing-rna-seq-results.html#cb116-9" tabindex="-1"></a>        <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb116-10"><a href="visualizing-rna-seq-results.html#cb116-10" tabindex="-1"></a>        <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, </span>
+<span id="cb116-11"><a href="visualizing-rna-seq-results.html#cb116-11" tabindex="-1"></a>                                         <span class="at">hjust =</span> <span class="dv">1</span>)) <span class="sc">+</span></span>
+<span id="cb116-12"><a href="visualizing-rna-seq-results.html#cb116-12" tabindex="-1"></a>        <span class="fu">theme</span>(<span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>))</span></code></pre></div>
+<p><img src="2024_RNA-seq-analysis_files/figure-html/unnamed-chunk-69-1.png" width="672" /></p>
+</div>
+</div>
+<div id="heatmap" class="section level3 hasAnchor" number="6.0.2">
+<h3><span class="header-section-number">6.0.2</span> Heatmap<a href="visualizing-rna-seq-results.html#heatmap" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>We will plot a heatmap of the <code>sigOE</code> genes to visualize their expression across all samples using <code>pheatmap()</code>.</p>
+<div class="sourceCode" id="cb117"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb117-1"><a href="visualizing-rna-seq-results.html#cb117-1" tabindex="-1"></a>sigOE <span class="ot">=</span> <span class="fu">readRDS</span>(<span class="st">&quot;data/sigOE.RDS&quot;</span>)</span>
+<span id="cb117-2"><a href="visualizing-rna-seq-results.html#cb117-2" tabindex="-1"></a></span>
+<span id="cb117-3"><a href="visualizing-rna-seq-results.html#cb117-3" tabindex="-1"></a>norm_OEsig <span class="ot">&lt;-</span> normalized_counts[,<span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span><span class="sc">:</span><span class="dv">4</span>,<span class="dv">7</span><span class="sc">:</span><span class="dv">9</span>)] <span class="sc">%&gt;%</span> </span>
+<span id="cb117-4"><a href="visualizing-rna-seq-results.html#cb117-4" tabindex="-1"></a>              <span class="fu">filter</span>(gene <span class="sc">%in%</span> sigOE<span class="sc">$</span>gene) <span class="sc">%&gt;%</span> </span>
+<span id="cb117-5"><a href="visualizing-rna-seq-results.html#cb117-5" tabindex="-1"></a>              <span class="fu">data.frame</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb117-6"><a href="visualizing-rna-seq-results.html#cb117-6" tabindex="-1"></a>              <span class="fu">column_to_rownames</span>(<span class="at">var =</span> <span class="st">&quot;gene&quot;</span>) </span></code></pre></div>
+<p>Now let’s draw the heatmap using pheatmap. We can also add annotations to the heatmap to indicate the sample type. The <code>annotation_col</code> argument in <code>pheatmap()</code>requires a data frame with the same row names as the column names of the matrix used to generate the heatmap.</p>
+<div class="sourceCode" id="cb118"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb118-1"><a href="visualizing-rna-seq-results.html#cb118-1" tabindex="-1"></a><span class="do">### Annotate our heatmap (optional)</span></span>
+<span id="cb118-2"><a href="visualizing-rna-seq-results.html#cb118-2" tabindex="-1"></a>annotation <span class="ot">&lt;-</span> mov10_meta <span class="sc">%&gt;%</span> </span>
+<span id="cb118-3"><a href="visualizing-rna-seq-results.html#cb118-3" tabindex="-1"></a>  <span class="fu">filter</span>(samplename <span class="sc">%in%</span> <span class="fu">colnames</span>(norm_OEsig)) <span class="sc">%&gt;%</span></span>
+<span id="cb118-4"><a href="visualizing-rna-seq-results.html#cb118-4" tabindex="-1"></a>    dplyr<span class="sc">::</span><span class="fu">select</span>(samplename, sampletype) <span class="sc">%&gt;%</span> </span>
+<span id="cb118-5"><a href="visualizing-rna-seq-results.html#cb118-5" tabindex="-1"></a>    <span class="fu">data.frame</span>(<span class="at">row.names =</span> <span class="st">&quot;samplename&quot;</span>)</span>
+<span id="cb118-6"><a href="visualizing-rna-seq-results.html#cb118-6" tabindex="-1"></a></span>
+<span id="cb118-7"><a href="visualizing-rna-seq-results.html#cb118-7" tabindex="-1"></a>annotation<span class="sc">$</span>sampletype <span class="ot">=</span> <span class="fu">factor</span>(annotation<span class="sc">$</span>sampletype)</span>
+<span id="cb118-8"><a href="visualizing-rna-seq-results.html#cb118-8" tabindex="-1"></a></span>
+<span id="cb118-9"><a href="visualizing-rna-seq-results.html#cb118-9" tabindex="-1"></a><span class="do">### Set a color palette</span></span>
+<span id="cb118-10"><a href="visualizing-rna-seq-results.html#cb118-10" tabindex="-1"></a>heat_colors <span class="ot">&lt;-</span> <span class="fu">brewer.pal</span>(<span class="dv">6</span>, <span class="st">&quot;YlOrRd&quot;</span>)</span>
+<span id="cb118-11"><a href="visualizing-rna-seq-results.html#cb118-11" tabindex="-1"></a></span>
+<span id="cb118-12"><a href="visualizing-rna-seq-results.html#cb118-12" tabindex="-1"></a><span class="do">### Set annotation colors</span></span>
+<span id="cb118-13"><a href="visualizing-rna-seq-results.html#cb118-13" tabindex="-1"></a>ann_colors <span class="ot">=</span> <span class="fu">list</span>(</span>
+<span id="cb118-14"><a href="visualizing-rna-seq-results.html#cb118-14" tabindex="-1"></a>  <span class="at">sampletype =</span> <span class="fu">c</span>(<span class="at">control=</span><span class="st">&quot;navy&quot;</span>,</span>
+<span id="cb118-15"><a href="visualizing-rna-seq-results.html#cb118-15" tabindex="-1"></a>  <span class="at">MOV10_overexpression=</span> <span class="st">&quot;green&quot;</span>))</span>
+<span id="cb118-16"><a href="visualizing-rna-seq-results.html#cb118-16" tabindex="-1"></a></span>
+<span id="cb118-17"><a href="visualizing-rna-seq-results.html#cb118-17" tabindex="-1"></a><span class="do">### Run pheatmap</span></span>
+<span id="cb118-18"><a href="visualizing-rna-seq-results.html#cb118-18" tabindex="-1"></a><span class="fu">pheatmap</span>(norm_OEsig, </span>
+<span id="cb118-19"><a href="visualizing-rna-seq-results.html#cb118-19" tabindex="-1"></a>         <span class="at">annotation_colors =</span> ann_colors, </span>
+<span id="cb118-20"><a href="visualizing-rna-seq-results.html#cb118-20" tabindex="-1"></a>         <span class="at">color =</span> heat_colors, </span>
+<span id="cb118-21"><a href="visualizing-rna-seq-results.html#cb118-21" tabindex="-1"></a>         <span class="at">cluster_rows =</span> T, </span>
+<span id="cb118-22"><a href="visualizing-rna-seq-results.html#cb118-22" tabindex="-1"></a>         <span class="at">show_rownames =</span> F,</span>
+<span id="cb118-23"><a href="visualizing-rna-seq-results.html#cb118-23" tabindex="-1"></a>         <span class="at">annotation_col =</span> annotation, </span>
+<span id="cb118-24"><a href="visualizing-rna-seq-results.html#cb118-24" tabindex="-1"></a>         <span class="at">border_color =</span> <span class="cn">NA</span>, </span>
+<span id="cb118-25"><a href="visualizing-rna-seq-results.html#cb118-25" tabindex="-1"></a>         <span class="at">fontsize =</span> <span class="dv">12</span>, </span>
+<span id="cb118-26"><a href="visualizing-rna-seq-results.html#cb118-26" tabindex="-1"></a>         <span class="at">scale =</span> <span class="st">&quot;row&quot;</span>, </span>
+<span id="cb118-27"><a href="visualizing-rna-seq-results.html#cb118-27" tabindex="-1"></a>         <span class="at">fontsize_col =</span> <span class="dv">12</span>)</span></code></pre></div>
+<blockquote>
+<p><em>NOTE:</em> There are several additional arguments we have included in the function for aesthetics. One important one is <code>scale="row"</code>, in which Z-scores are plotted, rather than the actual normalized count value.</p>
+</blockquote>
+</div>
+<div id="volcano-plots" class="section level3 hasAnchor" number="6.0.3">
+<h3><span class="header-section-number">6.0.3</span> Volcano plots<a href="visualizing-rna-seq-results.html#volcano-plots" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>A commonly used plot in RNA-seq analysis is the <strong>volcano plot</strong>. in which you have the log transformed adjusted p-values plotted on the y-axis and log2 fold change values on the x-axis.</p>
+<p>To generate a volcano plot, we first need to have a column in our results data indicating whether or not the gene is considered differentially expressed based on p-adjusted values.</p>
+<div class="sourceCode" id="cb119"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb119-1"><a href="visualizing-rna-seq-results.html#cb119-1" tabindex="-1"></a><span class="do">## create a column for thresholding in the results table</span></span>
+<span id="cb119-2"><a href="visualizing-rna-seq-results.html#cb119-2" tabindex="-1"></a>res_tableOE_tb <span class="ot">&lt;-</span> res_tableOE_tb <span class="sc">%&gt;%</span> </span>
+<span id="cb119-3"><a href="visualizing-rna-seq-results.html#cb119-3" tabindex="-1"></a>                  <span class="fu">mutate</span>(<span class="at">threshold_OE =</span> padj <span class="sc">&lt;</span> <span class="fl">0.05</span> <span class="sc">&amp;</span> </span>
+<span id="cb119-4"><a href="visualizing-rna-seq-results.html#cb119-4" tabindex="-1"></a>                  <span class="fu">abs</span>(log2FoldChange) <span class="sc">&gt;=</span> <span class="fl">0.58</span>)</span></code></pre></div>
+<p>Now we can start plotting. The <code>geom_point</code> object is most applicable, as this is essentially a scatter plot:</p>
+<div class="sourceCode" id="cb120"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb120-1"><a href="visualizing-rna-seq-results.html#cb120-1" tabindex="-1"></a><span class="fu">ggplot</span>(res_tableOE_tb) <span class="sc">+</span></span>
+<span id="cb120-2"><a href="visualizing-rna-seq-results.html#cb120-2" tabindex="-1"></a>        <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">x =</span> log2FoldChange, </span>
+<span id="cb120-3"><a href="visualizing-rna-seq-results.html#cb120-3" tabindex="-1"></a>        <span class="at">y =</span> <span class="sc">-</span><span class="fu">log10</span>(padj), <span class="at">colour =</span> threshold_OE)) <span class="sc">+</span></span>
+<span id="cb120-4"><a href="visualizing-rna-seq-results.html#cb120-4" tabindex="-1"></a>        <span class="fu">ggtitle</span>(<span class="st">&quot;Mov10 overexpression&quot;</span>) <span class="sc">+</span></span>
+<span id="cb120-5"><a href="visualizing-rna-seq-results.html#cb120-5" tabindex="-1"></a>        <span class="fu">xlab</span>(<span class="st">&quot;log2 fold change&quot;</span>) <span class="sc">+</span> </span>
+<span id="cb120-6"><a href="visualizing-rna-seq-results.html#cb120-6" tabindex="-1"></a>        <span class="fu">ylab</span>(<span class="st">&quot;-log10 adjusted p-value&quot;</span>) <span class="sc">+</span></span>
+<span id="cb120-7"><a href="visualizing-rna-seq-results.html#cb120-7" tabindex="-1"></a>        <span class="fu">theme_bw</span>() <span class="sc">+</span>      </span>
+<span id="cb120-8"><a href="visualizing-rna-seq-results.html#cb120-8" tabindex="-1"></a>        <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;none&quot;</span>,</span>
+<span id="cb120-9"><a href="visualizing-rna-seq-results.html#cb120-9" tabindex="-1"></a>        <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="fu">rel</span>(<span class="fl">1.5</span>), </span>
+<span id="cb120-10"><a href="visualizing-rna-seq-results.html#cb120-10" tabindex="-1"></a>                                  <span class="at">hjust =</span> <span class="fl">0.5</span>),</span>
+<span id="cb120-11"><a href="visualizing-rna-seq-results.html#cb120-11" tabindex="-1"></a>        <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="fu">rel</span>(<span class="fl">1.25</span>)))  </span></code></pre></div>
+<p><img src="2024_RNA-seq-analysis_files/figure-html/unnamed-chunk-73-1.png" width="672" /></p>
+<p>What if we also wanted to know where the top 10 genes (lowest padj) in our DE list are located on this plot? We could label those dots with the gene name on the volcano plot using <code>geom_text_repel()</code>.</p>
+<p>First, we need to order the res_tableOE tibble by <code>padj</code>, and add an additional column to it, to include on those gene names we want to use to label the plot.</p>
+<div class="sourceCode" id="cb121"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb121-1"><a href="visualizing-rna-seq-results.html#cb121-1" tabindex="-1"></a><span class="do">## Create a column to indicate which genes to label</span></span>
+<span id="cb121-2"><a href="visualizing-rna-seq-results.html#cb121-2" tabindex="-1"></a>res_tableOE_tb <span class="ot">&lt;-</span> res_tableOE_tb <span class="sc">%&gt;%</span> </span>
+<span id="cb121-3"><a href="visualizing-rna-seq-results.html#cb121-3" tabindex="-1"></a>  <span class="fu">arrange</span>(padj) <span class="sc">%&gt;%</span> </span>
+<span id="cb121-4"><a href="visualizing-rna-seq-results.html#cb121-4" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">genelabels =</span> <span class="st">&quot;&quot;</span>)</span>
+<span id="cb121-5"><a href="visualizing-rna-seq-results.html#cb121-5" tabindex="-1"></a></span>
+<span id="cb121-6"><a href="visualizing-rna-seq-results.html#cb121-6" tabindex="-1"></a>res_tableOE_tb<span class="sc">$</span>genelabels[<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>] <span class="ot">&lt;-</span> res_tableOE_tb<span class="sc">$</span>gene[<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>]</span>
+<span id="cb121-7"><a href="visualizing-rna-seq-results.html#cb121-7" tabindex="-1"></a></span>
+<span id="cb121-8"><a href="visualizing-rna-seq-results.html#cb121-8" tabindex="-1"></a><span class="fu">head</span>(res_tableOE_tb)</span></code></pre></div>
+<div class="kable-table">
+<table>
+<colgroup>
+<col width="11%" />
+<col width="12%" />
+<col width="18%" />
+<col width="12%" />
+<col width="8%" />
+<col width="6%" />
+<col width="16%" />
+<col width="13%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">gene</th>
+<th align="right">baseMean</th>
+<th align="right">log2FoldChange</th>
+<th align="right">lfcSE</th>
+<th align="right">pvalue</th>
+<th align="right">padj</th>
+<th align="left">threshold_OE</th>
+<th align="left">genelabels</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">MOV10</td>
+<td align="right">21681.800</td>
+<td align="right">5.0833015</td>
+<td align="right">0.1100637</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="left">TRUE</td>
+<td align="left">MOV10</td>
+</tr>
+<tr class="even">
+<td align="left">H1F0</td>
+<td align="right">7881.081</td>
+<td align="right">1.5488442</td>
+<td align="right">0.0565866</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="left">TRUE</td>
+<td align="left">H1F0</td>
+</tr>
+<tr class="odd">
+<td align="left">HIST1H1C</td>
+<td align="right">1741.383</td>
+<td align="right">1.5234178</td>
+<td align="right">0.0706100</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="left">TRUE</td>
+<td align="left">HIST1H1C</td>
+</tr>
+<tr class="even">
+<td align="left">TXNIP</td>
+<td align="right">5133.749</td>
+<td align="right">1.4237003</td>
+<td align="right">0.0697011</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="left">TRUE</td>
+<td align="left">TXNIP</td>
+</tr>
+<tr class="odd">
+<td align="left">NEAT1</td>
+<td align="right">21973.706</td>
+<td align="right">0.9164119</td>
+<td align="right">0.0466768</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="left">TRUE</td>
+<td align="left">NEAT1</td>
+</tr>
+<tr class="even">
+<td align="left">KLF10</td>
+<td align="right">1694.211</td>
+<td align="right">1.2330697</td>
+<td align="right">0.0651906</td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="left">TRUE</td>
+<td align="left">KLF10</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Next, we plot it as before with an additiona layer for <code>geom_text_repel()</code> wherein we can specify the column of gene labels we just created.</p>
+<div class="sourceCode" id="cb122"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb122-1"><a href="visualizing-rna-seq-results.html#cb122-1" tabindex="-1"></a><span class="fu">ggplot</span>(res_tableOE_tb, <span class="fu">aes</span>(<span class="at">x =</span> log2FoldChange, </span>
+<span id="cb122-2"><a href="visualizing-rna-seq-results.html#cb122-2" tabindex="-1"></a>        <span class="at">y =</span> <span class="sc">-</span><span class="fu">log10</span>(padj))) <span class="sc">+</span></span>
+<span id="cb122-3"><a href="visualizing-rna-seq-results.html#cb122-3" tabindex="-1"></a>        <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">colour =</span> threshold_OE)) <span class="sc">+</span></span>
+<span id="cb122-4"><a href="visualizing-rna-seq-results.html#cb122-4" tabindex="-1"></a>        <span class="fu">geom_text_repel</span>(<span class="fu">aes</span>(<span class="at">label =</span> genelabels)) <span class="sc">+</span></span>
+<span id="cb122-5"><a href="visualizing-rna-seq-results.html#cb122-5" tabindex="-1"></a>        <span class="fu">ggtitle</span>(<span class="st">&quot;Mov10 overexpression&quot;</span>) <span class="sc">+</span></span>
+<span id="cb122-6"><a href="visualizing-rna-seq-results.html#cb122-6" tabindex="-1"></a>        <span class="fu">xlab</span>(<span class="st">&quot;log2 fold change&quot;</span>) <span class="sc">+</span> </span>
+<span id="cb122-7"><a href="visualizing-rna-seq-results.html#cb122-7" tabindex="-1"></a>        <span class="fu">ylab</span>(<span class="st">&quot;-log10 adjusted p-value&quot;</span>) <span class="sc">+</span></span>
+<span id="cb122-8"><a href="visualizing-rna-seq-results.html#cb122-8" tabindex="-1"></a>        <span class="fu">theme_bw</span>() <span class="sc">+</span></span>
+<span id="cb122-9"><a href="visualizing-rna-seq-results.html#cb122-9" tabindex="-1"></a>        <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">&quot;none&quot;</span>,</span>
+<span id="cb122-10"><a href="visualizing-rna-seq-results.html#cb122-10" tabindex="-1"></a>        <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="fu">rel</span>(<span class="fl">1.5</span>), </span>
+<span id="cb122-11"><a href="visualizing-rna-seq-results.html#cb122-11" tabindex="-1"></a>                                  <span class="at">hjust =</span> <span class="fl">0.5</span>),</span>
+<span id="cb122-12"><a href="visualizing-rna-seq-results.html#cb122-12" tabindex="-1"></a>        <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="fu">rel</span>(<span class="fl">1.25</span>))) </span></code></pre></div>
+<p><img src="2024_RNA-seq-analysis_files/figure-html/unnamed-chunk-75-1.png" width="672" /></p>
+<hr />
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="negative-binomial-model-fitting.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="summary-of-dge-workflow.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": ["2024_RNA-seq-analysis.pdf", "2024_RNA-seq-analysis.epub"],
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "section"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

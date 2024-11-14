@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 5 Negative Binomial model fitting | 2024_RNA-seq-analysis</title>
+  <meta name="description" content="Chapter 5 Negative Binomial model fitting | 2024_RNA-seq-analysis" />
+  <meta name="generator" content="bookdown 0.41 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 5 Negative Binomial model fitting | 2024_RNA-seq-analysis" />
+  <meta property="og:type" content="book" />
+  <meta property="og:image" content="https://bookdown.org/ggiaever/2024_RNA-seq-analysis/img/football.png" />
+  
+  <meta name="github-repo" content="gurinina/2024_RNA-seq-analysis" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 5 Negative Binomial model fitting | 2024_RNA-seq-analysis" />
+  
+  
+  <meta name="twitter:image" content="https://bookdown.org/ggiaever/2024_RNA-seq-analysis/img/football.png" />
+
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="dge-analysis-workflow.html"/>
+<link rel="next" href="visualizing-rna-seq-results.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<script src="libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<link href="libs/vis-9.1.0/vis-network.min.css" rel="stylesheet" />
+<script src="libs/vis-9.1.0/vis-network.min.js"></script>
+<script src="libs/visNetwork-binding-2.1.2/visNetwork.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+
+<link rel="stylesheet" href="css/git.css" type="text/css" />
+<link rel="stylesheet" href="css/toc.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>RNA-seq analysis workshop</a></li>
+<li class="chapter" data-level="1" data-path="differential-gene-expression-dge-analysis-overview.html"><a href="differential-gene-expression-dge-analysis-overview.html"><i class="fa fa-check"></i><b>1</b> Differential gene expression (DGE) analysis overview</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="differential-gene-expression-dge-analysis-overview.html"><a href="differential-gene-expression-dge-analysis-overview.html#review-of-the-dataset"><i class="fa fa-check"></i><b>1.1</b> Review of the dataset</a></li>
+<li class="chapter" data-level="1.2" data-path="differential-gene-expression-dge-analysis-overview.html"><a href="differential-gene-expression-dge-analysis-overview.html#setting-up"><i class="fa fa-check"></i><b>1.2</b> Setting up</a>
+<ul>
+<li class="chapter" data-level="1.2.1" data-path="differential-gene-expression-dge-analysis-overview.html"><a href="differential-gene-expression-dge-analysis-overview.html#loading-libraries"><i class="fa fa-check"></i><b>1.2.1</b> Loading libraries</a></li>
+<li class="chapter" data-level="1.2.2" data-path="differential-gene-expression-dge-analysis-overview.html"><a href="differential-gene-expression-dge-analysis-overview.html#loading-data"><i class="fa fa-check"></i><b>1.2.2</b> Loading data</a></li>
+<li class="chapter" data-level="1.2.3" data-path="differential-gene-expression-dge-analysis-overview.html"><a href="differential-gene-expression-dge-analysis-overview.html#viewing-data"><i class="fa fa-check"></i><b>1.2.3</b> Viewing data</a></li>
+</ul></li>
+<li class="chapter" data-level="1.3" data-path="differential-gene-expression-dge-analysis-overview.html"><a href="differential-gene-expression-dge-analysis-overview.html#differential-gene-expression-analysis-overview"><i class="fa fa-check"></i><b>1.3</b> Differential gene expression analysis overview</a>
+<ul>
+<li class="chapter" data-level="1.3.1" data-path="differential-gene-expression-dge-analysis-overview.html"><a href="differential-gene-expression-dge-analysis-overview.html#rna-seq-count-distribution"><i class="fa fa-check"></i><b>1.3.1</b> RNA-seq count distribution</a></li>
+<li class="chapter" data-level="1.3.2" data-path="differential-gene-expression-dge-analysis-overview.html"><a href="differential-gene-expression-dge-analysis-overview.html#modeling-count-data"><i class="fa fa-check"></i><b>1.3.2</b> Modeling count data</a></li>
+<li class="chapter" data-level="1.3.3" data-path="differential-gene-expression-dge-analysis-overview.html"><a href="differential-gene-expression-dge-analysis-overview.html#improving-mean-estimates-i.e.-reducing-variance-with-biological-replicates"><i class="fa fa-check"></i><b>1.3.3</b> Improving mean estimates (i.e. reducing variance) with biological replicates</a></li>
+<li class="chapter" data-level="1.3.4" data-path="differential-gene-expression-dge-analysis-overview.html"><a href="differential-gene-expression-dge-analysis-overview.html#differential-expression-analysis-workflow"><i class="fa fa-check"></i><b>1.3.4</b> Differential expression analysis workflow</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="count-normalization.html"><a href="count-normalization.html"><i class="fa fa-check"></i><b>2</b> Count normalization</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="count-normalization.html"><a href="count-normalization.html#normalization"><i class="fa fa-check"></i><b>2.1</b> Normalization</a>
+<ul>
+<li class="chapter" data-level="2.1.1" data-path="count-normalization.html"><a href="count-normalization.html#common-normalization-methods"><i class="fa fa-check"></i><b>2.1.1</b> Common normalization methods</a></li>
+<li class="chapter" data-level="2.1.2" data-path="count-normalization.html"><a href="count-normalization.html#tpm-not-recommended"><i class="fa fa-check"></i><b>2.1.2</b> TPM (Not Recommended)</a></li>
+<li class="chapter" data-level="2.1.3" data-path="count-normalization.html"><a href="count-normalization.html#rpkmfpkm-not-recommended"><i class="fa fa-check"></i><b>2.1.3</b> RPKM/FPKM (Not Recommended)</a></li>
+<li class="chapter" data-level="2.1.4" data-path="count-normalization.html"><a href="count-normalization.html#deseq2-normalization-median-of-ratios-method"><i class="fa fa-check"></i><b>2.1.4</b> DESeq2 Normalization: Median of Ratios Method</a></li>
+<li class="chapter" data-level="2.1.5" data-path="count-normalization.html"><a href="count-normalization.html#summary-of-key-reasons-for-using-deseq2"><i class="fa fa-check"></i><b>2.1.5</b> Summary of Key Reasons for Using DESeq2</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="count-normalization.html"><a href="count-normalization.html#count-normalization-of-mov10"><i class="fa fa-check"></i><b>2.2</b> Count normalization of Mov10</a>
+<ul>
+<li class="chapter" data-level="2.2.1" data-path="count-normalization.html"><a href="count-normalization.html#match-the-metadata-and-counts-data"><i class="fa fa-check"></i><b>2.2.1</b> 1. Match the metadata and counts data</a></li>
+<li class="chapter" data-level="2.2.2" data-path="count-normalization.html"><a href="count-normalization.html#create-deseq2-object"><i class="fa fa-check"></i><b>2.2.2</b> 2. Create DESEq2 object</a></li>
+<li class="chapter" data-level="2.2.3" data-path="count-normalization.html"><a href="count-normalization.html#generate-the-mov10-normalized-counts"><i class="fa fa-check"></i><b>2.2.3</b> 3. Generate the Mov10 normalized counts</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="quality-control.html"><a href="quality-control.html"><i class="fa fa-check"></i><b>3</b> Quality Control</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="quality-control.html"><a href="quality-control.html#sample-level-qc"><i class="fa fa-check"></i><b>3.1</b> Sample-level QC</a>
+<ul>
+<li class="chapter" data-level="3.1.1" data-path="quality-control.html"><a href="quality-control.html#recommended-resources"><i class="fa fa-check"></i><b>3.1.1</b> Recommended Resources</a></li>
+<li class="chapter" data-level="3.1.2" data-path="quality-control.html"><a href="quality-control.html#hierarchical-clustering-heatmap"><i class="fa fa-check"></i><b>3.1.2</b> Hierarchical Clustering Heatmap</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="quality-control.html"><a href="quality-control.html#gene-level-qc"><i class="fa fa-check"></i><b>3.2</b> Gene-level QC</a></li>
+<li class="chapter" data-level="3.3" data-path="quality-control.html"><a href="quality-control.html#mov10-quality-assessment-and-exploratory-analysis-using-deseq2"><i class="fa fa-check"></i><b>3.3</b> Mov10 quality assessment and exploratory analysis using DESeq2</a>
+<ul>
+<li class="chapter" data-level="3.3.1" data-path="quality-control.html"><a href="quality-control.html#transform-normalized-counts-using-the-rlog-transformation"><i class="fa fa-check"></i><b>3.3.1</b> Transform normalized counts using the rlog transformation</a></li>
+<li class="chapter" data-level="3.3.2" data-path="quality-control.html"><a href="quality-control.html#principal-components-analysis-pca"><i class="fa fa-check"></i><b>3.3.2</b> Principal components analysis (PCA)</a></li>
+<li class="chapter" data-level="3.3.3" data-path="quality-control.html"><a href="quality-control.html#hierarchical-clustering"><i class="fa fa-check"></i><b>3.3.3</b> Hierarchical Clustering</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="dge-analysis-workflow.html"><a href="dge-analysis-workflow.html"><i class="fa fa-check"></i><b>4</b> DGE analysis workflow</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="dge-analysis-workflow.html"><a href="dge-analysis-workflow.html#running-deseq2"><i class="fa fa-check"></i><b>4.1</b> Running DESeq2</a>
+<ul>
+<li class="chapter" data-level="4.1.1" data-path="dge-analysis-workflow.html"><a href="dge-analysis-workflow.html#set-the-design-formula"><i class="fa fa-check"></i><b>4.1.1</b> Set the Design Formula</a></li>
+<li class="chapter" data-level="4.1.2" data-path="dge-analysis-workflow.html"><a href="dge-analysis-workflow.html#mov10-differential-expression-analysis"><i class="fa fa-check"></i><b>4.1.2</b> MOV10 Differential Expression Analysis</a></li>
+</ul></li>
+<li class="chapter" data-level="4.2" data-path="dge-analysis-workflow.html"><a href="dge-analysis-workflow.html#deseq2-differential-gene-expression-analysis-workflow"><i class="fa fa-check"></i><b>4.2</b> DESeq2 differential gene expression analysis workflow</a>
+<ul>
+<li class="chapter" data-level="4.2.1" data-path="dge-analysis-workflow.html"><a href="dge-analysis-workflow.html#step-1-estimate-size-factors"><i class="fa fa-check"></i><b>4.2.1</b> Step 1: Estimate size factors</a></li>
+<li class="chapter" data-level="4.2.2" data-path="dge-analysis-workflow.html"><a href="dge-analysis-workflow.html#step-2-estimate-gene-wise-dispersion"><i class="fa fa-check"></i><b>4.2.2</b> Step 2: Estimate Gene-wise Dispersion</a></li>
+<li class="chapter" data-level="4.2.3" data-path="dge-analysis-workflow.html"><a href="dge-analysis-workflow.html#step-3-fit-curve-to-gene-wise-dispersion-estimates"><i class="fa fa-check"></i><b>4.2.3</b> Step 3: Fit Curve to Gene-wise Dispersion Estimates</a></li>
+<li class="chapter" data-level="4.2.4" data-path="dge-analysis-workflow.html"><a href="dge-analysis-workflow.html#step-4-assessing-model-fit-with-dispersion-plots"><i class="fa fa-check"></i><b>4.2.4</b> Step 4: Assessing Model Fit with Dispersion Plots</a></li>
+<li class="chapter" data-level="4.2.5" data-path="dge-analysis-workflow.html"><a href="dge-analysis-workflow.html#assessing-and-addressing-issues"><i class="fa fa-check"></i><b>4.2.5</b> Assessing and Addressing Issues</a></li>
+<li class="chapter" data-level="4.2.6" data-path="dge-analysis-workflow.html"><a href="dge-analysis-workflow.html#mov10-differential-expression-analysis-exploring-dispersion-estimates"><i class="fa fa-check"></i><b>4.2.6</b> MOV10 Differential Expression Analysis: Exploring Dispersion Estimates</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html"><i class="fa fa-check"></i><b>5</b> Negative Binomial model fitting</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#generalized-linear-model-fit-for-each-gene"><i class="fa fa-check"></i><b>5.1</b> Generalized Linear Model fit for each gene</a>
+<ul>
+<li class="chapter" data-level="5.1.1" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#negative-binomial-model-formula"><i class="fa fa-check"></i><b>5.1.1</b> Negative Binomial Model Formula</a></li>
+<li class="chapter" data-level="5.1.2" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#estimating-beta-coefficients-using-the-design-matrix"><i class="fa fa-check"></i><b>5.1.2</b> Estimating Beta Coefficients Using the Design Matrix</a></li>
+<li class="chapter" data-level="5.1.3" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#step-by-step-process"><i class="fa fa-check"></i><b>5.1.3</b> Step-by-Step Process:</a></li>
+<li class="chapter" data-level="5.1.4" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#example"><i class="fa fa-check"></i><b>5.1.4</b> Example:</a></li>
+<li class="chapter" data-level="5.1.5" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#calculation"><i class="fa fa-check"></i><b>5.1.5</b> Calculation:</a></li>
+<li class="chapter" data-level="5.1.6" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#matrix-multiplication-form"><i class="fa fa-check"></i><b>5.1.6</b> Matrix Multiplication Form:</a></li>
+<li class="chapter" data-level="5.1.7" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#log2-fold-change-and-adjustments"><i class="fa fa-check"></i><b>5.1.7</b> <strong>Log2 Fold Change and Adjustments</strong></a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#shrunken-log2-foldchanges-lfc"><i class="fa fa-check"></i><b>5.2</b> Shrunken log2 foldchanges (LFC)</a>
+<ul>
+<li class="chapter" data-level="5.2.1" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#hypothesis-testing"><i class="fa fa-check"></i><b>5.2.1</b> Hypothesis Testing</a></li>
+</ul></li>
+<li class="chapter" data-level="5.3" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#statistical-test-for-lfc-estimates-wald-test"><i class="fa fa-check"></i><b>5.3</b> Statistical test for LFC estimates: Wald test</a></li>
+<li class="chapter" data-level="5.4" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#mov10-differential-expression-analysis-control-versus-overexpression"><i class="fa fa-check"></i><b>5.4</b> MOV10 Differential Expression Analysis: Control versus Overexpression</a>
+<ul>
+<li class="chapter" data-level="5.4.1" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#creating-contrasts-for-hypothesis-testing"><i class="fa fa-check"></i><b>5.4.1</b> Creating Contrasts for Hypothesis Testing</a></li>
+<li class="chapter" data-level="5.4.2" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#ma-plot"><i class="fa fa-check"></i><b>5.4.2</b> MA Plot</a></li>
+<li class="chapter" data-level="5.4.3" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#multiple-testing-correction"><i class="fa fa-check"></i><b>5.4.3</b> Multiple Testing Correction</a></li>
+<li class="chapter" data-level="5.4.4" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#benjamini-hochberg-adjustment"><i class="fa fa-check"></i><b>5.4.4</b> Benjamini-Hochberg Adjustment</a></li>
+<li class="chapter" data-level="5.4.5" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#mov10-de-analysis-control-vs.-knockdown"><i class="fa fa-check"></i><b>5.4.5</b> MOV10 DE Analysis: <strong>Control vs. Knockdown</strong></a></li>
+</ul></li>
+<li class="chapter" data-level="5.5" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#summarizing-results"><i class="fa fa-check"></i><b>5.5</b> Summarizing Results</a>
+<ul>
+<li class="chapter" data-level="5.5.1" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#extracting-significant-differentially-expressed-genes"><i class="fa fa-check"></i><b>5.5.1</b> Extracting Significant Differentially Expressed Genes</a></li>
+<li class="chapter" data-level="5.5.2" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#mov10-knockdown-analysis-control-vs.-knockdown"><i class="fa fa-check"></i><b>5.5.2</b> MOV10 Knockdown Analysis: Control vs. Knockdown</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="visualizing-rna-seq-results.html"><a href="visualizing-rna-seq-results.html"><i class="fa fa-check"></i><b>6</b> Visualizing RNA-seq results</a>
+<ul>
+<li class="chapter" data-level="6.0.1" data-path="visualizing-rna-seq-results.html"><a href="visualizing-rna-seq-results.html#plotting-signicant-de-genes"><i class="fa fa-check"></i><b>6.0.1</b> Plotting signicant DE genes</a></li>
+<li class="chapter" data-level="6.0.2" data-path="visualizing-rna-seq-results.html"><a href="visualizing-rna-seq-results.html#heatmap"><i class="fa fa-check"></i><b>6.0.2</b> Heatmap</a></li>
+<li class="chapter" data-level="6.0.3" data-path="visualizing-rna-seq-results.html"><a href="visualizing-rna-seq-results.html#volcano-plots"><i class="fa fa-check"></i><b>6.0.3</b> Volcano plots</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="summary-of-dge-workflow.html"><a href="summary-of-dge-workflow.html"><i class="fa fa-check"></i><b>7</b> Summary of DGE workflow</a>
+<ul>
+<li class="chapter" data-level="7.0.1" data-path="summary-of-dge-workflow.html"><a href="summary-of-dge-workflow.html#import-data-into-dds-object"><i class="fa fa-check"></i><b>7.0.1</b> 1. Import data into dds object:</a></li>
+<li class="chapter" data-level="7.0.2" data-path="summary-of-dge-workflow.html"><a href="summary-of-dge-workflow.html#exploratory-data-analysis-pca-heirarchical-clustering---identifying-outliers-and-sources-of-variation-in-the-data"><i class="fa fa-check"></i><b>7.0.2</b> 2. Exploratory data analysis (PCA &amp; heirarchical clustering) - identifying outliers and sources of variation in the data:</a></li>
+<li class="chapter" data-level="7.0.3" data-path="summary-of-dge-workflow.html"><a href="summary-of-dge-workflow.html#run-deseq2"><i class="fa fa-check"></i><b>7.0.3</b> 3. Run DESeq2:</a></li>
+<li class="chapter" data-level="7.0.4" data-path="summary-of-dge-workflow.html"><a href="summary-of-dge-workflow.html#check-the-fit-of-the-dispersion-estimates"><i class="fa fa-check"></i><b>7.0.4</b> 4. Check the fit of the dispersion estimates:</a></li>
+<li class="chapter" data-level="7.0.5" data-path="summary-of-dge-workflow.html"><a href="summary-of-dge-workflow.html#create-contrasts-to-perform-wald-testing-on-the-shrunken-log2-foldchanges-between-specific-conditions"><i class="fa fa-check"></i><b>7.0.5</b> 5. Create contrasts to perform Wald testing on the shrunken log2 foldchanges between specific conditions:</a></li>
+<li class="chapter" data-level="7.0.6" data-path="summary-of-dge-workflow.html"><a href="summary-of-dge-workflow.html#output-significant-results"><i class="fa fa-check"></i><b>7.0.6</b> 6. Output significant results:</a></li>
+<li class="chapter" data-level="7.0.7" data-path="summary-of-dge-workflow.html"><a href="summary-of-dge-workflow.html#visualize-results-volcano-plots-heatmaps-normalized-counts-plots-of-top-genes-etc."><i class="fa fa-check"></i><b>7.0.7</b> 7. Visualize results: volcano plots, heatmaps, normalized counts plots of top genes, etc.</a></li>
+<li class="chapter" data-level="7.0.8" data-path="summary-of-dge-workflow.html"><a href="summary-of-dge-workflow.html#make-sure-to-output-the-versions-of-all-tools-used-in-the-de-analysis"><i class="fa fa-check"></i><b>7.0.8</b> 8. Make sure to output the versions of all tools used in the DE analysis:</a></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="functional-analysis-of-rnaseq-data.html"><a href="functional-analysis-of-rnaseq-data.html"><i class="fa fa-check"></i><b>8</b> Functional analysis of RNAseq data</a>
+<ul>
+<li class="chapter" data-level="8.0.1" data-path="functional-analysis-of-rnaseq-data.html"><a href="functional-analysis-of-rnaseq-data.html#ontology-and-go-terms"><i class="fa fa-check"></i><b>8.0.1</b> Ontology and GO Terms</a></li>
+<li class="chapter" data-level="8.0.2" data-path="functional-analysis-of-rnaseq-data.html"><a href="functional-analysis-of-rnaseq-data.html#go-terms-gene-ontology-terms"><i class="fa fa-check"></i><b>8.0.2</b> GO Terms (Gene Ontology Terms)</a></li>
+<li class="chapter" data-level="8.0.3" data-path="functional-analysis-of-rnaseq-data.html"><a href="functional-analysis-of-rnaseq-data.html#go-enrichment-methods"><i class="fa fa-check"></i><b>8.0.3</b> GO Enrichment Methods</a></li>
+<li class="chapter" data-level="8.0.4" data-path="functional-analysis-of-rnaseq-data.html"><a href="functional-analysis-of-rnaseq-data.html#example-1"><i class="fa fa-check"></i><b>8.0.4</b> Example</a></li>
+<li class="chapter" data-level="8.0.5" data-path="functional-analysis-of-rnaseq-data.html"><a href="functional-analysis-of-rnaseq-data.html#over-representation-analysis-ora-using-clusterprofiler"><i class="fa fa-check"></i><b>8.0.5</b> Over-representation Analysis (ORA) using <code>clusterProfiler</code></a></li>
+<li class="chapter" data-level="8.0.6" data-path="functional-analysis-of-rnaseq-data.html"><a href="functional-analysis-of-rnaseq-data.html#visualizing-enrichment-results"><i class="fa fa-check"></i><b>8.0.6</b> Visualizing Enrichment Results</a></li>
+<li class="chapter" data-level="8.0.7" data-path="functional-analysis-of-rnaseq-data.html"><a href="functional-analysis-of-rnaseq-data.html#gsea-using-clusterprofiler-and-fgsea"><i class="fa fa-check"></i><b>8.0.7</b> GSEA Using clusterProfiler and fgsea</a></li>
+<li class="chapter" data-level="8.0.8" data-path="functional-analysis-of-rnaseq-data.html"><a href="functional-analysis-of-rnaseq-data.html#visualizing-gsea-results"><i class="fa fa-check"></i><b>8.0.8</b> Visualizing GSEA Results</a></li>
+<li class="chapter" data-level="8.0.9" data-path="functional-analysis-of-rnaseq-data.html"><a href="functional-analysis-of-rnaseq-data.html#gsea-using-fgsea"><i class="fa fa-check"></i><b>8.0.9</b> GSEA using fgsea</a></li>
+<li class="chapter" data-level="8.0.10" data-path="functional-analysis-of-rnaseq-data.html"><a href="functional-analysis-of-rnaseq-data.html#goenrichment-package-analysis"><i class="fa fa-check"></i><b>8.0.10</b> <code>GOenrichment</code> Package Analysis</a></li>
+<li class="chapter" data-level="8.0.11" data-path="functional-analysis-of-rnaseq-data.html"><a href="functional-analysis-of-rnaseq-data.html#other-tools-and-resources"><i class="fa fa-check"></i><b>8.0.11</b> Other tools and resources</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="codebook.html"><a href="codebook.html"><i class="fa fa-check"></i><b>9</b> Codebook</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="codebook.html"><a href="codebook.html#dge-analysis-overview"><i class="fa fa-check"></i><b>9.1</b> DGE analysis overview</a>
+<ul>
+<li class="chapter" data-level="9.1.1" data-path="codebook.html"><a href="codebook.html#setting-up-1"><i class="fa fa-check"></i><b>9.1.1</b> Setting up</a></li>
+<li class="chapter" data-level="9.1.2" data-path="codebook.html"><a href="codebook.html#dge-analysis-workflow-1"><i class="fa fa-check"></i><b>9.1.2</b> DGE analysis workflow</a></li>
+</ul></li>
+<li class="chapter" data-level="9.2" data-path="codebook.html"><a href="codebook.html#count-normalization-1"><i class="fa fa-check"></i><b>9.2</b> Count normalization</a>
+<ul>
+<li class="chapter" data-level="9.2.1" data-path="codebook.html"><a href="codebook.html#match-the-metadata-and-counts-data-1"><i class="fa fa-check"></i><b>9.2.1</b> 1. Match the metadata and counts data</a></li>
+<li class="chapter" data-level="9.2.2" data-path="codebook.html"><a href="codebook.html#create-deseq2-object-1"><i class="fa fa-check"></i><b>9.2.2</b> 2. Create DESEq2 object</a></li>
+<li class="chapter" data-level="9.2.3" data-path="codebook.html"><a href="codebook.html#generate-the-mov10-normalized-counts-1"><i class="fa fa-check"></i><b>9.2.3</b> 3. Generate the Mov10 normalized counts</a></li>
+</ul></li>
+<li class="chapter" data-level="9.3" data-path="codebook.html"><a href="codebook.html#quality-control-1"><i class="fa fa-check"></i><b>9.3</b> Quality Control</a>
+<ul>
+<li class="chapter" data-level="9.3.1" data-path="codebook.html"><a href="codebook.html#principal-components-analysis-pca-1"><i class="fa fa-check"></i><b>9.3.1</b> Principal components analysis (PCA)</a></li>
+<li class="chapter" data-level="9.3.2" data-path="codebook.html"><a href="codebook.html#hierarchical-clustering-1"><i class="fa fa-check"></i><b>9.3.2</b> Hierarchical Clustering</a></li>
+</ul></li>
+<li class="chapter" data-level="9.4" data-path="codebook.html"><a href="codebook.html#dge-analysis-workflow-2"><i class="fa fa-check"></i><b>9.4</b> DGE analysis workflow</a>
+<ul>
+<li class="chapter" data-level="9.4.1" data-path="codebook.html"><a href="codebook.html#set-the-design-formula-1"><i class="fa fa-check"></i><b>9.4.1</b> Set the Design Formula</a></li>
+<li class="chapter" data-level="9.4.2" data-path="codebook.html"><a href="codebook.html#mov10-differential-expression-analysis-1"><i class="fa fa-check"></i><b>9.4.2</b> MOV10 Differential Expression Analysis</a></li>
+<li class="chapter" data-level="9.4.3" data-path="codebook.html"><a href="codebook.html#deseq2-differential-gene-expression-analysis-workflow-1"><i class="fa fa-check"></i><b>9.4.3</b> DESeq2 differential gene expression analysis workflow</a></li>
+<li class="chapter" data-level="9.4.4" data-path="codebook.html"><a href="codebook.html#mov10-differential-expression-analysis-exploring-dispersion-estimates-1"><i class="fa fa-check"></i><b>9.4.4</b> MOV10 Differential Expression Analysis: Exploring Dispersion Estimates</a></li>
+</ul></li>
+<li class="chapter" data-level="9.5" data-path="codebook.html"><a href="codebook.html#negative-binomial-model-fitting-1"><i class="fa fa-check"></i><b>9.5</b> Negative Binomial model fitting</a>
+<ul>
+<li class="chapter" data-level="9.5.1" data-path="codebook.html"><a href="codebook.html#example-2"><i class="fa fa-check"></i><b>9.5.1</b> Example:</a></li>
+<li class="chapter" data-level="9.5.2" data-path="codebook.html"><a href="codebook.html#calculation-1"><i class="fa fa-check"></i><b>9.5.2</b> Calculation:</a></li>
+<li class="chapter" data-level="9.5.3" data-path="codebook.html"><a href="codebook.html#matrix-multiplication-form-1"><i class="fa fa-check"></i><b>9.5.3</b> Matrix Multiplication Form:</a></li>
+</ul></li>
+<li class="chapter" data-level="9.6" data-path="codebook.html"><a href="codebook.html#mov10-differential-expression-analysis-2"><i class="fa fa-check"></i><b>9.6</b> MOV10 Differential Expression Analysis:</a>
+<ul>
+<li class="chapter" data-level="9.6.1" data-path="codebook.html"><a href="codebook.html#mov10-de-analysis-control-vs.-knockdown-1"><i class="fa fa-check"></i><b>9.6.1</b> MOV10 DE Analysis: <strong>Control vs. Knockdown</strong></a></li>
+</ul></li>
+<li class="chapter" data-level="9.7" data-path="codebook.html"><a href="codebook.html#summarizing-results-1"><i class="fa fa-check"></i><b>9.7</b> Summarizing Results</a>
+<ul>
+<li class="chapter" data-level="9.7.1" data-path="codebook.html"><a href="codebook.html#extracting-significant-differentially-expressed-genes-1"><i class="fa fa-check"></i><b>9.7.1</b> Extracting Significant Differentially Expressed Genes</a></li>
+<li class="chapter" data-level="9.7.2" data-path="codebook.html"><a href="codebook.html#mov10-knockdown-analysis-control-vs.-knockdown-1"><i class="fa fa-check"></i><b>9.7.2</b> MOV10 Knockdown Analysis: Control vs. Knockdown</a></li>
+</ul></li>
+<li class="chapter" data-level="9.8" data-path="codebook.html"><a href="codebook.html#visualizing-rna-seq-results-1"><i class="fa fa-check"></i><b>9.8</b> Visualizing RNA-seq results</a>
+<ul>
+<li class="chapter" data-level="9.8.1" data-path="codebook.html"><a href="codebook.html#heatmap-1"><i class="fa fa-check"></i><b>9.8.1</b> Heatmap</a></li>
+<li class="chapter" data-level="9.8.2" data-path="codebook.html"><a href="codebook.html#volcano-plots-1"><i class="fa fa-check"></i><b>9.8.2</b> Volcano plots</a></li>
+</ul></li>
+<li class="chapter" data-level="9.9" data-path="codebook.html"><a href="codebook.html#summary-of-dge-workflow-1"><i class="fa fa-check"></i><b>9.9</b> Summary of DGE workflow</a>
+<ul>
+<li class="chapter" data-level="9.9.1" data-path="codebook.html"><a href="codebook.html#import-data-into-dds-object-1"><i class="fa fa-check"></i><b>9.9.1</b> 1. Import data into dds object:</a></li>
+<li class="chapter" data-level="9.9.2" data-path="codebook.html"><a href="codebook.html#exploratory-data-analysis-pca-heirarchical-clustering---identifying-outliers-and-sources-of-variation-in-the-data-1"><i class="fa fa-check"></i><b>9.9.2</b> 2. Exploratory data analysis (PCA &amp; heirarchical clustering) - identifying outliers and sources of variation in the data:</a></li>
+<li class="chapter" data-level="9.9.3" data-path="codebook.html"><a href="codebook.html#run-deseq2-1"><i class="fa fa-check"></i><b>9.9.3</b> 3. Run DESeq2:</a></li>
+<li class="chapter" data-level="9.9.4" data-path="codebook.html"><a href="codebook.html#check-the-fit-of-the-dispersion-estimates-1"><i class="fa fa-check"></i><b>9.9.4</b> 4. Check the fit of the dispersion estimates:</a></li>
+<li class="chapter" data-level="9.9.5" data-path="codebook.html"><a href="codebook.html#create-contrasts-to-perform-wald-testing-on-the-shrunken-log2-foldchanges-between-specific-conditions-1"><i class="fa fa-check"></i><b>9.9.5</b> 5. Create contrasts to perform Wald testing on the shrunken log2 foldchanges between specific conditions:</a></li>
+<li class="chapter" data-level="9.9.6" data-path="codebook.html"><a href="codebook.html#output-significant-results-1"><i class="fa fa-check"></i><b>9.9.6</b> 6. Output significant results:</a></li>
+<li class="chapter" data-level="9.9.7" data-path="codebook.html"><a href="codebook.html#visualize-results-volcano-plots-heatmaps-normalized-counts-plots-of-top-genes-etc.-1"><i class="fa fa-check"></i><b>9.9.7</b> 7. Visualize results: volcano plots, heatmaps, normalized counts plots of top genes, etc.</a></li>
+<li class="chapter" data-level="9.9.8" data-path="codebook.html"><a href="codebook.html#make-sure-to-output-the-versions-of-all-tools-used-in-the-de-analysis-1"><i class="fa fa-check"></i><b>9.9.8</b> 8. Make sure to output the versions of all tools used in the DE analysis:</a></li>
+</ul></li>
+<li class="chapter" data-level="9.10" data-path="codebook.html"><a href="codebook.html#functional-analysis-of-rna-seq-data"><i class="fa fa-check"></i><b>9.10</b> Functional analysis of RNA-seq data</a>
+<ul>
+<li class="chapter" data-level="9.10.1" data-path="codebook.html"><a href="codebook.html#over-representation-analysis-ora-using-clusterprofiler-1"><i class="fa fa-check"></i><b>9.10.1</b> Over-representation Analysis (ORA) using <code>clusterProfiler</code></a></li>
+<li class="chapter" data-level="9.10.2" data-path="codebook.html"><a href="codebook.html#visualizing-enrichment-results-1"><i class="fa fa-check"></i><b>9.10.2</b> Visualizing Enrichment Results</a></li>
+<li class="chapter" data-level="9.10.3" data-path="codebook.html"><a href="codebook.html#gsea-using-clusterprofiler-and-fgsea-1"><i class="fa fa-check"></i><b>9.10.3</b> GSEA Using clusterProfiler and fgsea</a></li>
+<li class="chapter" data-level="9.10.4" data-path="codebook.html"><a href="codebook.html#visualizing-gsea-results-1"><i class="fa fa-check"></i><b>9.10.4</b> Visualizing GSEA Results</a></li>
+<li class="chapter" data-level="9.10.5" data-path="codebook.html"><a href="codebook.html#gsea-using-fgsea-1"><i class="fa fa-check"></i><b>9.10.5</b> GSEA using fgsea</a></li>
+<li class="chapter" data-level="9.10.6" data-path="codebook.html"><a href="codebook.html#goenrichment-package-analysis-1"><i class="fa fa-check"></i><b>9.10.6</b> <code>GOenrichment</code> Package Analysis</a></li>
+</ul></li>
+</ul></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">2024_RNA-seq-analysis</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="negative-binomial-model-fitting" class="section level1 hasAnchor" number="5">
+<h1><span class="header-section-number">Chapter 5</span> Negative Binomial model fitting<a href="negative-binomial-model-fitting.html#negative-binomial-model-fitting" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="generalized-linear-model-fit-for-each-gene" class="section level2 hasAnchor" number="5.1">
+<h2><span class="header-section-number">5.1</span> Generalized Linear Model fit for each gene<a href="negative-binomial-model-fitting.html#generalized-linear-model-fit-for-each-gene" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The final step in the DESeq2 workflow is fitting the <strong>Negative Binomial (NB) model</strong> for each gene and performing differential expression testing. This step is crucial for identifying genes that are significantly differentially expressed between experimental conditions.</p>
+<p><img src="img/deseq2_workflow_separate_2018.png" width="400" alt="Alt text" /></p>
+<p>DESeq2 uses a <strong>Negative Binomial Generalized Linear Model (GLM)</strong> to estimate the counts for each gene. A GLM is a statistical method that models relationships between variables and is an extension of linear regression. It is suitable for handling non-normally distributed data, such as RNA-seq counts, which often exhibit overdispersion (variance &gt; mean).</p>
+<p>To fit the NB GLM, DESeq2 requires two key parameters:</p>
+<ul>
+<li><p><strong>Size factor</strong>, which accounts for differences in sequencing depth across samples.</p></li>
+<li><p><strong>Dispersion estimate</strong>, which measures variability in gene expression across replicates.</p></li>
+</ul>
+<p>The model incorporates the estimated dispersion and the design matrix specifying the experimental conditions and covariates.</p>
+<div id="negative-binomial-model-formula" class="section level3 hasAnchor" number="5.1.1">
+<h3><span class="header-section-number">5.1.1</span> Negative Binomial Model Formula<a href="negative-binomial-model-fitting.html#negative-binomial-model-formula" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>DESeq2 models RNA-seq counts as follows:</p>
+<p><span class="math display">\[
+Y_{ij} \sim \text{NB}\left(\mu_{ij}, \alpha_i\right)
+\]</span></p>
+<p>Where:</p>
+<ul>
+<li><p><span class="math inline">\(Y_{ij}\)</span> is the observed counts for gene <span class="math inline">\(i\)</span> in sample <span class="math inline">\(j\)</span></p></li>
+<li><p><span class="math inline">\(\mu_{ij}\)</span> is the expected normalized counts for gene <span class="math inline">\(i\)</span> in sample <span class="math inline">\(j\)</span></p></li>
+<li><p><span class="math inline">\(\alpha_i\)</span> is the dispersion parameter for gene <span class="math inline">\(i\)</span>, which has been estimated</p></li>
+</ul>
+<p>The expected mean <span class="math inline">\(\mu_{ij}\)</span> is modeled as:</p>
+<p><span class="math display">\[
+\mu_{ij} = sizeFactor_{j} \times q_{ij}
+\]</span></p>
+<p>Where:</p>
+<ul>
+<li><p><span class="math inline">\(sizeFactor_{j}\)</span> normalizes for differences in sequencing depth across samples</p></li>
+<li><p><span class="math inline">\(q_{ij}\)</span> represents the true underlying expression level of gene <span class="math inline">\(i\)</span> in sample <span class="math inline">\(j\)</span>, typically modeled as a function of covariates (such as experimental conditions).</p></li>
+</ul>
+</div>
+<div id="estimating-beta-coefficients-using-the-design-matrix" class="section level3 hasAnchor" number="5.1.2">
+<h3><span class="header-section-number">5.1.2</span> Estimating Beta Coefficients Using the Design Matrix<a href="negative-binomial-model-fitting.html#estimating-beta-coefficients-using-the-design-matrix" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>In DESeq2, <strong>beta coefficients</strong> (<span class="math inline">\(\beta\)</span>) are estimated using the <strong>design matrix</strong>, which captures the experimental conditions for each sample (e.g., control, treatment). These coefficients represent the <strong>log2 fold changes</strong> in gene expression between different conditions. The estimation process involves fitting a <strong>negative binomial generalized linear model (GLM)</strong> to the observed count data for each gene, where the expected mean expression <span class="math inline">\(\mu_{ij}\)</span> is modeled as a function of the design matrix <span class="math inline">\(X_j\)</span> and the beta coefficients <span class="math inline">\(\beta_i\)</span>.</p>
+</div>
+<div id="step-by-step-process" class="section level3 hasAnchor" number="5.1.3">
+<h3><span class="header-section-number">5.1.3</span> Step-by-Step Process:<a href="negative-binomial-model-fitting.html#step-by-step-process" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<ol style="list-style-type: decimal">
+<li><strong>Define the Design Matrix <span class="math inline">\(X_j\)</span>:</strong>
+The design matrix <span class="math inline">\(X\)</span> includes the covariates (experimental conditions) for each sample. Each row of the matrix corresponds to a sample, and each column corresponds to a covariate (e.g., intercept, control, treatment). This matrix is generated using the <strong><code>model.matrix()</code></strong> function in R.</li>
+</ol>
+<div class="sourceCode" id="cb63"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb63-1"><a href="negative-binomial-model-fitting.html#cb63-1" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">model.matrix</span>(<span class="sc">~</span> sampletype, <span class="at">data =</span> meta)</span>
+<span id="cb63-2"><a href="negative-binomial-model-fitting.html#cb63-2" tabindex="-1"></a></span>
+<span id="cb63-3"><a href="negative-binomial-model-fitting.html#cb63-3" tabindex="-1"></a><span class="co"># OR</span></span>
+<span id="cb63-4"><a href="negative-binomial-model-fitting.html#cb63-4" tabindex="-1"></a></span>
+<span id="cb63-5"><a href="negative-binomial-model-fitting.html#cb63-5" tabindex="-1"></a>X <span class="ot">&lt;-</span> <span class="fu">model.matrix</span>(<span class="fu">design</span>(dds), <span class="at">data =</span> <span class="fu">colData</span>(dds))</span></code></pre></div>
+<ol start="2" style="list-style-type: decimal">
+<li><strong>Link Mean Expression to the Design Matrix:</strong>
+The expected mean expression for <strong>gene <span class="math inline">\(i\)</span></strong> in <strong>sample <span class="math inline">\(j\)</span></strong> is modeled as:</li>
+</ol>
+<p><span class="math display">\[
+\log_2(\mu_{ij}) = \beta_i X_j
+\]</span></p>
+<p>Or equivalently:</p>
+<p><span class="math display">\[
+\mu_{ij} = 2^{\beta_i X_j}
+\]</span></p>
+<p>Here:</p>
+<ul>
+<li><p><span class="math inline">\(X_j\)</span> is the row of the design matrix for sample <span class="math inline">\(j\)</span> (it contains the covariates for that sample)</p></li>
+<li><p><span class="math inline">\(\beta_i\)</span> is the vector of log2 fold changes (beta coefficients) for gene <span class="math inline">\(i\)</span>.</p></li>
+</ul>
+<ol start="3" style="list-style-type: decimal">
+<li><strong>Estimate the Beta Coefficients:</strong>
+“DESeq2 estimates the <strong>beta coefficients</strong> by fitting a <strong>negative binomial GLM</strong> to the data using <strong>Maximum Likelihood Estimation (MLE)</strong>. DESeq2 substitutes the mean (<span class="math inline">\(\mu_{ij}\)</span>) with <span class="math inline">\(2^{\beta_i X_j}\)</span> in the negative binomial model, using MLE to predict expected counts based on experimental covariates and estimate gene expression changes while controlling for design factors.</li>
+</ol>
+<p>The model is fit using the <strong><code>DESeq()</code></strong> function in R, which carries out the entire estimation process:</p>
+<div class="sourceCode" id="cb64"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb64-1"><a href="negative-binomial-model-fitting.html#cb64-1" tabindex="-1"></a>dds <span class="ot">&lt;-</span> <span class="fu">DESeq</span>(dds)</span></code></pre></div>
+<pre><code>## using pre-existing size factors</code></pre>
+<pre><code>## estimating dispersions</code></pre>
+<pre><code>## found already estimated dispersions, replacing these</code></pre>
+<pre><code>## gene-wise dispersion estimates</code></pre>
+<pre><code>## mean-dispersion relationship</code></pre>
+<pre><code>## final dispersion estimates</code></pre>
+<pre><code>## fitting model and testing</code></pre>
+<ol start="4" style="list-style-type: decimal">
+<li><strong>Extract the Beta Coefficients:</strong>
+Once the model is fitted, the estimated beta coefficients (log2 fold changes) for each gene can be extracted using the <strong><code>coef()</code></strong> function:</li>
+</ol>
+<div class="sourceCode" id="cb72"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb72-1"><a href="negative-binomial-model-fitting.html#cb72-1" tabindex="-1"></a>beta_coefficients <span class="ot">&lt;-</span> <span class="fu">coef</span>(dds)</span></code></pre></div>
+<p>This gives a matrix of estimated beta coefficients, where each row corresponds to a gene and each column corresponds to a covariate in the design matrix.</p>
+</div>
+<div id="example" class="section level3 hasAnchor" number="5.1.4">
+<h3><span class="header-section-number">5.1.4</span> Example:<a href="negative-binomial-model-fitting.html#example" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>For example, if the design matrix includes an intercept (control) and two conditions (MOV10 knockdown and MOV10 overexpression), the beta coefficients <span class="math inline">\(\beta_i\)</span> for gene <span class="math inline">\(i\)</span> would represent:</p>
+<ul>
+<li><p><span class="math inline">\(\beta_{i1}\)</span>: the log2 fold change for the control group (intercept)</p></li>
+<li><p><span class="math inline">\(\beta_{i2}\)</span>: the log2 fold change for the MOV10 knockdown group</p></li>
+<li><p><span class="math inline">\(\beta_{i3}\)</span>: the log2 fold change for the MOV10 overexpression group.</p></li>
+</ul>
+</div>
+<div id="calculation" class="section level3 hasAnchor" number="5.1.5">
+<h3><span class="header-section-number">5.1.5</span> Calculation:<a href="negative-binomial-model-fitting.html#calculation" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>To calculate the fitted (expected) log2 counts for <strong>gene <span class="math inline">\(i\)</span></strong> in <strong>sample <span class="math inline">\(j\)</span></strong>, you can take the <strong>dot product</strong> of the row of the design matrix <span class="math inline">\(X_j\)</span> for that sample and the beta coefficients <span class="math inline">\(\beta_i\)</span> for that gene:</p>
+<p><span class="math display">\[
+\log_2(\mu_{ij}) = \beta_i X_j = \beta_{i1} X_{j1} + \beta_{i2} X_{j2}  + \dots + \beta_{iP} X_{jP}
+\]</span></p>
+<p>Where:</p>
+<ul>
+<li><span class="math inline">\(P\)</span> is the number of covariates in the design matrix</li>
+</ul>
+<p>The expected mean <span class="math inline">\(\mu_{ij}\)</span> on the original count scale is obtained by exponentiating the log2-scale fitted values:</p>
+<p><span class="math display">\[
+\mu_{ij} = 2^{\beta_i X_j}
+\]</span></p>
+<p><strong>Exercise</strong> points = +1</p>
+<p>In the DESeq2 workflow, what is the purpose of the design matrix in the context of fitting the Negative Binomial model for each gene?</p>
+<ul>
+<li>Ans:</li>
+</ul>
+</div>
+<div id="matrix-multiplication-form" class="section level3 hasAnchor" number="5.1.6">
+<h3><span class="header-section-number">5.1.6</span> Matrix Multiplication Form:<a href="negative-binomial-model-fitting.html#matrix-multiplication-form" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>If you want to calculate the fitted values for all genes and samples at once, you can express the model as a <strong>matrix multiplication</strong>:</p>
+<p><span class="math display">\[
+\log_2(\mu) = \beta X^T
+\]</span></p>
+<p>This computes the expected log2 counts for all genes across all samples.</p>
+<p>In R, you can calculate the fitted log2 counts for all genes and samples using:</p>
+<div class="sourceCode" id="cb73"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb73-1"><a href="negative-binomial-model-fitting.html#cb73-1" tabindex="-1"></a>log2_fitted <span class="ot">&lt;-</span> beta_coefficients <span class="sc">%*%</span> <span class="fu">t</span>(X)</span></code></pre></div>
+<p>This step multiplies the beta coefficients matrix by the transpose of the design matrix to compute the fitted log2 counts.</p>
+</div>
+<div id="log2-fold-change-and-adjustments" class="section level3 hasAnchor" number="5.1.7">
+<h3><span class="header-section-number">5.1.7</span> <strong>Log2 Fold Change and Adjustments</strong><a href="negative-binomial-model-fitting.html#log2-fold-change-and-adjustments" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The <span class="math inline">\(\beta\)</span> coefficents are the estimates for the <strong>log2 fold changes</strong> for each sample group. However, <strong>log2 fold changes</strong> are inherently noisier when counts are low due to the large dispersion we observe with low read counts. To avoid this, the <strong>log2 fold changes calculated by the model need to be adjusted</strong>.</p>
+</div>
+</div>
+<div id="shrunken-log2-foldchanges-lfc" class="section level2 hasAnchor" number="5.2">
+<h2><span class="header-section-number">5.2</span> Shrunken log2 foldchanges (LFC)<a href="negative-binomial-model-fitting.html#shrunken-log2-foldchanges-lfc" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>To generate more accurate LFC estimates, DESeq2 allows for the <strong>shrinkage of the LFC estimates toward zero</strong> when the information for a gene is low, which could include:</p>
+<ul>
+<li>Low counts</li>
+<li>High dispersion values</li>
+</ul>
+<p>As with the shrinkage of dispersion estimates, LFC shrinkage uses <strong>information from all genes</strong> to generate more accurate estimates. Specifically, the distribution of LFC estimates for all genes is used (as a prior) to shrink the LFC estimates of genes with little information or high dispersion toward more likely (lower) LFC estimates.</p>
+<p><img src="img/deseq2_shrunken_lfc.png" width="500" alt="Alt text" /></p>
+<p><em>Illustration taken from the <a href="https://genomebiology.biomedcentral.com/articles/10.1186/s13059-014-0550-8">DESeq2 paper</a>.</em></p>
+<p>For example, in the figure above, the green gene and purple gene have the same mean values for the two sample groups (C57BL/6J and DBA/2J), but the green gene has little variation while the purple gene has high levels of variation. For the green gene with low variation, the <strong>unshrunken LFC estimate</strong> (vertex of the green <strong>solid line</strong>) is very similar to the shrunken LFC estimate (vertex of the green dotted line), but the LFC estimates for the purple gene are quite different due to the high dispersion. So even though two genes can have similar normalized count values, they can have differing degrees of LFC shrinkage. Notice the <strong>LFC estimates are shrunken toward the prior (black solid line)</strong>.</p>
+<p><strong>Generating Shrunken LFC Estimates</strong>
+To generate the shrunken log2 fold change estimates, you have to run an additional step on your results object (that we will create below) with the function <code>lfcShrink()</code></p>
+<div id="hypothesis-testing" class="section level3 hasAnchor" number="5.2.1">
+<h3><span class="header-section-number">5.2.1</span> Hypothesis Testing<a href="negative-binomial-model-fitting.html#hypothesis-testing" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>In DESeq2, hypothesis testing evaluates whether changes in gene expression between conditions are statistically significant. The <strong>null hypothesis</strong> assumes no differential expression between groups, meaning the log2 fold change is zero (<span class="math inline">\(LFC = 0\)</span>).</p>
+</div>
+</div>
+<div id="statistical-test-for-lfc-estimates-wald-test" class="section level2 hasAnchor" number="5.3">
+<h2><span class="header-section-number">5.3</span> Statistical test for LFC estimates: Wald test<a href="negative-binomial-model-fitting.html#statistical-test-for-lfc-estimates-wald-test" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>In DESeq2, the Wald test is the default used for hypothesis testing when comparing two groups. The Wald test is a test usually performed on the LFC estimates.</p>
+<p>DESeq2 implements the Wald test by:</p>
+<ul>
+<li><p>Taking the LFC and dividing it by its standard error, resulting in a z-statistic</p></li>
+<li><p>The z-statistic is compared to a standard normal distribution, and a p-value is computed reporting the probability that a z-statistic at least as extreme as the observed value would be selected at random</p></li>
+<li><p>If the p-value is small we reject the null hypothesis (LFC = 0) and state that there is evidence against the null (i.e. the gene is differentially expressed).</p></li>
+</ul>
+</div>
+<div id="mov10-differential-expression-analysis-control-versus-overexpression" class="section level2 hasAnchor" number="5.4">
+<h2><span class="header-section-number">5.4</span> MOV10 Differential Expression Analysis: Control versus Overexpression<a href="negative-binomial-model-fitting.html#mov10-differential-expression-analysis-control-versus-overexpression" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>We have three sample classes so we can make three possible pairwise comparisons:</p>
+<ol style="list-style-type: decimal">
+<li>Control vs. Mov10 overexpression</li>
+<li>Control vs. Mov10 knockdown</li>
+<li>Mov10 knockdown vs. Mov10 overexpression</li>
+</ol>
+<p><strong>We are really only interested in #1 and #2 from above</strong>. Using the design formula we provided <code>~ sampletype</code>, indicating that this is our main factor of interest.</p>
+<div id="creating-contrasts-for-hypothesis-testing" class="section level3 hasAnchor" number="5.4.1">
+<h3><span class="header-section-number">5.4.1</span> Creating Contrasts for Hypothesis Testing<a href="negative-binomial-model-fitting.html#creating-contrasts-for-hypothesis-testing" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>In DESeq2, <strong>contrasts</strong> specify which groups to compare for differential expression testing. You can define contrasts in two ways:</p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Default Comparison:</strong> DESeq2 automatically uses the alphabetically first level of the factor as the <strong>baseline</strong>.</p></li>
+<li><p><strong>Manual Specification:</strong> You can manually specify the comparison using the <code>contrast</code> argument in the <code>results()</code> function. The <code>contrast</code> argument takes a vector of three elements. The first element is the name of the factor (design). The second and third elements listed in the contrast are the names of the numerator and denominator level for the fold change, respectively.</p></li>
+</ol>
+<p><strong>Building the Results Table</strong></p>
+<p>To build the results table, we use the <code>results()</code> function. You can specify the <code>contrast</code> to be tested using the contrast argument. In this example, we’ll save the unshrunken and shrunken results of <strong>Control vs. Mov10 overexpression</strong> to different variables. We’ll also set the <code>alpha</code> to 0.05, which is more stringent than the default value of 0.1.</p>
+<div class="sourceCode" id="cb74"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb74-1"><a href="negative-binomial-model-fitting.html#cb74-1" tabindex="-1"></a><span class="co"># define contrasts</span></span>
+<span id="cb74-2"><a href="negative-binomial-model-fitting.html#cb74-2" tabindex="-1"></a>contrast_oe <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;sampletype&quot;</span>, </span>
+<span id="cb74-3"><a href="negative-binomial-model-fitting.html#cb74-3" tabindex="-1"></a>                 <span class="st">&quot;MOV10_overexpression&quot;</span>, </span>
+<span id="cb74-4"><a href="negative-binomial-model-fitting.html#cb74-4" tabindex="-1"></a>                 <span class="st">&quot;control&quot;</span>)</span>
+<span id="cb74-5"><a href="negative-binomial-model-fitting.html#cb74-5" tabindex="-1"></a></span>
+<span id="cb74-6"><a href="negative-binomial-model-fitting.html#cb74-6" tabindex="-1"></a><span class="co"># extract results table</span></span>
+<span id="cb74-7"><a href="negative-binomial-model-fitting.html#cb74-7" tabindex="-1"></a>res_tableOE_unshrunken <span class="ot">&lt;-</span> <span class="fu">results</span>(dds, </span>
+<span id="cb74-8"><a href="negative-binomial-model-fitting.html#cb74-8" tabindex="-1"></a>                                  <span class="at">contrast =</span> contrast_oe, </span>
+<span id="cb74-9"><a href="negative-binomial-model-fitting.html#cb74-9" tabindex="-1"></a>                                  <span class="at">alpha =</span> <span class="fl">0.05</span>)</span>
+<span id="cb74-10"><a href="negative-binomial-model-fitting.html#cb74-10" tabindex="-1"></a></span>
+<span id="cb74-11"><a href="negative-binomial-model-fitting.html#cb74-11" tabindex="-1"></a><span class="fu">resultsNames</span>(dds)</span></code></pre></div>
+<pre><code>## [1] &quot;Intercept&quot;                                 
+## [2] &quot;sampletype_MOV10_knockdown_vs_control&quot;     
+## [3] &quot;sampletype_MOV10_overexpression_vs_control&quot;</code></pre>
+<div class="sourceCode" id="cb76"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb76-1"><a href="negative-binomial-model-fitting.html#cb76-1" tabindex="-1"></a><span class="co"># shrink log2 fold changes</span></span>
+<span id="cb76-2"><a href="negative-binomial-model-fitting.html#cb76-2" tabindex="-1"></a>res_tableOE <span class="ot">&lt;-</span> <span class="fu">lfcShrink</span>(<span class="at">dds =</span> dds, </span>
+<span id="cb76-3"><a href="negative-binomial-model-fitting.html#cb76-3" tabindex="-1"></a>               <span class="at">coef =</span> <span class="st">&quot;sampletype_MOV10_overexpression_vs_control&quot;</span>, </span>
+<span id="cb76-4"><a href="negative-binomial-model-fitting.html#cb76-4" tabindex="-1"></a>               <span class="at">res =</span> res_tableOE_unshrunken)</span></code></pre></div>
+<pre><code>## using &#39;apeglm&#39; for LFC shrinkage. If used in published research, please cite:
+##     Zhu, A., Ibrahim, J.G., Love, M.I. (2018) Heavy-tailed prior distributions for
+##     sequence count data: removing the noise and preserving large differences.
+##     Bioinformatics. https://doi.org/10.1093/bioinformatics/bty895</code></pre>
+<div class="sourceCode" id="cb78"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb78-1"><a href="negative-binomial-model-fitting.html#cb78-1" tabindex="-1"></a><span class="co"># save the results for future use</span></span>
+<span id="cb78-2"><a href="negative-binomial-model-fitting.html#cb78-2" tabindex="-1"></a><span class="fu">saveRDS</span>(res_tableOE, <span class="at">file =</span> <span class="st">&quot;data/res_tableOE.RDS&quot;</span>)</span></code></pre></div>
+<p><strong>The order of the names determines the direction of fold change that is reported.</strong> The name provided in the second element is the level that is used as baseline. So for example, if we observe a log2 fold change of -2 this would mean the gene expression is lower in Mov10_oe relative to the control.</p>
+</div>
+<div id="ma-plot" class="section level3 hasAnchor" number="5.4.2">
+<h3><span class="header-section-number">5.4.2</span> MA Plot<a href="negative-binomial-model-fitting.html#ma-plot" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>A plot that can be useful to exploring our results is the MA plot. The MA plot shows the mean of the normalized counts versus the log2 foldchanges for all genes tested. The genes that are significantly DE are colored to be easily identified. This is also a great way to illustrate the effect of LFC shrinkage. The DESeq2 package offers a simple function to generate an MA plot.</p>
+<p><strong>Shrunken &amp; Unshrunken Results:</strong></p>
+<div class="sourceCode" id="cb79"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb79-1"><a href="negative-binomial-model-fitting.html#cb79-1" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">1</span>,<span class="dv">2</span>))</span>
+<span id="cb79-2"><a href="negative-binomial-model-fitting.html#cb79-2" tabindex="-1"></a></span>
+<span id="cb79-3"><a href="negative-binomial-model-fitting.html#cb79-3" tabindex="-1"></a><span class="fu">plotMA</span>(res_tableOE_unshrunken, <span class="at">ylim=</span><span class="fu">c</span>(<span class="sc">-</span><span class="dv">2</span>,<span class="dv">2</span>))</span>
+<span id="cb79-4"><a href="negative-binomial-model-fitting.html#cb79-4" tabindex="-1"></a></span>
+<span id="cb79-5"><a href="negative-binomial-model-fitting.html#cb79-5" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> <span class="dv">10</span>,<span class="at">col=</span><span class="st">&quot;red&quot;</span>,<span class="at">lwd =</span> <span class="dv">2</span>)</span>
+<span id="cb79-6"><a href="negative-binomial-model-fitting.html#cb79-6" tabindex="-1"></a></span>
+<span id="cb79-7"><a href="negative-binomial-model-fitting.html#cb79-7" tabindex="-1"></a><span class="co"># Shrunken results:</span></span>
+<span id="cb79-8"><a href="negative-binomial-model-fitting.html#cb79-8" tabindex="-1"></a><span class="fu">plotMA</span>(res_tableOE, <span class="at">ylim=</span><span class="fu">c</span>(<span class="sc">-</span><span class="dv">2</span>,<span class="dv">2</span>))</span>
+<span id="cb79-9"><a href="negative-binomial-model-fitting.html#cb79-9" tabindex="-1"></a></span>
+<span id="cb79-10"><a href="negative-binomial-model-fitting.html#cb79-10" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">v =</span> <span class="dv">10</span>,<span class="at">col=</span><span class="st">&quot;red&quot;</span>,<span class="at">lwd =</span> <span class="dv">2</span>)</span></code></pre></div>
+<p><img src="2024_RNA-seq-analysis_files/figure-html/unnamed-chunk-47-1.png" width="672" /></p>
+<p><strong>MOV10 DE Analysis: Exploring the Results</strong></p>
+<p>The results table in <code>DESeq2</code> looks similar to a data.frame and can be treated like one for accessing or subsetting data. However, it is stored as a <code>DESeqResults</code> object, which is important to keep in mind when working with visualization tools.</p>
+<div class="sourceCode" id="cb80"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb80-1"><a href="negative-binomial-model-fitting.html#cb80-1" tabindex="-1"></a><span class="fu">class</span>(res_tableOE)</span></code></pre></div>
+<pre><code>## [1] &quot;DESeqResults&quot;
+## attr(,&quot;package&quot;)
+## [1] &quot;DESeq2&quot;</code></pre>
+<p>Let’s go through some of the columns in the results table to get a better idea of what we are looking at. To extract information regarding the meaning of each column we can use <code>mcols()</code>:</p>
+<div class="sourceCode" id="cb82"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb82-1"><a href="negative-binomial-model-fitting.html#cb82-1" tabindex="-1"></a><span class="fu">mcols</span>(res_tableOE, <span class="at">use.names =</span> T)</span></code></pre></div>
+<pre><code>## DataFrame with 5 rows and 2 columns
+##                        type            description
+##                 &lt;character&gt;            &lt;character&gt;
+## baseMean       intermediate mean of normalized c..
+## log2FoldChange      results log2 fold change (MA..
+## lfcSE               results posterior SD: sample..
+## pvalue              results Wald test p-value: s..
+## padj                results   BH adjusted p-values</code></pre>
+<p>Now let’s take a look at what information is stored in the results:</p>
+<div class="sourceCode" id="cb84"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb84-1"><a href="negative-binomial-model-fitting.html#cb84-1" tabindex="-1"></a><span class="fu">head</span>(res_tableOE)</span></code></pre></div>
+<pre><code>## log2 fold change (MAP): sampletype MOV10_overexpression vs control 
+## Wald test p-value: sampletype MOV10 overexpression vs control 
+## DataFrame with 6 rows and 5 columns
+##               baseMean log2FoldChange     lfcSE    pvalue      padj
+##              &lt;numeric&gt;      &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt; &lt;numeric&gt;
+## 1/2-SBSRNA4  45.652040     0.16858121  0.209275 0.1610752 0.2655661
+## A1BG         61.093102     0.13623770  0.176713 0.2401909 0.3603094
+## A1BG-AS1    175.665807    -0.04016953  0.116916 0.6789312 0.7748342
+## A1CF          0.237692     0.00626568  0.210057 0.7945932        NA
+## A2LD1        89.617985     0.29007260  0.195380 0.0333343 0.0741149
+## A2M           5.860084    -0.09623512  0.233587 0.1057823 0.1900466</code></pre>
+<div class="sourceCode" id="cb86"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb86-1"><a href="negative-binomial-model-fitting.html#cb86-1" tabindex="-1"></a><span class="fu">names</span>(res_tableOE)</span></code></pre></div>
+<pre><code>## [1] &quot;baseMean&quot;       &quot;log2FoldChange&quot; &quot;lfcSE&quot;          &quot;pvalue&quot;        
+## [5] &quot;padj&quot;</code></pre>
+<p><strong>Interpreting p-values Set to NA</strong></p>
+<p>In some cases, p-values or adjusted p-values may be set to NA for a gene. This happens in three scenarios:</p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Zero counts:</strong> If all samples have zero counts for a gene, its baseMean will be zero, and the log2 fold change, p-value, and adjusted p-value will all be set to NA.</p></li>
+<li><p><strong>Outliers:</strong> If a gene has an extreme count outlier, its p-values will be set to NA. These outliers are detected using Cook’s distance.</p></li>
+<li><p><strong>Low counts:</strong> If a gene is filtered out by independent filtering for having a low mean normalized count, only the adjusted p-value will be set to NA.</p></li>
+</ol>
+</div>
+<div id="multiple-testing-correction" class="section level3 hasAnchor" number="5.4.3">
+<h3><span class="header-section-number">5.4.3</span> Multiple Testing Correction<a href="negative-binomial-model-fitting.html#multiple-testing-correction" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>When testing many genes, using raw <strong>p-values</strong> increases the chance of false positives (genes appearing significant by chance). If we used the <code>p-value</code> directly from the Wald test with a significance cut-off of p &lt; 0.05, that means there is a 5% chance it is a false positives. Each p-value is the result of a single test (single gene). The more genes we test, the more we inflate the false positive rate. This issue is the known as the <strong>multiple testing problem.</strong> FFor example, if we test 20,000 genes for differential expression, at p &lt; 0.05 we would expect to find 1,000 genes by chance. If we found 3000 genes to be differentially expressed total, 150 of our genes are false positives. We would not want to sift through our “significant” genes to identify which ones are true positives.</p>
+<p>DESeq2 addresses this by removing genes with low counts or outliers before testing and by applying the <strong>Benjamini-Hochberg (BH)</strong> method to control the <strong>false discovery rate (FDR)</strong>.</p>
+</div>
+<div id="benjamini-hochberg-adjustment" class="section level3 hasAnchor" number="5.4.4">
+<h3><span class="header-section-number">5.4.4</span> Benjamini-Hochberg Adjustment<a href="negative-binomial-model-fitting.html#benjamini-hochberg-adjustment" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The <strong>BH-adjusted p-value</strong> is calculated as:</p>
+<ol style="list-style-type: decimal">
+<li><p>Sort p-values from smallest to largest.</p></li>
+<li><p>Assign ranks to each p-value <span class="math inline">\(p_i\)</span>.</p></li>
+<li><p>Compute the adjusted p-value:</p></li>
+</ol>
+<p><span class="math display">\[p_{i}^{adj} = p_{i} \times \frac{m}{i}\]</span></p>
+<p>Where:</p>
+<ul>
+<li><p><span class="math inline">\(p_{i}\)</span> is the raw p-value</p></li>
+<li><p><span class="math inline">\(m\)</span> is the total number of genes tested</p></li>
+<li><p><span class="math inline">\(i\)</span> is the rank of the p-value.</p></li>
+</ul>
+<p><strong>Adjusted p-values</strong> are compared to a significance threshold (e.g., 0.05) to identify significant genes. The <strong>Bonferroni method</strong>, another correction, is more conservative and less commonly used due to a higher risk of false negatives.</p>
+<p>In most cases, we should use the <strong>adjusted p-values</strong> (BH-corrected) to identify significant genes.</p>
+</div>
+<div id="mov10-de-analysis-control-vs.-knockdown" class="section level3 hasAnchor" number="5.4.5">
+<h3><span class="header-section-number">5.4.5</span> MOV10 DE Analysis: <strong>Control vs. Knockdown</strong><a href="negative-binomial-model-fitting.html#mov10-de-analysis-control-vs.-knockdown" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>After examining the overexpression results, let’s move on to the comparison between <strong>Control vs. Knockdown</strong>. We’ll use contrasts in the <code>results()</code> function to extract the results table and store it in the <code>res_tableKD</code> variable. You can also use <code>coef</code> to specify the contrast directly in the <code>lfcShrink()</code> function.</p>
+<div class="sourceCode" id="cb88"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb88-1"><a href="negative-binomial-model-fitting.html#cb88-1" tabindex="-1"></a><span class="co"># define contrast</span></span>
+<span id="cb88-2"><a href="negative-binomial-model-fitting.html#cb88-2" tabindex="-1"></a>contrast_kd <span class="ot">&lt;-</span>  <span class="fu">c</span>(<span class="st">&quot;sampletype&quot;</span>, </span>
+<span id="cb88-3"><a href="negative-binomial-model-fitting.html#cb88-3" tabindex="-1"></a>                  <span class="st">&quot;MOV10_knockdown&quot;</span>,</span>
+<span id="cb88-4"><a href="negative-binomial-model-fitting.html#cb88-4" tabindex="-1"></a>                  <span class="st">&quot;control&quot;</span>)</span>
+<span id="cb88-5"><a href="negative-binomial-model-fitting.html#cb88-5" tabindex="-1"></a></span>
+<span id="cb88-6"><a href="negative-binomial-model-fitting.html#cb88-6" tabindex="-1"></a><span class="co"># extract results table</span></span>
+<span id="cb88-7"><a href="negative-binomial-model-fitting.html#cb88-7" tabindex="-1"></a>res_tableKD_unshrunken <span class="ot">&lt;-</span> <span class="fu">results</span>(dds, </span>
+<span id="cb88-8"><a href="negative-binomial-model-fitting.html#cb88-8" tabindex="-1"></a>                                  <span class="at">contrast =</span> contrast_kd, </span>
+<span id="cb88-9"><a href="negative-binomial-model-fitting.html#cb88-9" tabindex="-1"></a>                                  <span class="at">alpha =</span> <span class="fl">0.05</span>)</span>
+<span id="cb88-10"><a href="negative-binomial-model-fitting.html#cb88-10" tabindex="-1"></a></span>
+<span id="cb88-11"><a href="negative-binomial-model-fitting.html#cb88-11" tabindex="-1"></a><span class="fu">resultsNames</span>(dds)</span></code></pre></div>
+<pre><code>## [1] &quot;Intercept&quot;                                 
+## [2] &quot;sampletype_MOV10_knockdown_vs_control&quot;     
+## [3] &quot;sampletype_MOV10_overexpression_vs_control&quot;</code></pre>
+<div class="sourceCode" id="cb90"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb90-1"><a href="negative-binomial-model-fitting.html#cb90-1" tabindex="-1"></a><span class="co"># use the `coef` argument to specify the contrast directly</span></span>
+<span id="cb90-2"><a href="negative-binomial-model-fitting.html#cb90-2" tabindex="-1"></a>res_tableKD <span class="ot">&lt;-</span> <span class="fu">lfcShrink</span>(dds, <span class="at">coef =</span> <span class="dv">2</span>, </span>
+<span id="cb90-3"><a href="negative-binomial-model-fitting.html#cb90-3" tabindex="-1"></a>                         <span class="at">res =</span> res_tableKD_unshrunken)</span></code></pre></div>
+<pre><code>## using &#39;apeglm&#39; for LFC shrinkage. If used in published research, please cite:
+##     Zhu, A., Ibrahim, J.G., Love, M.I. (2018) Heavy-tailed prior distributions for
+##     sequence count data: removing the noise and preserving large differences.
+##     Bioinformatics. https://doi.org/10.1093/bioinformatics/bty895</code></pre>
+<div class="sourceCode" id="cb92"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb92-1"><a href="negative-binomial-model-fitting.html#cb92-1" tabindex="-1"></a><span class="do">## Save results for future use</span></span>
+<span id="cb92-2"><a href="negative-binomial-model-fitting.html#cb92-2" tabindex="-1"></a><span class="fu">saveRDS</span>(res_tableKD, <span class="at">file =</span> <span class="st">&quot;data/res_tableKD.RDS&quot;</span>)</span></code></pre></div>
+</div>
+</div>
+<div id="summarizing-results" class="section level2 hasAnchor" number="5.5">
+<h2><span class="header-section-number">5.5</span> Summarizing Results<a href="negative-binomial-model-fitting.html#summarizing-results" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>To summarize the results, DESeq2 offers the <code>summary()</code> function, which conveniently reports the number of genes that are significantly differentially expressed at a specified threshold (<code>default FDR &lt; 0.05</code>). Note that, even though the output refers to p-values, it actually summarizes the results using <strong>adjusted p-values (padj/FDR)</strong>.</p>
+<p>Let’s start by summarizing the results for the OE vs. control comparison:</p>
+<div class="sourceCode" id="cb93"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb93-1"><a href="negative-binomial-model-fitting.html#cb93-1" tabindex="-1"></a><span class="do">## Summarize results</span></span>
+<span id="cb93-2"><a href="negative-binomial-model-fitting.html#cb93-2" tabindex="-1"></a><span class="fu">summary</span>(res_tableOE)</span></code></pre></div>
+<pre><code>## 
+## out of 19748 with nonzero total read count
+## adjusted p-value &lt; 0.05
+## LFC &gt; 0 (up)       : 3103, 16%
+## LFC &lt; 0 (down)     : 3408, 17%
+## outliers [1]       : 0, 0%
+## low counts [2]     : 4171, 21%
+## (mean count &lt; 5)
+## [1] see &#39;cooksCutoff&#39; argument of ?results
+## [2] see &#39;independentFiltering&#39; argument of ?results</code></pre>
+<p>In addition to reporting the number of up- and down-regulated genes at the default significance threshold, this function also provides information on:</p>
+<ul>
+<li><strong>Number of genes tested</strong> (genes with non-zero total read count)</li>
+<li><strong>Number of genes excluded</strong> from multiple test correction due to low mean counts</li>
+</ul>
+<div id="extracting-significant-differentially-expressed-genes" class="section level3 hasAnchor" number="5.5.1">
+<h3><span class="header-section-number">5.5.1</span> Extracting Significant Differentially Expressed Genes<a href="negative-binomial-model-fitting.html#extracting-significant-differentially-expressed-genes" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>In some cases, using only the FDR threshold doesn’t sufficiently reduce the number of significant genes, making it difficult to extract biologically meaningful results. To increase stringency, we can apply an additional fold change threshold.</p>
+<p>Although the summary() function doesn’t include an argument for fold change thresholds, we can define our own criteria.</p>
+<p>Let’s start by setting the thresholds for both adjusted p-value (FDR &lt; 0.05) and log2 fold change (|log2FC| &gt; 0.58, corresponding to a 1.5-fold change):</p>
+<div class="sourceCode" id="cb95"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb95-1"><a href="negative-binomial-model-fitting.html#cb95-1" tabindex="-1"></a><span class="do">### Set thresholds</span></span>
+<span id="cb95-2"><a href="negative-binomial-model-fitting.html#cb95-2" tabindex="-1"></a>padj.cutoff <span class="ot">&lt;-</span> <span class="fl">0.05</span></span>
+<span id="cb95-3"><a href="negative-binomial-model-fitting.html#cb95-3" tabindex="-1"></a>lfc.cutoff <span class="ot">&lt;-</span> <span class="fl">0.58</span></span></code></pre></div>
+<p>Next, we’ll convert the results table to a tibble for easier subsetting:</p>
+<div class="sourceCode" id="cb96"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb96-1"><a href="negative-binomial-model-fitting.html#cb96-1" tabindex="-1"></a>res_tableOE_tb <span class="ot">&lt;-</span> res_tableOE <span class="sc">%&gt;%</span></span>
+<span id="cb96-2"><a href="negative-binomial-model-fitting.html#cb96-2" tabindex="-1"></a>  <span class="fu">data.frame</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb96-3"><a href="negative-binomial-model-fitting.html#cb96-3" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">&quot;gene&quot;</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb96-4"><a href="negative-binomial-model-fitting.html#cb96-4" tabindex="-1"></a>  <span class="fu">as_tibble</span>()</span></code></pre></div>
+<p>Now, we can filter the table to retain only the genes that meet the significance and fold change criteria:</p>
+<div class="sourceCode" id="cb97"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb97-1"><a href="negative-binomial-model-fitting.html#cb97-1" tabindex="-1"></a>sigOE <span class="ot">&lt;-</span> res_tableOE_tb <span class="sc">%&gt;%</span></span>
+<span id="cb97-2"><a href="negative-binomial-model-fitting.html#cb97-2" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(padj <span class="sc">&lt;</span> padj.cutoff <span class="sc">&amp;</span> </span>
+<span id="cb97-3"><a href="negative-binomial-model-fitting.html#cb97-3" tabindex="-1"></a>                <span class="fu">abs</span>(log2FoldChange) <span class="sc">&gt;</span> lfc.cutoff)</span>
+<span id="cb97-4"><a href="negative-binomial-model-fitting.html#cb97-4" tabindex="-1"></a></span>
+<span id="cb97-5"><a href="negative-binomial-model-fitting.html#cb97-5" tabindex="-1"></a><span class="co"># Save the results for future use</span></span>
+<span id="cb97-6"><a href="negative-binomial-model-fitting.html#cb97-6" tabindex="-1"></a><span class="fu">saveRDS</span>(sigOE,<span class="st">&quot;data/sigOE.RDS&quot;</span>)</span></code></pre></div>
+<p><strong>Exercise</strong> points = +3</p>
+<p>How many genes are differentially expressed in the <strong>Overexpression vs. Control</strong> comparison based on the criteria we just defined? Does this reduce the number of significant genes compared to using only the FDR threshold?</p>
+<div class="sourceCode" id="cb98"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb98-1"><a href="negative-binomial-model-fitting.html#cb98-1" tabindex="-1"></a><span class="co"># Your code here</span></span></code></pre></div>
+<p><strong>Does this reduce our results?</strong></p>
+<div class="sourceCode" id="cb99"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb99-1"><a href="negative-binomial-model-fitting.html#cb99-1" tabindex="-1"></a><span class="co"># Your code here</span></span></code></pre></div>
+</div>
+<div id="mov10-knockdown-analysis-control-vs.-knockdown" class="section level3 hasAnchor" number="5.5.2">
+<h3><span class="header-section-number">5.5.2</span> MOV10 Knockdown Analysis: Control vs. Knockdown<a href="negative-binomial-model-fitting.html#mov10-knockdown-analysis-control-vs.-knockdown" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Next, let’s perform the same analysis for the <strong>Control vs. Mov10 knockdown</strong> comparison. We’ll use the same thresholds for adjusted p-value (FDR &lt; 0.05) and log2 fold change (|log2FC| &gt; 0.58).</p>
+<div class="sourceCode" id="cb100"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb100-1"><a href="negative-binomial-model-fitting.html#cb100-1" tabindex="-1"></a>res_tableKD_tb <span class="ot">&lt;-</span> res_tableKD <span class="sc">%&gt;%</span></span>
+<span id="cb100-2"><a href="negative-binomial-model-fitting.html#cb100-2" tabindex="-1"></a>  <span class="fu">data.frame</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb100-3"><a href="negative-binomial-model-fitting.html#cb100-3" tabindex="-1"></a>  <span class="fu">rownames_to_column</span>(<span class="at">var =</span> <span class="st">&quot;gene&quot;</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb100-4"><a href="negative-binomial-model-fitting.html#cb100-4" tabindex="-1"></a>  <span class="fu">as_tibble</span>()</span>
+<span id="cb100-5"><a href="negative-binomial-model-fitting.html#cb100-5" tabindex="-1"></a></span>
+<span id="cb100-6"><a href="negative-binomial-model-fitting.html#cb100-6" tabindex="-1"></a>sigKD <span class="ot">&lt;-</span> res_tableKD_tb <span class="sc">%&gt;%</span></span>
+<span id="cb100-7"><a href="negative-binomial-model-fitting.html#cb100-7" tabindex="-1"></a>         dplyr<span class="sc">::</span><span class="fu">filter</span>(padj <span class="sc">&lt;</span> padj.cutoff <span class="sc">&amp;</span> </span>
+<span id="cb100-8"><a href="negative-binomial-model-fitting.html#cb100-8" tabindex="-1"></a>         <span class="fu">abs</span>(log2FoldChange) <span class="sc">&gt;</span> lfc.cutoff)</span>
+<span id="cb100-9"><a href="negative-binomial-model-fitting.html#cb100-9" tabindex="-1"></a></span>
+<span id="cb100-10"><a href="negative-binomial-model-fitting.html#cb100-10" tabindex="-1"></a><span class="co"># We&#39;ll save this object for use in the homework</span></span>
+<span id="cb100-11"><a href="negative-binomial-model-fitting.html#cb100-11" tabindex="-1"></a><span class="fu">saveRDS</span>(sigKD,<span class="st">&quot;data/sigKD.RDS&quot;</span>)</span></code></pre></div>
+<p><strong>How many genes are differentially expressed in the Knockdown compared to Control?</strong></p>
+<div class="sourceCode" id="cb101"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb101-1"><a href="negative-binomial-model-fitting.html#cb101-1" tabindex="-1"></a><span class="co"># Your code here</span></span></code></pre></div>
+<p>With our subset of significant genes identified, we can now proceed to visualize the results and explore patterns of differential expression.</p>
+<div class="sourceCode" id="cb102"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb102-1"><a href="negative-binomial-model-fitting.html#cb102-1" tabindex="-1"></a><span class="do">## Save all objects for later</span></span>
+<span id="cb102-2"><a href="negative-binomial-model-fitting.html#cb102-2" tabindex="-1"></a><span class="fu">save.image</span>()</span></code></pre></div>
+
+</div>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="dge-analysis-workflow.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="visualizing-rna-seq-results.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": ["2024_RNA-seq-analysis.pdf", "2024_RNA-seq-analysis.epub"],
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "section"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

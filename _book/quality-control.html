@@ -1,0 +1,652 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 3 Quality Control | 2024_RNA-seq-analysis</title>
+  <meta name="description" content="Chapter 3 Quality Control | 2024_RNA-seq-analysis" />
+  <meta name="generator" content="bookdown 0.41 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 3 Quality Control | 2024_RNA-seq-analysis" />
+  <meta property="og:type" content="book" />
+  <meta property="og:image" content="https://bookdown.org/ggiaever/2024_RNA-seq-analysis/img/football.png" />
+  
+  <meta name="github-repo" content="gurinina/2024_RNA-seq-analysis" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 3 Quality Control | 2024_RNA-seq-analysis" />
+  
+  
+  <meta name="twitter:image" content="https://bookdown.org/ggiaever/2024_RNA-seq-analysis/img/football.png" />
+
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="count-normalization.html"/>
+<link rel="next" href="dge-analysis-workflow.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<script src="libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<link href="libs/vis-9.1.0/vis-network.min.css" rel="stylesheet" />
+<script src="libs/vis-9.1.0/vis-network.min.js"></script>
+<script src="libs/visNetwork-binding-2.1.2/visNetwork.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+
+<link rel="stylesheet" href="css/git.css" type="text/css" />
+<link rel="stylesheet" href="css/toc.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>RNA-seq analysis workshop</a></li>
+<li class="chapter" data-level="1" data-path="differential-gene-expression-dge-analysis-overview.html"><a href="differential-gene-expression-dge-analysis-overview.html"><i class="fa fa-check"></i><b>1</b> Differential gene expression (DGE) analysis overview</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="differential-gene-expression-dge-analysis-overview.html"><a href="differential-gene-expression-dge-analysis-overview.html#review-of-the-dataset"><i class="fa fa-check"></i><b>1.1</b> Review of the dataset</a></li>
+<li class="chapter" data-level="1.2" data-path="differential-gene-expression-dge-analysis-overview.html"><a href="differential-gene-expression-dge-analysis-overview.html#setting-up"><i class="fa fa-check"></i><b>1.2</b> Setting up</a>
+<ul>
+<li class="chapter" data-level="1.2.1" data-path="differential-gene-expression-dge-analysis-overview.html"><a href="differential-gene-expression-dge-analysis-overview.html#loading-libraries"><i class="fa fa-check"></i><b>1.2.1</b> Loading libraries</a></li>
+<li class="chapter" data-level="1.2.2" data-path="differential-gene-expression-dge-analysis-overview.html"><a href="differential-gene-expression-dge-analysis-overview.html#loading-data"><i class="fa fa-check"></i><b>1.2.2</b> Loading data</a></li>
+<li class="chapter" data-level="1.2.3" data-path="differential-gene-expression-dge-analysis-overview.html"><a href="differential-gene-expression-dge-analysis-overview.html#viewing-data"><i class="fa fa-check"></i><b>1.2.3</b> Viewing data</a></li>
+</ul></li>
+<li class="chapter" data-level="1.3" data-path="differential-gene-expression-dge-analysis-overview.html"><a href="differential-gene-expression-dge-analysis-overview.html#differential-gene-expression-analysis-overview"><i class="fa fa-check"></i><b>1.3</b> Differential gene expression analysis overview</a>
+<ul>
+<li class="chapter" data-level="1.3.1" data-path="differential-gene-expression-dge-analysis-overview.html"><a href="differential-gene-expression-dge-analysis-overview.html#rna-seq-count-distribution"><i class="fa fa-check"></i><b>1.3.1</b> RNA-seq count distribution</a></li>
+<li class="chapter" data-level="1.3.2" data-path="differential-gene-expression-dge-analysis-overview.html"><a href="differential-gene-expression-dge-analysis-overview.html#modeling-count-data"><i class="fa fa-check"></i><b>1.3.2</b> Modeling count data</a></li>
+<li class="chapter" data-level="1.3.3" data-path="differential-gene-expression-dge-analysis-overview.html"><a href="differential-gene-expression-dge-analysis-overview.html#improving-mean-estimates-i.e.-reducing-variance-with-biological-replicates"><i class="fa fa-check"></i><b>1.3.3</b> Improving mean estimates (i.e. reducing variance) with biological replicates</a></li>
+<li class="chapter" data-level="1.3.4" data-path="differential-gene-expression-dge-analysis-overview.html"><a href="differential-gene-expression-dge-analysis-overview.html#differential-expression-analysis-workflow"><i class="fa fa-check"></i><b>1.3.4</b> Differential expression analysis workflow</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="count-normalization.html"><a href="count-normalization.html"><i class="fa fa-check"></i><b>2</b> Count normalization</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="count-normalization.html"><a href="count-normalization.html#normalization"><i class="fa fa-check"></i><b>2.1</b> Normalization</a>
+<ul>
+<li class="chapter" data-level="2.1.1" data-path="count-normalization.html"><a href="count-normalization.html#common-normalization-methods"><i class="fa fa-check"></i><b>2.1.1</b> Common normalization methods</a></li>
+<li class="chapter" data-level="2.1.2" data-path="count-normalization.html"><a href="count-normalization.html#tpm-not-recommended"><i class="fa fa-check"></i><b>2.1.2</b> TPM (Not Recommended)</a></li>
+<li class="chapter" data-level="2.1.3" data-path="count-normalization.html"><a href="count-normalization.html#rpkmfpkm-not-recommended"><i class="fa fa-check"></i><b>2.1.3</b> RPKM/FPKM (Not Recommended)</a></li>
+<li class="chapter" data-level="2.1.4" data-path="count-normalization.html"><a href="count-normalization.html#deseq2-normalization-median-of-ratios-method"><i class="fa fa-check"></i><b>2.1.4</b> DESeq2 Normalization: Median of Ratios Method</a></li>
+<li class="chapter" data-level="2.1.5" data-path="count-normalization.html"><a href="count-normalization.html#summary-of-key-reasons-for-using-deseq2"><i class="fa fa-check"></i><b>2.1.5</b> Summary of Key Reasons for Using DESeq2</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="count-normalization.html"><a href="count-normalization.html#count-normalization-of-mov10"><i class="fa fa-check"></i><b>2.2</b> Count normalization of Mov10</a>
+<ul>
+<li class="chapter" data-level="2.2.1" data-path="count-normalization.html"><a href="count-normalization.html#match-the-metadata-and-counts-data"><i class="fa fa-check"></i><b>2.2.1</b> 1. Match the metadata and counts data</a></li>
+<li class="chapter" data-level="2.2.2" data-path="count-normalization.html"><a href="count-normalization.html#create-deseq2-object"><i class="fa fa-check"></i><b>2.2.2</b> 2. Create DESEq2 object</a></li>
+<li class="chapter" data-level="2.2.3" data-path="count-normalization.html"><a href="count-normalization.html#generate-the-mov10-normalized-counts"><i class="fa fa-check"></i><b>2.2.3</b> 3. Generate the Mov10 normalized counts</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="quality-control.html"><a href="quality-control.html"><i class="fa fa-check"></i><b>3</b> Quality Control</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="quality-control.html"><a href="quality-control.html#sample-level-qc"><i class="fa fa-check"></i><b>3.1</b> Sample-level QC</a>
+<ul>
+<li class="chapter" data-level="3.1.1" data-path="quality-control.html"><a href="quality-control.html#recommended-resources"><i class="fa fa-check"></i><b>3.1.1</b> Recommended Resources</a></li>
+<li class="chapter" data-level="3.1.2" data-path="quality-control.html"><a href="quality-control.html#hierarchical-clustering-heatmap"><i class="fa fa-check"></i><b>3.1.2</b> Hierarchical Clustering Heatmap</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="quality-control.html"><a href="quality-control.html#gene-level-qc"><i class="fa fa-check"></i><b>3.2</b> Gene-level QC</a></li>
+<li class="chapter" data-level="3.3" data-path="quality-control.html"><a href="quality-control.html#mov10-quality-assessment-and-exploratory-analysis-using-deseq2"><i class="fa fa-check"></i><b>3.3</b> Mov10 quality assessment and exploratory analysis using DESeq2</a>
+<ul>
+<li class="chapter" data-level="3.3.1" data-path="quality-control.html"><a href="quality-control.html#transform-normalized-counts-using-the-rlog-transformation"><i class="fa fa-check"></i><b>3.3.1</b> Transform normalized counts using the rlog transformation</a></li>
+<li class="chapter" data-level="3.3.2" data-path="quality-control.html"><a href="quality-control.html#principal-components-analysis-pca"><i class="fa fa-check"></i><b>3.3.2</b> Principal components analysis (PCA)</a></li>
+<li class="chapter" data-level="3.3.3" data-path="quality-control.html"><a href="quality-control.html#hierarchical-clustering"><i class="fa fa-check"></i><b>3.3.3</b> Hierarchical Clustering</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="dge-analysis-workflow.html"><a href="dge-analysis-workflow.html"><i class="fa fa-check"></i><b>4</b> DGE analysis workflow</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="dge-analysis-workflow.html"><a href="dge-analysis-workflow.html#running-deseq2"><i class="fa fa-check"></i><b>4.1</b> Running DESeq2</a>
+<ul>
+<li class="chapter" data-level="4.1.1" data-path="dge-analysis-workflow.html"><a href="dge-analysis-workflow.html#set-the-design-formula"><i class="fa fa-check"></i><b>4.1.1</b> Set the Design Formula</a></li>
+<li class="chapter" data-level="4.1.2" data-path="dge-analysis-workflow.html"><a href="dge-analysis-workflow.html#mov10-differential-expression-analysis"><i class="fa fa-check"></i><b>4.1.2</b> MOV10 Differential Expression Analysis</a></li>
+</ul></li>
+<li class="chapter" data-level="4.2" data-path="dge-analysis-workflow.html"><a href="dge-analysis-workflow.html#deseq2-differential-gene-expression-analysis-workflow"><i class="fa fa-check"></i><b>4.2</b> DESeq2 differential gene expression analysis workflow</a>
+<ul>
+<li class="chapter" data-level="4.2.1" data-path="dge-analysis-workflow.html"><a href="dge-analysis-workflow.html#step-1-estimate-size-factors"><i class="fa fa-check"></i><b>4.2.1</b> Step 1: Estimate size factors</a></li>
+<li class="chapter" data-level="4.2.2" data-path="dge-analysis-workflow.html"><a href="dge-analysis-workflow.html#step-2-estimate-gene-wise-dispersion"><i class="fa fa-check"></i><b>4.2.2</b> Step 2: Estimate Gene-wise Dispersion</a></li>
+<li class="chapter" data-level="4.2.3" data-path="dge-analysis-workflow.html"><a href="dge-analysis-workflow.html#step-3-fit-curve-to-gene-wise-dispersion-estimates"><i class="fa fa-check"></i><b>4.2.3</b> Step 3: Fit Curve to Gene-wise Dispersion Estimates</a></li>
+<li class="chapter" data-level="4.2.4" data-path="dge-analysis-workflow.html"><a href="dge-analysis-workflow.html#step-4-assessing-model-fit-with-dispersion-plots"><i class="fa fa-check"></i><b>4.2.4</b> Step 4: Assessing Model Fit with Dispersion Plots</a></li>
+<li class="chapter" data-level="4.2.5" data-path="dge-analysis-workflow.html"><a href="dge-analysis-workflow.html#assessing-and-addressing-issues"><i class="fa fa-check"></i><b>4.2.5</b> Assessing and Addressing Issues</a></li>
+<li class="chapter" data-level="4.2.6" data-path="dge-analysis-workflow.html"><a href="dge-analysis-workflow.html#mov10-differential-expression-analysis-exploring-dispersion-estimates"><i class="fa fa-check"></i><b>4.2.6</b> MOV10 Differential Expression Analysis: Exploring Dispersion Estimates</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html"><i class="fa fa-check"></i><b>5</b> Negative Binomial model fitting</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#generalized-linear-model-fit-for-each-gene"><i class="fa fa-check"></i><b>5.1</b> Generalized Linear Model fit for each gene</a>
+<ul>
+<li class="chapter" data-level="5.1.1" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#negative-binomial-model-formula"><i class="fa fa-check"></i><b>5.1.1</b> Negative Binomial Model Formula</a></li>
+<li class="chapter" data-level="5.1.2" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#estimating-beta-coefficients-using-the-design-matrix"><i class="fa fa-check"></i><b>5.1.2</b> Estimating Beta Coefficients Using the Design Matrix</a></li>
+<li class="chapter" data-level="5.1.3" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#step-by-step-process"><i class="fa fa-check"></i><b>5.1.3</b> Step-by-Step Process:</a></li>
+<li class="chapter" data-level="5.1.4" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#example"><i class="fa fa-check"></i><b>5.1.4</b> Example:</a></li>
+<li class="chapter" data-level="5.1.5" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#calculation"><i class="fa fa-check"></i><b>5.1.5</b> Calculation:</a></li>
+<li class="chapter" data-level="5.1.6" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#matrix-multiplication-form"><i class="fa fa-check"></i><b>5.1.6</b> Matrix Multiplication Form:</a></li>
+<li class="chapter" data-level="5.1.7" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#log2-fold-change-and-adjustments"><i class="fa fa-check"></i><b>5.1.7</b> <strong>Log2 Fold Change and Adjustments</strong></a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#shrunken-log2-foldchanges-lfc"><i class="fa fa-check"></i><b>5.2</b> Shrunken log2 foldchanges (LFC)</a>
+<ul>
+<li class="chapter" data-level="5.2.1" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#hypothesis-testing"><i class="fa fa-check"></i><b>5.2.1</b> Hypothesis Testing</a></li>
+</ul></li>
+<li class="chapter" data-level="5.3" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#statistical-test-for-lfc-estimates-wald-test"><i class="fa fa-check"></i><b>5.3</b> Statistical test for LFC estimates: Wald test</a></li>
+<li class="chapter" data-level="5.4" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#mov10-differential-expression-analysis-control-versus-overexpression"><i class="fa fa-check"></i><b>5.4</b> MOV10 Differential Expression Analysis: Control versus Overexpression</a>
+<ul>
+<li class="chapter" data-level="5.4.1" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#creating-contrasts-for-hypothesis-testing"><i class="fa fa-check"></i><b>5.4.1</b> Creating Contrasts for Hypothesis Testing</a></li>
+<li class="chapter" data-level="5.4.2" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#ma-plot"><i class="fa fa-check"></i><b>5.4.2</b> MA Plot</a></li>
+<li class="chapter" data-level="5.4.3" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#multiple-testing-correction"><i class="fa fa-check"></i><b>5.4.3</b> Multiple Testing Correction</a></li>
+<li class="chapter" data-level="5.4.4" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#benjamini-hochberg-adjustment"><i class="fa fa-check"></i><b>5.4.4</b> Benjamini-Hochberg Adjustment</a></li>
+<li class="chapter" data-level="5.4.5" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#mov10-de-analysis-control-vs.-knockdown"><i class="fa fa-check"></i><b>5.4.5</b> MOV10 DE Analysis: <strong>Control vs. Knockdown</strong></a></li>
+</ul></li>
+<li class="chapter" data-level="5.5" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#summarizing-results"><i class="fa fa-check"></i><b>5.5</b> Summarizing Results</a>
+<ul>
+<li class="chapter" data-level="5.5.1" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#extracting-significant-differentially-expressed-genes"><i class="fa fa-check"></i><b>5.5.1</b> Extracting Significant Differentially Expressed Genes</a></li>
+<li class="chapter" data-level="5.5.2" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#mov10-knockdown-analysis-control-vs.-knockdown"><i class="fa fa-check"></i><b>5.5.2</b> MOV10 Knockdown Analysis: Control vs. Knockdown</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="visualizing-rna-seq-results.html"><a href="visualizing-rna-seq-results.html"><i class="fa fa-check"></i><b>6</b> Visualizing RNA-seq results</a>
+<ul>
+<li class="chapter" data-level="6.0.1" data-path="visualizing-rna-seq-results.html"><a href="visualizing-rna-seq-results.html#plotting-signicant-de-genes"><i class="fa fa-check"></i><b>6.0.1</b> Plotting signicant DE genes</a></li>
+<li class="chapter" data-level="6.0.2" data-path="visualizing-rna-seq-results.html"><a href="visualizing-rna-seq-results.html#heatmap"><i class="fa fa-check"></i><b>6.0.2</b> Heatmap</a></li>
+<li class="chapter" data-level="6.0.3" data-path="visualizing-rna-seq-results.html"><a href="visualizing-rna-seq-results.html#volcano-plots"><i class="fa fa-check"></i><b>6.0.3</b> Volcano plots</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="summary-of-dge-workflow.html"><a href="summary-of-dge-workflow.html"><i class="fa fa-check"></i><b>7</b> Summary of DGE workflow</a>
+<ul>
+<li class="chapter" data-level="7.0.1" data-path="summary-of-dge-workflow.html"><a href="summary-of-dge-workflow.html#import-data-into-dds-object"><i class="fa fa-check"></i><b>7.0.1</b> 1. Import data into dds object:</a></li>
+<li class="chapter" data-level="7.0.2" data-path="summary-of-dge-workflow.html"><a href="summary-of-dge-workflow.html#exploratory-data-analysis-pca-heirarchical-clustering---identifying-outliers-and-sources-of-variation-in-the-data"><i class="fa fa-check"></i><b>7.0.2</b> 2. Exploratory data analysis (PCA &amp; heirarchical clustering) - identifying outliers and sources of variation in the data:</a></li>
+<li class="chapter" data-level="7.0.3" data-path="summary-of-dge-workflow.html"><a href="summary-of-dge-workflow.html#run-deseq2"><i class="fa fa-check"></i><b>7.0.3</b> 3. Run DESeq2:</a></li>
+<li class="chapter" data-level="7.0.4" data-path="summary-of-dge-workflow.html"><a href="summary-of-dge-workflow.html#check-the-fit-of-the-dispersion-estimates"><i class="fa fa-check"></i><b>7.0.4</b> 4. Check the fit of the dispersion estimates:</a></li>
+<li class="chapter" data-level="7.0.5" data-path="summary-of-dge-workflow.html"><a href="summary-of-dge-workflow.html#create-contrasts-to-perform-wald-testing-on-the-shrunken-log2-foldchanges-between-specific-conditions"><i class="fa fa-check"></i><b>7.0.5</b> 5. Create contrasts to perform Wald testing on the shrunken log2 foldchanges between specific conditions:</a></li>
+<li class="chapter" data-level="7.0.6" data-path="summary-of-dge-workflow.html"><a href="summary-of-dge-workflow.html#output-significant-results"><i class="fa fa-check"></i><b>7.0.6</b> 6. Output significant results:</a></li>
+<li class="chapter" data-level="7.0.7" data-path="summary-of-dge-workflow.html"><a href="summary-of-dge-workflow.html#visualize-results-volcano-plots-heatmaps-normalized-counts-plots-of-top-genes-etc."><i class="fa fa-check"></i><b>7.0.7</b> 7. Visualize results: volcano plots, heatmaps, normalized counts plots of top genes, etc.</a></li>
+<li class="chapter" data-level="7.0.8" data-path="summary-of-dge-workflow.html"><a href="summary-of-dge-workflow.html#make-sure-to-output-the-versions-of-all-tools-used-in-the-de-analysis"><i class="fa fa-check"></i><b>7.0.8</b> 8. Make sure to output the versions of all tools used in the DE analysis:</a></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="functional-analysis-of-rnaseq-data.html"><a href="functional-analysis-of-rnaseq-data.html"><i class="fa fa-check"></i><b>8</b> Functional analysis of RNAseq data</a>
+<ul>
+<li class="chapter" data-level="8.0.1" data-path="functional-analysis-of-rnaseq-data.html"><a href="functional-analysis-of-rnaseq-data.html#ontology-and-go-terms"><i class="fa fa-check"></i><b>8.0.1</b> Ontology and GO Terms</a></li>
+<li class="chapter" data-level="8.0.2" data-path="functional-analysis-of-rnaseq-data.html"><a href="functional-analysis-of-rnaseq-data.html#go-terms-gene-ontology-terms"><i class="fa fa-check"></i><b>8.0.2</b> GO Terms (Gene Ontology Terms)</a></li>
+<li class="chapter" data-level="8.0.3" data-path="functional-analysis-of-rnaseq-data.html"><a href="functional-analysis-of-rnaseq-data.html#go-enrichment-methods"><i class="fa fa-check"></i><b>8.0.3</b> GO Enrichment Methods</a></li>
+<li class="chapter" data-level="8.0.4" data-path="functional-analysis-of-rnaseq-data.html"><a href="functional-analysis-of-rnaseq-data.html#example-1"><i class="fa fa-check"></i><b>8.0.4</b> Example</a></li>
+<li class="chapter" data-level="8.0.5" data-path="functional-analysis-of-rnaseq-data.html"><a href="functional-analysis-of-rnaseq-data.html#over-representation-analysis-ora-using-clusterprofiler"><i class="fa fa-check"></i><b>8.0.5</b> Over-representation Analysis (ORA) using <code>clusterProfiler</code></a></li>
+<li class="chapter" data-level="8.0.6" data-path="functional-analysis-of-rnaseq-data.html"><a href="functional-analysis-of-rnaseq-data.html#visualizing-enrichment-results"><i class="fa fa-check"></i><b>8.0.6</b> Visualizing Enrichment Results</a></li>
+<li class="chapter" data-level="8.0.7" data-path="functional-analysis-of-rnaseq-data.html"><a href="functional-analysis-of-rnaseq-data.html#gsea-using-clusterprofiler-and-fgsea"><i class="fa fa-check"></i><b>8.0.7</b> GSEA Using clusterProfiler and fgsea</a></li>
+<li class="chapter" data-level="8.0.8" data-path="functional-analysis-of-rnaseq-data.html"><a href="functional-analysis-of-rnaseq-data.html#visualizing-gsea-results"><i class="fa fa-check"></i><b>8.0.8</b> Visualizing GSEA Results</a></li>
+<li class="chapter" data-level="8.0.9" data-path="functional-analysis-of-rnaseq-data.html"><a href="functional-analysis-of-rnaseq-data.html#gsea-using-fgsea"><i class="fa fa-check"></i><b>8.0.9</b> GSEA using fgsea</a></li>
+<li class="chapter" data-level="8.0.10" data-path="functional-analysis-of-rnaseq-data.html"><a href="functional-analysis-of-rnaseq-data.html#goenrichment-package-analysis"><i class="fa fa-check"></i><b>8.0.10</b> <code>GOenrichment</code> Package Analysis</a></li>
+<li class="chapter" data-level="8.0.11" data-path="functional-analysis-of-rnaseq-data.html"><a href="functional-analysis-of-rnaseq-data.html#other-tools-and-resources"><i class="fa fa-check"></i><b>8.0.11</b> Other tools and resources</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="codebook.html"><a href="codebook.html"><i class="fa fa-check"></i><b>9</b> Codebook</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="codebook.html"><a href="codebook.html#dge-analysis-overview"><i class="fa fa-check"></i><b>9.1</b> DGE analysis overview</a>
+<ul>
+<li class="chapter" data-level="9.1.1" data-path="codebook.html"><a href="codebook.html#setting-up-1"><i class="fa fa-check"></i><b>9.1.1</b> Setting up</a></li>
+<li class="chapter" data-level="9.1.2" data-path="codebook.html"><a href="codebook.html#dge-analysis-workflow-1"><i class="fa fa-check"></i><b>9.1.2</b> DGE analysis workflow</a></li>
+</ul></li>
+<li class="chapter" data-level="9.2" data-path="codebook.html"><a href="codebook.html#count-normalization-1"><i class="fa fa-check"></i><b>9.2</b> Count normalization</a>
+<ul>
+<li class="chapter" data-level="9.2.1" data-path="codebook.html"><a href="codebook.html#match-the-metadata-and-counts-data-1"><i class="fa fa-check"></i><b>9.2.1</b> 1. Match the metadata and counts data</a></li>
+<li class="chapter" data-level="9.2.2" data-path="codebook.html"><a href="codebook.html#create-deseq2-object-1"><i class="fa fa-check"></i><b>9.2.2</b> 2. Create DESEq2 object</a></li>
+<li class="chapter" data-level="9.2.3" data-path="codebook.html"><a href="codebook.html#generate-the-mov10-normalized-counts-1"><i class="fa fa-check"></i><b>9.2.3</b> 3. Generate the Mov10 normalized counts</a></li>
+</ul></li>
+<li class="chapter" data-level="9.3" data-path="codebook.html"><a href="codebook.html#quality-control-1"><i class="fa fa-check"></i><b>9.3</b> Quality Control</a>
+<ul>
+<li class="chapter" data-level="9.3.1" data-path="codebook.html"><a href="codebook.html#principal-components-analysis-pca-1"><i class="fa fa-check"></i><b>9.3.1</b> Principal components analysis (PCA)</a></li>
+<li class="chapter" data-level="9.3.2" data-path="codebook.html"><a href="codebook.html#hierarchical-clustering-1"><i class="fa fa-check"></i><b>9.3.2</b> Hierarchical Clustering</a></li>
+</ul></li>
+<li class="chapter" data-level="9.4" data-path="codebook.html"><a href="codebook.html#dge-analysis-workflow-2"><i class="fa fa-check"></i><b>9.4</b> DGE analysis workflow</a>
+<ul>
+<li class="chapter" data-level="9.4.1" data-path="codebook.html"><a href="codebook.html#set-the-design-formula-1"><i class="fa fa-check"></i><b>9.4.1</b> Set the Design Formula</a></li>
+<li class="chapter" data-level="9.4.2" data-path="codebook.html"><a href="codebook.html#mov10-differential-expression-analysis-1"><i class="fa fa-check"></i><b>9.4.2</b> MOV10 Differential Expression Analysis</a></li>
+<li class="chapter" data-level="9.4.3" data-path="codebook.html"><a href="codebook.html#deseq2-differential-gene-expression-analysis-workflow-1"><i class="fa fa-check"></i><b>9.4.3</b> DESeq2 differential gene expression analysis workflow</a></li>
+<li class="chapter" data-level="9.4.4" data-path="codebook.html"><a href="codebook.html#mov10-differential-expression-analysis-exploring-dispersion-estimates-1"><i class="fa fa-check"></i><b>9.4.4</b> MOV10 Differential Expression Analysis: Exploring Dispersion Estimates</a></li>
+</ul></li>
+<li class="chapter" data-level="9.5" data-path="codebook.html"><a href="codebook.html#negative-binomial-model-fitting-1"><i class="fa fa-check"></i><b>9.5</b> Negative Binomial model fitting</a>
+<ul>
+<li class="chapter" data-level="9.5.1" data-path="codebook.html"><a href="codebook.html#example-2"><i class="fa fa-check"></i><b>9.5.1</b> Example:</a></li>
+<li class="chapter" data-level="9.5.2" data-path="codebook.html"><a href="codebook.html#calculation-1"><i class="fa fa-check"></i><b>9.5.2</b> Calculation:</a></li>
+<li class="chapter" data-level="9.5.3" data-path="codebook.html"><a href="codebook.html#matrix-multiplication-form-1"><i class="fa fa-check"></i><b>9.5.3</b> Matrix Multiplication Form:</a></li>
+</ul></li>
+<li class="chapter" data-level="9.6" data-path="codebook.html"><a href="codebook.html#mov10-differential-expression-analysis-2"><i class="fa fa-check"></i><b>9.6</b> MOV10 Differential Expression Analysis:</a>
+<ul>
+<li class="chapter" data-level="9.6.1" data-path="codebook.html"><a href="codebook.html#mov10-de-analysis-control-vs.-knockdown-1"><i class="fa fa-check"></i><b>9.6.1</b> MOV10 DE Analysis: <strong>Control vs. Knockdown</strong></a></li>
+</ul></li>
+<li class="chapter" data-level="9.7" data-path="codebook.html"><a href="codebook.html#summarizing-results-1"><i class="fa fa-check"></i><b>9.7</b> Summarizing Results</a>
+<ul>
+<li class="chapter" data-level="9.7.1" data-path="codebook.html"><a href="codebook.html#extracting-significant-differentially-expressed-genes-1"><i class="fa fa-check"></i><b>9.7.1</b> Extracting Significant Differentially Expressed Genes</a></li>
+<li class="chapter" data-level="9.7.2" data-path="codebook.html"><a href="codebook.html#mov10-knockdown-analysis-control-vs.-knockdown-1"><i class="fa fa-check"></i><b>9.7.2</b> MOV10 Knockdown Analysis: Control vs. Knockdown</a></li>
+</ul></li>
+<li class="chapter" data-level="9.8" data-path="codebook.html"><a href="codebook.html#visualizing-rna-seq-results-1"><i class="fa fa-check"></i><b>9.8</b> Visualizing RNA-seq results</a>
+<ul>
+<li class="chapter" data-level="9.8.1" data-path="codebook.html"><a href="codebook.html#heatmap-1"><i class="fa fa-check"></i><b>9.8.1</b> Heatmap</a></li>
+<li class="chapter" data-level="9.8.2" data-path="codebook.html"><a href="codebook.html#volcano-plots-1"><i class="fa fa-check"></i><b>9.8.2</b> Volcano plots</a></li>
+</ul></li>
+<li class="chapter" data-level="9.9" data-path="codebook.html"><a href="codebook.html#summary-of-dge-workflow-1"><i class="fa fa-check"></i><b>9.9</b> Summary of DGE workflow</a>
+<ul>
+<li class="chapter" data-level="9.9.1" data-path="codebook.html"><a href="codebook.html#import-data-into-dds-object-1"><i class="fa fa-check"></i><b>9.9.1</b> 1. Import data into dds object:</a></li>
+<li class="chapter" data-level="9.9.2" data-path="codebook.html"><a href="codebook.html#exploratory-data-analysis-pca-heirarchical-clustering---identifying-outliers-and-sources-of-variation-in-the-data-1"><i class="fa fa-check"></i><b>9.9.2</b> 2. Exploratory data analysis (PCA &amp; heirarchical clustering) - identifying outliers and sources of variation in the data:</a></li>
+<li class="chapter" data-level="9.9.3" data-path="codebook.html"><a href="codebook.html#run-deseq2-1"><i class="fa fa-check"></i><b>9.9.3</b> 3. Run DESeq2:</a></li>
+<li class="chapter" data-level="9.9.4" data-path="codebook.html"><a href="codebook.html#check-the-fit-of-the-dispersion-estimates-1"><i class="fa fa-check"></i><b>9.9.4</b> 4. Check the fit of the dispersion estimates:</a></li>
+<li class="chapter" data-level="9.9.5" data-path="codebook.html"><a href="codebook.html#create-contrasts-to-perform-wald-testing-on-the-shrunken-log2-foldchanges-between-specific-conditions-1"><i class="fa fa-check"></i><b>9.9.5</b> 5. Create contrasts to perform Wald testing on the shrunken log2 foldchanges between specific conditions:</a></li>
+<li class="chapter" data-level="9.9.6" data-path="codebook.html"><a href="codebook.html#output-significant-results-1"><i class="fa fa-check"></i><b>9.9.6</b> 6. Output significant results:</a></li>
+<li class="chapter" data-level="9.9.7" data-path="codebook.html"><a href="codebook.html#visualize-results-volcano-plots-heatmaps-normalized-counts-plots-of-top-genes-etc.-1"><i class="fa fa-check"></i><b>9.9.7</b> 7. Visualize results: volcano plots, heatmaps, normalized counts plots of top genes, etc.</a></li>
+<li class="chapter" data-level="9.9.8" data-path="codebook.html"><a href="codebook.html#make-sure-to-output-the-versions-of-all-tools-used-in-the-de-analysis-1"><i class="fa fa-check"></i><b>9.9.8</b> 8. Make sure to output the versions of all tools used in the DE analysis:</a></li>
+</ul></li>
+<li class="chapter" data-level="9.10" data-path="codebook.html"><a href="codebook.html#functional-analysis-of-rna-seq-data"><i class="fa fa-check"></i><b>9.10</b> Functional analysis of RNA-seq data</a>
+<ul>
+<li class="chapter" data-level="9.10.1" data-path="codebook.html"><a href="codebook.html#over-representation-analysis-ora-using-clusterprofiler-1"><i class="fa fa-check"></i><b>9.10.1</b> Over-representation Analysis (ORA) using <code>clusterProfiler</code></a></li>
+<li class="chapter" data-level="9.10.2" data-path="codebook.html"><a href="codebook.html#visualizing-enrichment-results-1"><i class="fa fa-check"></i><b>9.10.2</b> Visualizing Enrichment Results</a></li>
+<li class="chapter" data-level="9.10.3" data-path="codebook.html"><a href="codebook.html#gsea-using-clusterprofiler-and-fgsea-1"><i class="fa fa-check"></i><b>9.10.3</b> GSEA Using clusterProfiler and fgsea</a></li>
+<li class="chapter" data-level="9.10.4" data-path="codebook.html"><a href="codebook.html#visualizing-gsea-results-1"><i class="fa fa-check"></i><b>9.10.4</b> Visualizing GSEA Results</a></li>
+<li class="chapter" data-level="9.10.5" data-path="codebook.html"><a href="codebook.html#gsea-using-fgsea-1"><i class="fa fa-check"></i><b>9.10.5</b> GSEA using fgsea</a></li>
+<li class="chapter" data-level="9.10.6" data-path="codebook.html"><a href="codebook.html#goenrichment-package-analysis-1"><i class="fa fa-check"></i><b>9.10.6</b> <code>GOenrichment</code> Package Analysis</a></li>
+</ul></li>
+</ul></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">2024_RNA-seq-analysis</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="quality-control" class="section level1 hasAnchor" number="3">
+<h1><span class="header-section-number">Chapter 3</span> Quality Control<a href="quality-control.html#quality-control" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>The next step in the DESeq2 workflow is QC, which includes sample-level and gene-level steps to perform QC checks on the count data to help us ensure that the samples/replicates look good.</p>
+<p><img src="img/deseq_workflow_qc_2018.png" width="400" alt="Alt text" /></p>
+<div id="sample-level-qc" class="section level2 hasAnchor" number="3.1">
+<h2><span class="header-section-number">3.1</span> Sample-level QC<a href="quality-control.html#sample-level-qc" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>A useful initial step in an RNA-seq analysis is often to assess overall similarity between samples:</p>
+<ul>
+<li>Which samples are similar to each other, which are different?</li>
+<li>Does this fit to the expectation from the experiment’s design?</li>
+<li>What are the major sources of variation in the dataset?</li>
+</ul>
+<p>To explore the similarity of our samples, we will be performing sample-level QC using Principal Component Analysis (PCA) and hierarchical clustering methods. Our sample-level QC allows us to see how well our replicates cluster together, as well as, observe whether our experimental condition represents the major source of variation in the data. Performing sample-level QC can also identify any sample outliers, which may need to be explored further to determine whether they need to be removed prior to DE analysis.</p>
+<p><img src="img/sample_qc.png" width="700" alt="Alt text" /></p>
+<p>When using these unsupervised clustering methods, log2-transformation of the normalized counts improves the distances/clustering for visualization. DESeq2 uses a <strong>regularized log transform</strong> (rlog) of the normalized counts for sample-level QC as it moderates the variance across the mean, improving the clustering.</p>
+<p><img src="img/rlog_transformation.png" width="500" alt="Alt text" /></p>
+<p>Principal Component Analysis (PCA) is a technique used to emphasize variation and highlight strong patterns in a dataset. It is particularly useful for dimensionality reduction, meaning it simplifies large datasets by identifying the directions (or principal components) that explain the greatest variation in the data. For a more detailed introduction to PCA, we recommend watching this <a href="https://www.youtube.com/watch?v=_UVHneBUBW0">StatQuest’s video</a>.</p>
+<p>Suppose we have a dataset with two samples and four genes. To evaluate the relationship between these samples, we can plot the counts of one sample against the other, with Sample 1 on the x-axis and Sample 2 on the y-axis, as shown below:</p>
+<p><img src="img/PCA_2sample_genes.png" width="600" alt="Alt text" /></p>
+<p>For PCA analysis, the first step is finding the <strong>first principal component</strong> (PC1). The <strong>first principal component</strong> is the direction that <strong>maximizes the variance</strong> (the sum of squared distances from the mean) and simultaneously <strong>minimizes the squared distances between the data points</strong> and their projections onto that line. Why? Because variance is essentially the spread (or squared distances) of the data from its mean, and PCA wants to capture as much of this spread as possible. In this example, the most variation is along the diagonal. That is, the <strong>largest spread in the data</strong> is between the two endpoints of this line. <strong>This is called the first principal component, or PC1.</strong> The genes at the endpoints of this line (Gene B and Gene C) have the <strong>greatest influence</strong> on the direction of this line.</p>
+<p><img src="img/pca_with_PC1_line.png" width="300" alt="Alt text" /></p>
+<p>After determining PC1, PCA assigns each sample a <strong>PC1 score</strong>, which represents how each sample aligns with this principal component. The score for each sample is calculated by taking the product of each gene’s influence on PC1 and its normalized expression in the sample, and summing these products across all genes. A second line can then be drawn to represent the <strong>second principal component (PC2)</strong>, which captures the second-largest amount of variation in the data. This process can continue for additional principal components.</p>
+<p>The formula to calculate a sample’s PC1 score is as follows:</p>
+<p><span class="math display">\[
+\text{Sample1 PC1 score} = \sum_{i=1}^{n} (\text{counts}_{i} \times \text{influence}_{i})
+\]</span></p>
+<p>Where:</p>
+<ul>
+<li><p><span class="math inline">\(\text{counts}_{i}\)</span>: Normalized expression of gene <span class="math inline">\(i\)</span> in the sample</p></li>
+<li><p><span class="math inline">\(\text{influence}_{i}\)</span>: Influence of gene <span class="math inline">\(i\)</span> on PC1</p></li>
+</ul>
+<p>While calculating the <strong>influence</strong> of each gene on PC1 is complex, a key step involves calculating a z-score for each gene.</p>
+<p>A z-score measures how far a gene’s expression deviates from the mean, and genes with larger z-scores (like Gene B and Gene C in this example) have a greater influence on PC1 because they contribute more to the variation.</p>
+<p><img src="img/PCA_samples.png" width="600" alt="Alt text" /></p>
+<p>Briefly, calculating PCA and the influence of each gene on PC1 involves the following steps:</p>
+<div id="steps-to-calculate-pca" class="section level4 hasAnchor" number="3.1.0.1">
+<h4><span class="header-section-number">3.1.0.1</span> Steps to calculate PCA<a href="quality-control.html#steps-to-calculate-pca" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<ol style="list-style-type: decimal">
+<li><strong>Z-Scores</strong>:</li>
+</ol>
+<ul>
+<li>A z-score transforms the data points, indicating how far a value is from the mean in terms of standard deviations. This standardization adjusts for differences in scale between different genes, allowing for more accurate comparisons.</li>
+<li>The formula for calculating a z-score for a value <span class="math inline">\(x\)</span> of a gene is:</li>
+</ul>
+<p><span class="math display">\[
+z = \frac{x - \mu}{\sigma}
+\]</span></p>
+<p>Where:</p>
+<ul>
+<li><p><span class="math inline">\(\mu\)</span> is the mean expression of the gene across samples.</p></li>
+<li><p><span class="math inline">\(\sigma\)</span> is the standard deviation of the gene expression.</p></li>
+</ul>
+<ol start="2" style="list-style-type: decimal">
+<li><strong>Covariance matrix</strong>:</li>
+</ol>
+<ul>
+<li><p>Covariance measures the degree to which two variables change together. In the context of PCA, we calculate the covariance matrix for standardized (z-scored) gene expressions to understand how genes vary together.</p></li>
+<li><p>A positive covariance indicates that higher values of one gene correspond to higher values of another, while a negative covariance implies that higher values of one gene correspond to lower values of another.</p></li>
+<li><p>After standardizing the data, calculate the covariance between the z-scores of different genes. This will produce a covariance matrix that reveals how gene expressions vary together.</p></li>
+<li><p>In the context of Principal Component Analysis (PCA), the covariance matrix is a crucial component. It captures how variables in the dataset change with respect to one another and is used to determine the principal components.</p></li>
+</ul>
+<ol start="3" style="list-style-type: decimal">
+<li><strong>Eigenvectors and Eigenvalues:</strong> Find these from the covariance matrix. They reveal the directions (principal components) and their importance (variance explained) in the data. Think of PCA as creating new “axes” or dimensions that capture the most variation in the data. PCA will identify the direction of these axes based on the covariance of the standardized gene expressions that better highlight differences in your data.</li>
+</ol>
+<p>The <strong>take-home message</strong> is that if <strong>two samples have similar levels of expression for the genes that contribute significantly to PC1</strong>, they will have similar PC1 scores and will be plotted close to each other on the PC1 axis. Therefore, we would expect <strong>biological replicates</strong> (samples from the same condition) to have similar PC1 scores and cluster together. On the other hand, samples from different treatment groups should have different PC1 scores, reflecting their distinct gene expression patterns. This is more easily understood through visualizing example PCA plots.</p>
+</div>
+<div id="interpreting-pca-plots" class="section level4 hasAnchor" number="3.1.0.2">
+<h4><span class="header-section-number">3.1.0.2</span> Interpreting PCA plots<a href="quality-control.html#interpreting-pca-plots" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>In real datasets with many samples and genes, PCA reduces the complex, high-dimensional data into a 2-dimensional space, where each sample is represented by its scores for the principal components. Typically, we plot the first two principal components (PC1 and PC2), as they explain the most variation in the data.</p>
+<p>When interpreting PCA plots, <strong>biological replicates</strong> (samples from the same condition) should cluster together because they have similar expression patterns for the genes driving variation in PC1. <strong>Samples from different treatment groups</strong> will often separate along these axes, reflecting differences in their gene expression profiles.</p>
+<p>This is best understood by looking at example PCA plots, where you can visualize how biological replicates cluster and treatment groups separate based on their gene expression patterns.</p>
+</div>
+<div id="interpreting-pca-plots-example" class="section level4 hasAnchor" number="3.1.0.3">
+<h4><span class="header-section-number">3.1.0.3</span> Interpreting PCA plots example<a href="quality-control.html#interpreting-pca-plots-example" class="anchor-section" aria-label="Anchor link to header"></a></h4>
+<p>We have an example dataset and a few associated PCA plots below to get a feel for how to interpret them. The metadata for the experiment is displayed below. The main condition of interest is <code>treatment</code>.</p>
+<p><img src="img/example_metadata.png" width="600" alt="Alt text" /></p>
+<p>When visualizing the samples on PC1 and PC2, we can color the points based on different metadata columns to identify potential sources of variation. In the first plot, if we don’t observe a clear separation of samples by <code>treatment</code>, we can explore other factors that may explain the variation. Ideally, our metadata table includes all known sources of variation (such as batch effects, age, or gender), and we can use these factors to color the PCA plot to see if they explain any underlying patterns.</p>
+<p><img src="img/example_PCA_treatmentPC1.png" width="600" alt="Alt text" /></p>
+<p>We begin by coloring the points in the PCA plot based on the <code>cage</code> factor, but this factor does not seem to explain the variation observed on PC1 or PC2.</p>
+<p><img src="img/example_PCA_cage.png" width="600" alt="Alt text" /></p>
+<p>Next, we color the points by the <code>sex</code> factor. Here, we observe that <code>sex</code> separates the samples along PC2, which is valuable information. We can use this in our model to account for variation due to <code>sex</code> and potentially regress it out to focus on other sources of variation.</p>
+<p><img src="img/example_PCA_sex.png" width="600" alt="Alt text" /></p>
+<p>Next we explore the <code>strain</code> factor and find that it explains the variation on PC1.</p>
+<p><img src="img/example_PCA_strain.png" width="600" alt="Alt text" /></p>
+<p>It’s great that we have been able to identify the sources of variation for both PC1 and PC2. By accounting for it in our model, we should be able to detect more genes differentially expressed due to <code>treatment</code>.</p>
+<p>Worrisome about this plot is that we see two samples that do not cluster with the correct strain. This would indicate a likely <strong>sample swap</strong> and should be investigated to determine whether these samples are indeed the labeled strains. If we found there was a switch, we could swap the samples in the metadata. However, if we think they are labeled correctly or are unsure, we could just remove the samples from the dataset.</p>
+<p>Still we haven’t found if <code>treatment</code> is a major source of variation after <code>strain</code> and <code>sex</code>. So, we explore PC3 and PC4 to see if <code>treatment</code> is driving the variation represented by either of these PCs.</p>
+<p><img src="img/example_PCA_treatmentPC3.png" width="600" alt="Alt text" /></p>
+<p>We find that the samples separate by <code>treatment</code> on PC3, and are optimistic about our DE analysis since our condition of interest, <code>treatment</code>, is separating on PC3 and we can regress out the variation driving PC1 and PC2. Treatment separating on PC3 indicates that it still contributes to variation, but its effect is smaller and is only captured after accounting for the larger effects (<code>strain</code>, <code>sex</code>)..
+me stop</p>
+<p><strong>Exercise</strong> points = +5</p>
+<p>The figure below was generated from a time course experiment with sample groups ‘Ctrl’ and ‘Sci’ and the following timepoints: 0h, 2h, 8h, and 16h.</p>
+<p><img src="img/PCA_example3.png" width="600" alt="Alt text" /></p>
+<p><strong>Determine the sources explaining the variation represented by PC1 and PC2.</strong></p>
+<ul>
+<li>Ans:</li>
+</ul>
+<p><strong>Do the sample groups separate well?</strong></p>
+<ul>
+<li>Ans:</li>
+</ul>
+<p><strong>Do the replicates cluster together for each sample group?</strong></p>
+<ul>
+<li>Ans:</li>
+</ul>
+<p><strong>Are there any outliers in the data?</strong></p>
+<ul>
+<li>Ans:</li>
+</ul>
+<p><strong>Should we have any other concerns regarding the samples in the dataset?</strong></p>
+<ul>
+<li>Ans:</li>
+</ul>
+</div>
+<div id="recommended-resources" class="section level3 hasAnchor" number="3.1.1">
+<h3><span class="header-section-number">3.1.1</span> Recommended Resources<a href="quality-control.html#recommended-resources" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>For further reading and visual examples of PCA, consider resources such as:
+- StatQuest’s PCA video (<a href="https://www.youtube.com/watch?v=_UVHneBUBW0">Link</a>)
+- Online tutorials on PCA in bioinformatics.</p>
+</div>
+<div id="hierarchical-clustering-heatmap" class="section level3 hasAnchor" number="3.1.2">
+<h3><span class="header-section-number">3.1.2</span> Hierarchical Clustering Heatmap<a href="quality-control.html#hierarchical-clustering-heatmap" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Similar to PCA, hierarchical clustering is another, complementary method for identifying strong patterns in a dataset and potential outliers. The heatmap displays <strong>the correlation of gene expression for all pairwise combinations of samples</strong> in the dataset. Since the majority of genes are not differentially expressed, samples generally have high correlations with each other (values higher than 0.80). Samples below 0.80 may indicate an outlier in your data and/or sample contamination.</p>
+<p>The hierarchical tree can indicate which samples are more similar to each other based on the normalized gene expression values. The color blocks indicate substructure in the data, and you would expect to see your replicates cluster together as a block for each sample group. Additionally, we expect to see samples clustered similar to the groupings observed in a PCA plot.</p>
+<p><strong>In the plot below, we would be quite concerned about ‘Wt_3’ and ‘KD_3’ samples not clustering with the other replicates. We would want to explore the PCA to see if we see the same clustering of samples.</strong></p>
+<p><img src="img/heatmap_example.png" width="500" alt="Alt text" /></p>
+</div>
+</div>
+<div id="gene-level-qc" class="section level2 hasAnchor" number="3.2">
+<h2><span class="header-section-number">3.2</span> Gene-level QC<a href="quality-control.html#gene-level-qc" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>In addition to examining how well the samples/replicates cluster together, there are a few more QC steps. Prior to differential expression analysis it is beneficial to omit genes that have little or no chance of being detected as differentially expressed. This will increase the power to detect differentially expressed genes. The genes omitted fall into three categories:</p>
+<ul>
+<li>Genes with zero counts in all samples</li>
+<li>Genes with an extreme count outlier</li>
+<li>Genes with a low mean normalized counts</li>
+</ul>
+<p><img src="img/gene_filtering.png" width="600" alt="Alt text" /></p>
+<p><strong>DESeq2 will perform this filtering by default; however other DE tools, such as EdgeR will not.</strong> Filtering is a necessary step, especially when you are using methods other than DESeq2.</p>
+</div>
+<div id="mov10-quality-assessment-and-exploratory-analysis-using-deseq2" class="section level2 hasAnchor" number="3.3">
+<h2><span class="header-section-number">3.3</span> Mov10 quality assessment and exploratory analysis using DESeq2<a href="quality-control.html#mov10-quality-assessment-and-exploratory-analysis-using-deseq2" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Now that we have a good understanding of the QC steps normally employed for RNA-seq, let’s implement them for the Mov10 dataset we are going to be working with.</p>
+<div id="transform-normalized-counts-using-the-rlog-transformation" class="section level3 hasAnchor" number="3.3.1">
+<h3><span class="header-section-number">3.3.1</span> Transform normalized counts using the rlog transformation<a href="quality-control.html#transform-normalized-counts-using-the-rlog-transformation" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p><strong>To improve the distances/clustering for the PCA and heirarchical clustering visualization methods</strong>, we need to apply the <strong>regularized log transformation (rlog)</strong> transformation to the normalized counts. <strong>rlog</strong> is used for visualizations in RNA-Seq data analysis, particularly with tools like DESeq2, because it stabilizes the variance across different levels of gene expression, making it easier to interpret patterns in the data.</p>
+<p><strong>Example of Variance Stabilization</strong>
+Raw RNA-Seq count data has different levels of variability:</p>
+<p>Without stabilization: Lowly expressed genes show high variability between samples (often due to noise), and highly expressed genes show less variability.
+With stabilization (e.g., rlog or vst): Variance across genes is more evenly distributed, which makes the data easier to work with in analyses like clustering or PCA.</p>
+<blockquote>
+<p>The rlog transformation of the normalized counts is only necessary for these visualization methods during this quality assessment.</p>
+</blockquote>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="quality-control.html#cb36-1" tabindex="-1"></a><span class="do">### Transform counts for data visualization</span></span>
+<span id="cb36-2"><a href="quality-control.html#cb36-2" tabindex="-1"></a>rld <span class="ot">&lt;-</span> <span class="fu">rlog</span>(dds, <span class="at">blind=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<p>The <code>blind=TRUE</code> argument results in a transformation unbiased to sample condition information. When performing quality assessment, it is important to include this option. The <a href="http://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html#blind-dispersion-estimation">DESeq2 vignette</a> has more details.</p>
+<p>The <code>rlog</code> function returns a <code>DESeqTransform</code> object, another type of DESeq-specific object. The reason you don’t just get a matrix of transformed values is because all of the parameters (i.e. size factors) that went into computing the rlog transform are stored in that object. We use this object to plot the PCA and heirarchical clustering figures for quality assessment.</p>
+</div>
+<div id="principal-components-analysis-pca" class="section level3 hasAnchor" number="3.3.2">
+<h3><span class="header-section-number">3.3.2</span> Principal components analysis (PCA)<a href="quality-control.html#principal-components-analysis-pca" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>DESeq2 has a built-in function for plotting PCA plots, that uses <code>ggplot2</code> under the hood. This is great because it saves us having to type out lines of code and having to fiddle with the different ggplot2 layers. In addition, it takes the <code>rlog</code> object as an input directly, hence saving us the trouble of extracting the relevant information from it.</p>
+<p>The function <code>plotPCA()</code> requires two arguments as input: an <code>rlog</code> object and the <code>intgroup</code> (the column in our metadata that we are interested in).</p>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="quality-control.html#cb37-1" tabindex="-1"></a><span class="do">### Plot PCA </span></span>
+<span id="cb37-2"><a href="quality-control.html#cb37-2" tabindex="-1"></a><span class="fu">plotPCA</span>(rld, <span class="at">intgroup=</span><span class="st">&quot;sampletype&quot;</span>)</span></code></pre></div>
+<p><img src="2024_RNA-seq-analysis_files/figure-html/unnamed-chunk-25-1.png" width="576" style="display: block; margin: auto;" /></p>
+<p><strong>What does this plot tell you about the similarity of samples? Does it fit the expectation from the experimental design?</strong> By default the function uses the <em>top 500 most variable genes</em>. You can change this by adding the <code>ntop</code> argument and specifying how many genes you want to use to draw the plot.</p>
+<blockquote>
+<p><a href="http://www.sthda.com/english/wiki/principal-component-analysis-in-r-prcomp-vs-princomp-r-software-and-data-mining">Resources</a> are available to learn how to do more complex inquiries using the PCs.</p>
+</blockquote>
+</div>
+<div id="hierarchical-clustering" class="section level3 hasAnchor" number="3.3.3">
+<h3><span class="header-section-number">3.3.3</span> Hierarchical Clustering<a href="quality-control.html#hierarchical-clustering" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Since there is no built-in function for heatmaps in DESeq2 we will be using the <code>pheatmap()</code> function from the <code>pheatmap</code> package. This function requires a matrix/dataframe of numeric values as input, and so the first thing we need to is retrieve that information from the <code>rld</code> object:</p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb38-1"><a href="quality-control.html#cb38-1" tabindex="-1"></a><span class="do">### Extract the rlog matrix from the object</span></span>
+<span id="cb38-2"><a href="quality-control.html#cb38-2" tabindex="-1"></a>rld_mat <span class="ot">&lt;-</span> <span class="fu">assay</span>(rld) <span class="do">## assay() is function from the &quot;SummarizedExperiment&quot; package that was loaded when you loaded DESeq2</span></span></code></pre></div>
+<p>Then we need to compute the pairwise correlation values for samples. We can do this using the <code>cor()</code> function:</p>
+<div class="sourceCode" id="cb39"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb39-1"><a href="quality-control.html#cb39-1" tabindex="-1"></a><span class="do">### Compute pairwise correlation values</span></span>
+<span id="cb39-2"><a href="quality-control.html#cb39-2" tabindex="-1"></a>rld_cor <span class="ot">&lt;-</span> <span class="fu">cor</span>(rld_mat) <span class="do">## cor() is a base R function</span></span>
+<span id="cb39-3"><a href="quality-control.html#cb39-3" tabindex="-1"></a></span>
+<span id="cb39-4"><a href="quality-control.html#cb39-4" tabindex="-1"></a><span class="fu">head</span>(rld_cor)   <span class="do">## check the output of cor(), make note of the rownames and colnames</span></span></code></pre></div>
+<pre><code>##            Irrel_kd_1 Irrel_kd_2 Irrel_kd_3 Mov10_kd_2 Mov10_kd_3
+## Irrel_kd_1  1.0000000  0.9999614  0.9999532  0.9997202  0.9997748
+## Irrel_kd_2  0.9999614  1.0000000  0.9999544  0.9996918  0.9997568
+## Irrel_kd_3  0.9999532  0.9999544  1.0000000  0.9996816  0.9997574
+## Mov10_kd_2  0.9997202  0.9996918  0.9996816  1.0000000  0.9999492
+## Mov10_kd_3  0.9997748  0.9997568  0.9997574  0.9999492  1.0000000
+## Mov10_oe_1  0.9996700  0.9996984  0.9997067  0.9994868  0.9996154
+##            Mov10_oe_1 Mov10_oe_2 Mov10_oe_3
+## Irrel_kd_1  0.9996700  0.9996599  0.9995804
+## Irrel_kd_2  0.9996984  0.9996825  0.9996227
+## Irrel_kd_3  0.9997067  0.9997090  0.9996026
+## Mov10_kd_2  0.9994868  0.9994565  0.9993869
+## Mov10_kd_3  0.9996154  0.9995905  0.9995235
+## Mov10_oe_1  1.0000000  0.9999505  0.9999196</code></pre>
+<p>And now to plot the correlation values as a heatmap:</p>
+<div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="quality-control.html#cb41-1" tabindex="-1"></a><span class="do">### Plot heatmap</span></span>
+<span id="cb41-2"><a href="quality-control.html#cb41-2" tabindex="-1"></a><span class="fu">pheatmap</span>(rld_cor)</span></code></pre></div>
+<p>Overall, we observe pretty high correlations across the board ( &gt; 0.999) suggesting no outlying sample(s). Also, similar to the PCA plot you see the samples clustering together by sample group. Together, these plots suggest to us that the data are of good quality and we have the green light to proceed to differential expression analysis.</p>
+<p><strong>Exercise</strong> points = +3</p>
+<p>The pheatmap function has a number of different arguments that we can alter from default values to enhance the aesthetics of the plot. Try adding the arguments <code>color</code>, <code>border_color</code>, <code>fontsize_row</code>, <code>fontsize_col</code>, <code>show_rownames</code> and <code>show_colnames</code> to your pheatmap. How does your plot change (plot shown below)? Take a look through the help pages (?pheatmap) and identify what each of the added arguments is contributing to the plot.</p>
+<p>Pheatmap for exercise:</p>
+<div class="sourceCode" id="cb42"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb42-1"><a href="quality-control.html#cb42-1" tabindex="-1"></a><span class="fu">library</span>(pheatmap)</span>
+<span id="cb42-2"><a href="quality-control.html#cb42-2" tabindex="-1"></a><span class="fu">library</span>(RColorBrewer)</span>
+<span id="cb42-3"><a href="quality-control.html#cb42-3" tabindex="-1"></a>heat.colors <span class="ot">&lt;-</span> <span class="fu">colorRampPalette</span>(<span class="fu">brewer.pal</span>(<span class="dv">9</span>, <span class="st">&quot;Blues&quot;</span>))(<span class="dv">100</span>)</span>
+<span id="cb42-4"><a href="quality-control.html#cb42-4" tabindex="-1"></a></span>
+<span id="cb42-5"><a href="quality-control.html#cb42-5" tabindex="-1"></a><span class="fu">pheatmap</span>(rld_cor, <span class="at">color =</span> <span class="fu">colorRampPalette</span>(<span class="fu">brewer.pal</span>(<span class="dv">9</span>, <span class="st">&quot;Blues&quot;</span>))(<span class="dv">100</span>))</span></code></pre></div>
+<div class="sourceCode" id="cb43"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb43-1"><a href="quality-control.html#cb43-1" tabindex="-1"></a><span class="fu">library</span>(pheatmap)</span>
+<span id="cb43-2"><a href="quality-control.html#cb43-2" tabindex="-1"></a><span class="fu">library</span>(RColorBrewer)</span>
+<span id="cb43-3"><a href="quality-control.html#cb43-3" tabindex="-1"></a></span>
+<span id="cb43-4"><a href="quality-control.html#cb43-4" tabindex="-1"></a><span class="fu">pheatmap</span>(rld_cor)</span></code></pre></div>
+<div class="sourceCode" id="cb44"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb44-1"><a href="quality-control.html#cb44-1" tabindex="-1"></a><span class="fu">library</span>(pheatmap)</span>
+<span id="cb44-2"><a href="quality-control.html#cb44-2" tabindex="-1"></a><span class="fu">pheatmap</span>(rld_cor)</span></code></pre></div>
+<p><img src="2024_RNA-seq-analysis_files/figure-html/unnamed-chunk-32-1.png" width="768" /></p>
+<div class="sourceCode" id="cb45"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb45-1"><a href="quality-control.html#cb45-1" tabindex="-1"></a><span class="co"># The color palette &quot;Blues&quot; is a good choice for this heatmap</span></span>
+<span id="cb45-2"><a href="quality-control.html#cb45-2" tabindex="-1"></a>heat.colors <span class="ot">&lt;-</span> <span class="fu">brewer.pal</span>(<span class="dv">9</span>, <span class="st">&quot;Blues&quot;</span>)</span>
+<span id="cb45-3"><a href="quality-control.html#cb45-3" tabindex="-1"></a></span>
+<span id="cb45-4"><a href="quality-control.html#cb45-4" tabindex="-1"></a><span class="co"># Your code here</span></span></code></pre></div>
+<hr />
+
+</div>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="count-normalization.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="dge-analysis-workflow.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": ["2024_RNA-seq-analysis.pdf", "2024_RNA-seq-analysis.epub"],
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "section"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

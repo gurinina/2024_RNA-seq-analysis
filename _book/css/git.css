@@ -1,0 +1,245 @@
+.book .book-summary .summary .chapter a {
+  white-space: normal; /* Allows the text to wrap normally */
+  word-wrap: break-word; /* Breaks long words to ensure wrapping */
+  display: block;
+  padding-left: 1.5em; /* Adjust padding to align the second line */
+  text-indent: -1em; /* Aligns the first line with the list number sometimes -1.5 is better*/
+}
+
+/* This targets the Code element inside an r element, which is inside
+   an element with both the .pre and .sourceCode classes */
+.pre.sourceCode r Code {
+  background: white!important; /* Sets the background color to white */
+  color: black!important;      /* Ensures the text color is black */
+  border: 3px solid black;      /* Adds a black border around the element */
+}
+
+.book .book-body .page-wrapper .page-inner section.normal pre {
+  word-break: normal;
+  /* word-wrap: normal;*/
+  font-size: 12px!important;
+  border: 2px solid #000000!important;
+  white-space: pre-wrap;
+  background: #D7DDFD!important;
+}
+
+details[open] {
+  padding: 0.5em;
+  border: 3px solid #000000;
+  width: 672px;
+  background-color: #D7DDFD;
+  color: #000080;
+  border-radius: 4px;
+  border-color: #000000;
+  padding: 0.5em 0.5em 0;
+}
+
+details summary {
+  background-color: #000080;
+  font-size: 12px!important;
+  color: #FFFFFF;
+  border-bottom: 1px solid #000000;
+  margin-bottom: 0.5em;
+}
+
+details[open] summary {
+  font-size: 12px!important;
+  background-color: #D7DDFD;
+  color: #000080;
+  border-bottom: 1px solid #000000;
+  margin-bottom: 0.5em;
+}
+
+/* This targets r elements inside any element with the .sourceCode class */
+.sourceCode r {
+  background: #D7DDFD!important; /* Sets a lighter blue background for r elements */
+  color: black!important;        /* Ensures the text color is black */
+  border: 3px solid black;        /* Adds a black border around the r element */
+  margin-bottom: 12px!important;  /* Adds some space below the element */
+}
+
+/* This targets pre and code elements together to style code blocks */
+pre code {
+  white-space: pre-wrap;            /* Ensures the text wraps within code blocks */
+
+  word-wrap: break-word; /* Wraps long lines */
+  font-size: 12px;                  /* Sets the font size to 12px */
+  color: black;                     /* Sets the text color to black */
+  background-color: #D7DDFD!important; /* Sets a lighter blue background for code blocks */
+}
+
+
+th, td {
+        font-size: 12px;
+        border-collapse: collapse;
+        border-width:3px;
+    }
+
+/* ordered and unordered list styles */
+.reveal ul,
+.reveal ol {
+    font-size: 12px;
+    color: #000000;
+}
+
+/*
+.book.font-size-2 .book-body .page-inner section {
+  font-size: 12px;
+}
+*/
+
+
+
+.showopt {
+  background-color: #000080;
+  color: #FFFFFF;
+  width: 100px;
+  height: 20px;
+  text-align: center;
+  vertical-align: middle !important;
+  float: right;
+  font-family: sans-serif;
+  border-radius: 8px;
+}
+
+details {
+  border: 3px solid #aaa;
+  width: 672px;
+  border-color: #000000;
+  color: #FFFFFF;
+  background-color: #000080;
+  border-radius: 4px;
+  padding: 0.5em 0.5em 0;
+}
+
+summary {
+  background-color: Orange;
+  font-weight: bold;
+  color: #000080;
+  font-weight: bold;
+  margin: -0.5em -0.5em 0;
+  padding: 0.5em;
+}
+
+.book .book-body .page-wrapper .page-inner section.normal *{
+  font-size: 12px!important;
+}
+
+code span.do {
+  color: #000000!important;
+  font-style: italic;
+}
+
+p code {
+  white-space: inherit;
+  color: darkred!important;
+  background: #FFFFFF!important;
+}
+
+.main-container {
+  max-width: 800px!important;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.book .book-body .page-wrapper .page-inner {
+  max-width: 95%;
+}
+
+h1, h2, h3, h4 {
+  font-family: Arial, Helvetica, sans-serif;
+  color: #000080;
+}
+
+.title {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 1.3em !important;
+
+  color: #000080;
+ }
+
+.subtitle {
+  font-family: Arial, Helvetica, sans-serif;
+  color: #000080;
+  font-size: 12px !important;
+}
+
+dt {
+  color:  #000080;
+}
+
+.book.font-family-0 {
+  font-family: Georgia, serif;
+}
+.book.font-family-1 {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+/* this is paragraph text */
+.book .book-body .page-wrapper .page-inner section.normal p {
+
+    font-size: 12px;
+}
+
+.book .book-body .page-wrapper .page-inner section.normal h1{
+    font-size: 12px;
+    margin-top: 12px }
+
+.book .book-body .page-wrapper .page-inner section.normal h2 {
+    font-size: 12px!important;
+}
+
+.book .book-body .page-wrapper .page-inner section.normal h3 {
+    font-size: 12px!important;
+}
+.book .book-body .page-wrapper .page-inner section.normal h4 {
+    font-size: 12px!important
+}
+
+.book .book-body .page-wrapper .page-inner section.normal h5 {
+    font-size: 12px!important;
+}
+
+/* this is the sidebar hover */
+.book .book-summary ul.summary li a:hover {
+  color: #000080!important;
+  background: #FFFFFF!important;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif!important;
+    top: 0!important;
+    color: #FFFFFF!important;
+    /*background: #000080!important;*/
+    font-size: 12px!important;
+}
+
+/* this is the sidebar width and TEXT COLOR */
+.book .book-summary ul.summary li a, .book .book-summary ul.summary li span{
+    font-size: 12px!important;
+    color: #FFFFFF!important;
+    background-color: #000080!important;
+    display: block;
+    padding: 10px 15px;
+    font-size: 12px!important;
+    border-bottom: none;
+    text-overflow: ellipsis;
+    white-space: wrap;
+    position: relative;
+    font-weight: bold!important;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif !important;
+}
+
+/* this is the sidebar width and font family */
+.book .book-summary {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12px!important;
+  height: 100%;
+  width: 250px!important;
+  position:absolute;
+  font-weight: bold!important;
+  top:0px!important;
+  color: #FFFFFF!important;
+  background-color: #000080!important;
+}
+

@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 2 Count normalization | 2024_RNA-seq-analysis</title>
+  <meta name="description" content="Chapter 2 Count normalization | 2024_RNA-seq-analysis" />
+  <meta name="generator" content="bookdown 0.41 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 2 Count normalization | 2024_RNA-seq-analysis" />
+  <meta property="og:type" content="book" />
+  <meta property="og:image" content="https://bookdown.org/ggiaever/2024_RNA-seq-analysis/img/football.png" />
+  
+  <meta name="github-repo" content="gurinina/2024_RNA-seq-analysis" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 2 Count normalization | 2024_RNA-seq-analysis" />
+  
+  
+  <meta name="twitter:image" content="https://bookdown.org/ggiaever/2024_RNA-seq-analysis/img/football.png" />
+
+
+
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="differential-gene-expression-dge-analysis-overview.html"/>
+<link rel="next" href="quality-control.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<script src="libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<link href="libs/vis-9.1.0/vis-network.min.css" rel="stylesheet" />
+<script src="libs/vis-9.1.0/vis-network.min.js"></script>
+<script src="libs/visNetwork-binding-2.1.2/visNetwork.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+
+<link rel="stylesheet" href="css/git.css" type="text/css" />
+<link rel="stylesheet" href="css/toc.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>RNA-seq analysis workshop</a></li>
+<li class="chapter" data-level="1" data-path="differential-gene-expression-dge-analysis-overview.html"><a href="differential-gene-expression-dge-analysis-overview.html"><i class="fa fa-check"></i><b>1</b> Differential gene expression (DGE) analysis overview</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="differential-gene-expression-dge-analysis-overview.html"><a href="differential-gene-expression-dge-analysis-overview.html#review-of-the-dataset"><i class="fa fa-check"></i><b>1.1</b> Review of the dataset</a></li>
+<li class="chapter" data-level="1.2" data-path="differential-gene-expression-dge-analysis-overview.html"><a href="differential-gene-expression-dge-analysis-overview.html#setting-up"><i class="fa fa-check"></i><b>1.2</b> Setting up</a>
+<ul>
+<li class="chapter" data-level="1.2.1" data-path="differential-gene-expression-dge-analysis-overview.html"><a href="differential-gene-expression-dge-analysis-overview.html#loading-libraries"><i class="fa fa-check"></i><b>1.2.1</b> Loading libraries</a></li>
+<li class="chapter" data-level="1.2.2" data-path="differential-gene-expression-dge-analysis-overview.html"><a href="differential-gene-expression-dge-analysis-overview.html#loading-data"><i class="fa fa-check"></i><b>1.2.2</b> Loading data</a></li>
+<li class="chapter" data-level="1.2.3" data-path="differential-gene-expression-dge-analysis-overview.html"><a href="differential-gene-expression-dge-analysis-overview.html#viewing-data"><i class="fa fa-check"></i><b>1.2.3</b> Viewing data</a></li>
+</ul></li>
+<li class="chapter" data-level="1.3" data-path="differential-gene-expression-dge-analysis-overview.html"><a href="differential-gene-expression-dge-analysis-overview.html#differential-gene-expression-analysis-overview"><i class="fa fa-check"></i><b>1.3</b> Differential gene expression analysis overview</a>
+<ul>
+<li class="chapter" data-level="1.3.1" data-path="differential-gene-expression-dge-analysis-overview.html"><a href="differential-gene-expression-dge-analysis-overview.html#rna-seq-count-distribution"><i class="fa fa-check"></i><b>1.3.1</b> RNA-seq count distribution</a></li>
+<li class="chapter" data-level="1.3.2" data-path="differential-gene-expression-dge-analysis-overview.html"><a href="differential-gene-expression-dge-analysis-overview.html#modeling-count-data"><i class="fa fa-check"></i><b>1.3.2</b> Modeling count data</a></li>
+<li class="chapter" data-level="1.3.3" data-path="differential-gene-expression-dge-analysis-overview.html"><a href="differential-gene-expression-dge-analysis-overview.html#improving-mean-estimates-i.e.-reducing-variance-with-biological-replicates"><i class="fa fa-check"></i><b>1.3.3</b> Improving mean estimates (i.e. reducing variance) with biological replicates</a></li>
+<li class="chapter" data-level="1.3.4" data-path="differential-gene-expression-dge-analysis-overview.html"><a href="differential-gene-expression-dge-analysis-overview.html#differential-expression-analysis-workflow"><i class="fa fa-check"></i><b>1.3.4</b> Differential expression analysis workflow</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="count-normalization.html"><a href="count-normalization.html"><i class="fa fa-check"></i><b>2</b> Count normalization</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="count-normalization.html"><a href="count-normalization.html#normalization"><i class="fa fa-check"></i><b>2.1</b> Normalization</a>
+<ul>
+<li class="chapter" data-level="2.1.1" data-path="count-normalization.html"><a href="count-normalization.html#common-normalization-methods"><i class="fa fa-check"></i><b>2.1.1</b> Common normalization methods</a></li>
+<li class="chapter" data-level="2.1.2" data-path="count-normalization.html"><a href="count-normalization.html#tpm-not-recommended"><i class="fa fa-check"></i><b>2.1.2</b> TPM (Not Recommended)</a></li>
+<li class="chapter" data-level="2.1.3" data-path="count-normalization.html"><a href="count-normalization.html#rpkmfpkm-not-recommended"><i class="fa fa-check"></i><b>2.1.3</b> RPKM/FPKM (Not Recommended)</a></li>
+<li class="chapter" data-level="2.1.4" data-path="count-normalization.html"><a href="count-normalization.html#deseq2-normalization-median-of-ratios-method"><i class="fa fa-check"></i><b>2.1.4</b> DESeq2 Normalization: Median of Ratios Method</a></li>
+<li class="chapter" data-level="2.1.5" data-path="count-normalization.html"><a href="count-normalization.html#summary-of-key-reasons-for-using-deseq2"><i class="fa fa-check"></i><b>2.1.5</b> Summary of Key Reasons for Using DESeq2</a></li>
+</ul></li>
+<li class="chapter" data-level="2.2" data-path="count-normalization.html"><a href="count-normalization.html#count-normalization-of-mov10"><i class="fa fa-check"></i><b>2.2</b> Count normalization of Mov10</a>
+<ul>
+<li class="chapter" data-level="2.2.1" data-path="count-normalization.html"><a href="count-normalization.html#match-the-metadata-and-counts-data"><i class="fa fa-check"></i><b>2.2.1</b> 1. Match the metadata and counts data</a></li>
+<li class="chapter" data-level="2.2.2" data-path="count-normalization.html"><a href="count-normalization.html#create-deseq2-object"><i class="fa fa-check"></i><b>2.2.2</b> 2. Create DESEq2 object</a></li>
+<li class="chapter" data-level="2.2.3" data-path="count-normalization.html"><a href="count-normalization.html#generate-the-mov10-normalized-counts"><i class="fa fa-check"></i><b>2.2.3</b> 3. Generate the Mov10 normalized counts</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="quality-control.html"><a href="quality-control.html"><i class="fa fa-check"></i><b>3</b> Quality Control</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="quality-control.html"><a href="quality-control.html#sample-level-qc"><i class="fa fa-check"></i><b>3.1</b> Sample-level QC</a>
+<ul>
+<li class="chapter" data-level="3.1.1" data-path="quality-control.html"><a href="quality-control.html#recommended-resources"><i class="fa fa-check"></i><b>3.1.1</b> Recommended Resources</a></li>
+<li class="chapter" data-level="3.1.2" data-path="quality-control.html"><a href="quality-control.html#hierarchical-clustering-heatmap"><i class="fa fa-check"></i><b>3.1.2</b> Hierarchical Clustering Heatmap</a></li>
+</ul></li>
+<li class="chapter" data-level="3.2" data-path="quality-control.html"><a href="quality-control.html#gene-level-qc"><i class="fa fa-check"></i><b>3.2</b> Gene-level QC</a></li>
+<li class="chapter" data-level="3.3" data-path="quality-control.html"><a href="quality-control.html#mov10-quality-assessment-and-exploratory-analysis-using-deseq2"><i class="fa fa-check"></i><b>3.3</b> Mov10 quality assessment and exploratory analysis using DESeq2</a>
+<ul>
+<li class="chapter" data-level="3.3.1" data-path="quality-control.html"><a href="quality-control.html#transform-normalized-counts-using-the-rlog-transformation"><i class="fa fa-check"></i><b>3.3.1</b> Transform normalized counts using the rlog transformation</a></li>
+<li class="chapter" data-level="3.3.2" data-path="quality-control.html"><a href="quality-control.html#principal-components-analysis-pca"><i class="fa fa-check"></i><b>3.3.2</b> Principal components analysis (PCA)</a></li>
+<li class="chapter" data-level="3.3.3" data-path="quality-control.html"><a href="quality-control.html#hierarchical-clustering"><i class="fa fa-check"></i><b>3.3.3</b> Hierarchical Clustering</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="dge-analysis-workflow.html"><a href="dge-analysis-workflow.html"><i class="fa fa-check"></i><b>4</b> DGE analysis workflow</a>
+<ul>
+<li class="chapter" data-level="4.1" data-path="dge-analysis-workflow.html"><a href="dge-analysis-workflow.html#running-deseq2"><i class="fa fa-check"></i><b>4.1</b> Running DESeq2</a>
+<ul>
+<li class="chapter" data-level="4.1.1" data-path="dge-analysis-workflow.html"><a href="dge-analysis-workflow.html#set-the-design-formula"><i class="fa fa-check"></i><b>4.1.1</b> Set the Design Formula</a></li>
+<li class="chapter" data-level="4.1.2" data-path="dge-analysis-workflow.html"><a href="dge-analysis-workflow.html#mov10-differential-expression-analysis"><i class="fa fa-check"></i><b>4.1.2</b> MOV10 Differential Expression Analysis</a></li>
+</ul></li>
+<li class="chapter" data-level="4.2" data-path="dge-analysis-workflow.html"><a href="dge-analysis-workflow.html#deseq2-differential-gene-expression-analysis-workflow"><i class="fa fa-check"></i><b>4.2</b> DESeq2 differential gene expression analysis workflow</a>
+<ul>
+<li class="chapter" data-level="4.2.1" data-path="dge-analysis-workflow.html"><a href="dge-analysis-workflow.html#step-1-estimate-size-factors"><i class="fa fa-check"></i><b>4.2.1</b> Step 1: Estimate size factors</a></li>
+<li class="chapter" data-level="4.2.2" data-path="dge-analysis-workflow.html"><a href="dge-analysis-workflow.html#step-2-estimate-gene-wise-dispersion"><i class="fa fa-check"></i><b>4.2.2</b> Step 2: Estimate Gene-wise Dispersion</a></li>
+<li class="chapter" data-level="4.2.3" data-path="dge-analysis-workflow.html"><a href="dge-analysis-workflow.html#step-3-fit-curve-to-gene-wise-dispersion-estimates"><i class="fa fa-check"></i><b>4.2.3</b> Step 3: Fit Curve to Gene-wise Dispersion Estimates</a></li>
+<li class="chapter" data-level="4.2.4" data-path="dge-analysis-workflow.html"><a href="dge-analysis-workflow.html#step-4-assessing-model-fit-with-dispersion-plots"><i class="fa fa-check"></i><b>4.2.4</b> Step 4: Assessing Model Fit with Dispersion Plots</a></li>
+<li class="chapter" data-level="4.2.5" data-path="dge-analysis-workflow.html"><a href="dge-analysis-workflow.html#assessing-and-addressing-issues"><i class="fa fa-check"></i><b>4.2.5</b> Assessing and Addressing Issues</a></li>
+<li class="chapter" data-level="4.2.6" data-path="dge-analysis-workflow.html"><a href="dge-analysis-workflow.html#mov10-differential-expression-analysis-exploring-dispersion-estimates"><i class="fa fa-check"></i><b>4.2.6</b> MOV10 Differential Expression Analysis: Exploring Dispersion Estimates</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="5" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html"><i class="fa fa-check"></i><b>5</b> Negative Binomial model fitting</a>
+<ul>
+<li class="chapter" data-level="5.1" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#generalized-linear-model-fit-for-each-gene"><i class="fa fa-check"></i><b>5.1</b> Generalized Linear Model fit for each gene</a>
+<ul>
+<li class="chapter" data-level="5.1.1" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#negative-binomial-model-formula"><i class="fa fa-check"></i><b>5.1.1</b> Negative Binomial Model Formula</a></li>
+<li class="chapter" data-level="5.1.2" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#estimating-beta-coefficients-using-the-design-matrix"><i class="fa fa-check"></i><b>5.1.2</b> Estimating Beta Coefficients Using the Design Matrix</a></li>
+<li class="chapter" data-level="5.1.3" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#step-by-step-process"><i class="fa fa-check"></i><b>5.1.3</b> Step-by-Step Process:</a></li>
+<li class="chapter" data-level="5.1.4" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#example"><i class="fa fa-check"></i><b>5.1.4</b> Example:</a></li>
+<li class="chapter" data-level="5.1.5" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#calculation"><i class="fa fa-check"></i><b>5.1.5</b> Calculation:</a></li>
+<li class="chapter" data-level="5.1.6" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#matrix-multiplication-form"><i class="fa fa-check"></i><b>5.1.6</b> Matrix Multiplication Form:</a></li>
+<li class="chapter" data-level="5.1.7" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#log2-fold-change-and-adjustments"><i class="fa fa-check"></i><b>5.1.7</b> <strong>Log2 Fold Change and Adjustments</strong></a></li>
+</ul></li>
+<li class="chapter" data-level="5.2" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#shrunken-log2-foldchanges-lfc"><i class="fa fa-check"></i><b>5.2</b> Shrunken log2 foldchanges (LFC)</a>
+<ul>
+<li class="chapter" data-level="5.2.1" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#hypothesis-testing"><i class="fa fa-check"></i><b>5.2.1</b> Hypothesis Testing</a></li>
+</ul></li>
+<li class="chapter" data-level="5.3" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#statistical-test-for-lfc-estimates-wald-test"><i class="fa fa-check"></i><b>5.3</b> Statistical test for LFC estimates: Wald test</a></li>
+<li class="chapter" data-level="5.4" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#mov10-differential-expression-analysis-control-versus-overexpression"><i class="fa fa-check"></i><b>5.4</b> MOV10 Differential Expression Analysis: Control versus Overexpression</a>
+<ul>
+<li class="chapter" data-level="5.4.1" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#creating-contrasts-for-hypothesis-testing"><i class="fa fa-check"></i><b>5.4.1</b> Creating Contrasts for Hypothesis Testing</a></li>
+<li class="chapter" data-level="5.4.2" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#ma-plot"><i class="fa fa-check"></i><b>5.4.2</b> MA Plot</a></li>
+<li class="chapter" data-level="5.4.3" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#multiple-testing-correction"><i class="fa fa-check"></i><b>5.4.3</b> Multiple Testing Correction</a></li>
+<li class="chapter" data-level="5.4.4" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#benjamini-hochberg-adjustment"><i class="fa fa-check"></i><b>5.4.4</b> Benjamini-Hochberg Adjustment</a></li>
+<li class="chapter" data-level="5.4.5" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#mov10-de-analysis-control-vs.-knockdown"><i class="fa fa-check"></i><b>5.4.5</b> MOV10 DE Analysis: <strong>Control vs. Knockdown</strong></a></li>
+</ul></li>
+<li class="chapter" data-level="5.5" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#summarizing-results"><i class="fa fa-check"></i><b>5.5</b> Summarizing Results</a>
+<ul>
+<li class="chapter" data-level="5.5.1" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#extracting-significant-differentially-expressed-genes"><i class="fa fa-check"></i><b>5.5.1</b> Extracting Significant Differentially Expressed Genes</a></li>
+<li class="chapter" data-level="5.5.2" data-path="negative-binomial-model-fitting.html"><a href="negative-binomial-model-fitting.html#mov10-knockdown-analysis-control-vs.-knockdown"><i class="fa fa-check"></i><b>5.5.2</b> MOV10 Knockdown Analysis: Control vs. Knockdown</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="6" data-path="visualizing-rna-seq-results.html"><a href="visualizing-rna-seq-results.html"><i class="fa fa-check"></i><b>6</b> Visualizing RNA-seq results</a>
+<ul>
+<li class="chapter" data-level="6.0.1" data-path="visualizing-rna-seq-results.html"><a href="visualizing-rna-seq-results.html#plotting-signicant-de-genes"><i class="fa fa-check"></i><b>6.0.1</b> Plotting signicant DE genes</a></li>
+<li class="chapter" data-level="6.0.2" data-path="visualizing-rna-seq-results.html"><a href="visualizing-rna-seq-results.html#heatmap"><i class="fa fa-check"></i><b>6.0.2</b> Heatmap</a></li>
+<li class="chapter" data-level="6.0.3" data-path="visualizing-rna-seq-results.html"><a href="visualizing-rna-seq-results.html#volcano-plots"><i class="fa fa-check"></i><b>6.0.3</b> Volcano plots</a></li>
+</ul></li>
+<li class="chapter" data-level="7" data-path="summary-of-dge-workflow.html"><a href="summary-of-dge-workflow.html"><i class="fa fa-check"></i><b>7</b> Summary of DGE workflow</a>
+<ul>
+<li class="chapter" data-level="7.0.1" data-path="summary-of-dge-workflow.html"><a href="summary-of-dge-workflow.html#import-data-into-dds-object"><i class="fa fa-check"></i><b>7.0.1</b> 1. Import data into dds object:</a></li>
+<li class="chapter" data-level="7.0.2" data-path="summary-of-dge-workflow.html"><a href="summary-of-dge-workflow.html#exploratory-data-analysis-pca-heirarchical-clustering---identifying-outliers-and-sources-of-variation-in-the-data"><i class="fa fa-check"></i><b>7.0.2</b> 2. Exploratory data analysis (PCA &amp; heirarchical clustering) - identifying outliers and sources of variation in the data:</a></li>
+<li class="chapter" data-level="7.0.3" data-path="summary-of-dge-workflow.html"><a href="summary-of-dge-workflow.html#run-deseq2"><i class="fa fa-check"></i><b>7.0.3</b> 3. Run DESeq2:</a></li>
+<li class="chapter" data-level="7.0.4" data-path="summary-of-dge-workflow.html"><a href="summary-of-dge-workflow.html#check-the-fit-of-the-dispersion-estimates"><i class="fa fa-check"></i><b>7.0.4</b> 4. Check the fit of the dispersion estimates:</a></li>
+<li class="chapter" data-level="7.0.5" data-path="summary-of-dge-workflow.html"><a href="summary-of-dge-workflow.html#create-contrasts-to-perform-wald-testing-on-the-shrunken-log2-foldchanges-between-specific-conditions"><i class="fa fa-check"></i><b>7.0.5</b> 5. Create contrasts to perform Wald testing on the shrunken log2 foldchanges between specific conditions:</a></li>
+<li class="chapter" data-level="7.0.6" data-path="summary-of-dge-workflow.html"><a href="summary-of-dge-workflow.html#output-significant-results"><i class="fa fa-check"></i><b>7.0.6</b> 6. Output significant results:</a></li>
+<li class="chapter" data-level="7.0.7" data-path="summary-of-dge-workflow.html"><a href="summary-of-dge-workflow.html#visualize-results-volcano-plots-heatmaps-normalized-counts-plots-of-top-genes-etc."><i class="fa fa-check"></i><b>7.0.7</b> 7. Visualize results: volcano plots, heatmaps, normalized counts plots of top genes, etc.</a></li>
+<li class="chapter" data-level="7.0.8" data-path="summary-of-dge-workflow.html"><a href="summary-of-dge-workflow.html#make-sure-to-output-the-versions-of-all-tools-used-in-the-de-analysis"><i class="fa fa-check"></i><b>7.0.8</b> 8. Make sure to output the versions of all tools used in the DE analysis:</a></li>
+</ul></li>
+<li class="chapter" data-level="8" data-path="functional-analysis-of-rnaseq-data.html"><a href="functional-analysis-of-rnaseq-data.html"><i class="fa fa-check"></i><b>8</b> Functional analysis of RNAseq data</a>
+<ul>
+<li class="chapter" data-level="8.0.1" data-path="functional-analysis-of-rnaseq-data.html"><a href="functional-analysis-of-rnaseq-data.html#ontology-and-go-terms"><i class="fa fa-check"></i><b>8.0.1</b> Ontology and GO Terms</a></li>
+<li class="chapter" data-level="8.0.2" data-path="functional-analysis-of-rnaseq-data.html"><a href="functional-analysis-of-rnaseq-data.html#go-terms-gene-ontology-terms"><i class="fa fa-check"></i><b>8.0.2</b> GO Terms (Gene Ontology Terms)</a></li>
+<li class="chapter" data-level="8.0.3" data-path="functional-analysis-of-rnaseq-data.html"><a href="functional-analysis-of-rnaseq-data.html#go-enrichment-methods"><i class="fa fa-check"></i><b>8.0.3</b> GO Enrichment Methods</a></li>
+<li class="chapter" data-level="8.0.4" data-path="functional-analysis-of-rnaseq-data.html"><a href="functional-analysis-of-rnaseq-data.html#example-1"><i class="fa fa-check"></i><b>8.0.4</b> Example</a></li>
+<li class="chapter" data-level="8.0.5" data-path="functional-analysis-of-rnaseq-data.html"><a href="functional-analysis-of-rnaseq-data.html#over-representation-analysis-ora-using-clusterprofiler"><i class="fa fa-check"></i><b>8.0.5</b> Over-representation Analysis (ORA) using <code>clusterProfiler</code></a></li>
+<li class="chapter" data-level="8.0.6" data-path="functional-analysis-of-rnaseq-data.html"><a href="functional-analysis-of-rnaseq-data.html#visualizing-enrichment-results"><i class="fa fa-check"></i><b>8.0.6</b> Visualizing Enrichment Results</a></li>
+<li class="chapter" data-level="8.0.7" data-path="functional-analysis-of-rnaseq-data.html"><a href="functional-analysis-of-rnaseq-data.html#gsea-using-clusterprofiler-and-fgsea"><i class="fa fa-check"></i><b>8.0.7</b> GSEA Using clusterProfiler and fgsea</a></li>
+<li class="chapter" data-level="8.0.8" data-path="functional-analysis-of-rnaseq-data.html"><a href="functional-analysis-of-rnaseq-data.html#visualizing-gsea-results"><i class="fa fa-check"></i><b>8.0.8</b> Visualizing GSEA Results</a></li>
+<li class="chapter" data-level="8.0.9" data-path="functional-analysis-of-rnaseq-data.html"><a href="functional-analysis-of-rnaseq-data.html#gsea-using-fgsea"><i class="fa fa-check"></i><b>8.0.9</b> GSEA using fgsea</a></li>
+<li class="chapter" data-level="8.0.10" data-path="functional-analysis-of-rnaseq-data.html"><a href="functional-analysis-of-rnaseq-data.html#goenrichment-package-analysis"><i class="fa fa-check"></i><b>8.0.10</b> <code>GOenrichment</code> Package Analysis</a></li>
+<li class="chapter" data-level="8.0.11" data-path="functional-analysis-of-rnaseq-data.html"><a href="functional-analysis-of-rnaseq-data.html#other-tools-and-resources"><i class="fa fa-check"></i><b>8.0.11</b> Other tools and resources</a></li>
+</ul></li>
+<li class="chapter" data-level="9" data-path="codebook.html"><a href="codebook.html"><i class="fa fa-check"></i><b>9</b> Codebook</a>
+<ul>
+<li class="chapter" data-level="9.1" data-path="codebook.html"><a href="codebook.html#dge-analysis-overview"><i class="fa fa-check"></i><b>9.1</b> DGE analysis overview</a>
+<ul>
+<li class="chapter" data-level="9.1.1" data-path="codebook.html"><a href="codebook.html#setting-up-1"><i class="fa fa-check"></i><b>9.1.1</b> Setting up</a></li>
+<li class="chapter" data-level="9.1.2" data-path="codebook.html"><a href="codebook.html#dge-analysis-workflow-1"><i class="fa fa-check"></i><b>9.1.2</b> DGE analysis workflow</a></li>
+</ul></li>
+<li class="chapter" data-level="9.2" data-path="codebook.html"><a href="codebook.html#count-normalization-1"><i class="fa fa-check"></i><b>9.2</b> Count normalization</a>
+<ul>
+<li class="chapter" data-level="9.2.1" data-path="codebook.html"><a href="codebook.html#match-the-metadata-and-counts-data-1"><i class="fa fa-check"></i><b>9.2.1</b> 1. Match the metadata and counts data</a></li>
+<li class="chapter" data-level="9.2.2" data-path="codebook.html"><a href="codebook.html#create-deseq2-object-1"><i class="fa fa-check"></i><b>9.2.2</b> 2. Create DESEq2 object</a></li>
+<li class="chapter" data-level="9.2.3" data-path="codebook.html"><a href="codebook.html#generate-the-mov10-normalized-counts-1"><i class="fa fa-check"></i><b>9.2.3</b> 3. Generate the Mov10 normalized counts</a></li>
+</ul></li>
+<li class="chapter" data-level="9.3" data-path="codebook.html"><a href="codebook.html#quality-control-1"><i class="fa fa-check"></i><b>9.3</b> Quality Control</a>
+<ul>
+<li class="chapter" data-level="9.3.1" data-path="codebook.html"><a href="codebook.html#principal-components-analysis-pca-1"><i class="fa fa-check"></i><b>9.3.1</b> Principal components analysis (PCA)</a></li>
+<li class="chapter" data-level="9.3.2" data-path="codebook.html"><a href="codebook.html#hierarchical-clustering-1"><i class="fa fa-check"></i><b>9.3.2</b> Hierarchical Clustering</a></li>
+</ul></li>
+<li class="chapter" data-level="9.4" data-path="codebook.html"><a href="codebook.html#dge-analysis-workflow-2"><i class="fa fa-check"></i><b>9.4</b> DGE analysis workflow</a>
+<ul>
+<li class="chapter" data-level="9.4.1" data-path="codebook.html"><a href="codebook.html#set-the-design-formula-1"><i class="fa fa-check"></i><b>9.4.1</b> Set the Design Formula</a></li>
+<li class="chapter" data-level="9.4.2" data-path="codebook.html"><a href="codebook.html#mov10-differential-expression-analysis-1"><i class="fa fa-check"></i><b>9.4.2</b> MOV10 Differential Expression Analysis</a></li>
+<li class="chapter" data-level="9.4.3" data-path="codebook.html"><a href="codebook.html#deseq2-differential-gene-expression-analysis-workflow-1"><i class="fa fa-check"></i><b>9.4.3</b> DESeq2 differential gene expression analysis workflow</a></li>
+<li class="chapter" data-level="9.4.4" data-path="codebook.html"><a href="codebook.html#mov10-differential-expression-analysis-exploring-dispersion-estimates-1"><i class="fa fa-check"></i><b>9.4.4</b> MOV10 Differential Expression Analysis: Exploring Dispersion Estimates</a></li>
+</ul></li>
+<li class="chapter" data-level="9.5" data-path="codebook.html"><a href="codebook.html#negative-binomial-model-fitting-1"><i class="fa fa-check"></i><b>9.5</b> Negative Binomial model fitting</a>
+<ul>
+<li class="chapter" data-level="9.5.1" data-path="codebook.html"><a href="codebook.html#example-2"><i class="fa fa-check"></i><b>9.5.1</b> Example:</a></li>
+<li class="chapter" data-level="9.5.2" data-path="codebook.html"><a href="codebook.html#calculation-1"><i class="fa fa-check"></i><b>9.5.2</b> Calculation:</a></li>
+<li class="chapter" data-level="9.5.3" data-path="codebook.html"><a href="codebook.html#matrix-multiplication-form-1"><i class="fa fa-check"></i><b>9.5.3</b> Matrix Multiplication Form:</a></li>
+</ul></li>
+<li class="chapter" data-level="9.6" data-path="codebook.html"><a href="codebook.html#mov10-differential-expression-analysis-2"><i class="fa fa-check"></i><b>9.6</b> MOV10 Differential Expression Analysis:</a>
+<ul>
+<li class="chapter" data-level="9.6.1" data-path="codebook.html"><a href="codebook.html#mov10-de-analysis-control-vs.-knockdown-1"><i class="fa fa-check"></i><b>9.6.1</b> MOV10 DE Analysis: <strong>Control vs. Knockdown</strong></a></li>
+</ul></li>
+<li class="chapter" data-level="9.7" data-path="codebook.html"><a href="codebook.html#summarizing-results-1"><i class="fa fa-check"></i><b>9.7</b> Summarizing Results</a>
+<ul>
+<li class="chapter" data-level="9.7.1" data-path="codebook.html"><a href="codebook.html#extracting-significant-differentially-expressed-genes-1"><i class="fa fa-check"></i><b>9.7.1</b> Extracting Significant Differentially Expressed Genes</a></li>
+<li class="chapter" data-level="9.7.2" data-path="codebook.html"><a href="codebook.html#mov10-knockdown-analysis-control-vs.-knockdown-1"><i class="fa fa-check"></i><b>9.7.2</b> MOV10 Knockdown Analysis: Control vs. Knockdown</a></li>
+</ul></li>
+<li class="chapter" data-level="9.8" data-path="codebook.html"><a href="codebook.html#visualizing-rna-seq-results-1"><i class="fa fa-check"></i><b>9.8</b> Visualizing RNA-seq results</a>
+<ul>
+<li class="chapter" data-level="9.8.1" data-path="codebook.html"><a href="codebook.html#heatmap-1"><i class="fa fa-check"></i><b>9.8.1</b> Heatmap</a></li>
+<li class="chapter" data-level="9.8.2" data-path="codebook.html"><a href="codebook.html#volcano-plots-1"><i class="fa fa-check"></i><b>9.8.2</b> Volcano plots</a></li>
+</ul></li>
+<li class="chapter" data-level="9.9" data-path="codebook.html"><a href="codebook.html#summary-of-dge-workflow-1"><i class="fa fa-check"></i><b>9.9</b> Summary of DGE workflow</a>
+<ul>
+<li class="chapter" data-level="9.9.1" data-path="codebook.html"><a href="codebook.html#import-data-into-dds-object-1"><i class="fa fa-check"></i><b>9.9.1</b> 1. Import data into dds object:</a></li>
+<li class="chapter" data-level="9.9.2" data-path="codebook.html"><a href="codebook.html#exploratory-data-analysis-pca-heirarchical-clustering---identifying-outliers-and-sources-of-variation-in-the-data-1"><i class="fa fa-check"></i><b>9.9.2</b> 2. Exploratory data analysis (PCA &amp; heirarchical clustering) - identifying outliers and sources of variation in the data:</a></li>
+<li class="chapter" data-level="9.9.3" data-path="codebook.html"><a href="codebook.html#run-deseq2-1"><i class="fa fa-check"></i><b>9.9.3</b> 3. Run DESeq2:</a></li>
+<li class="chapter" data-level="9.9.4" data-path="codebook.html"><a href="codebook.html#check-the-fit-of-the-dispersion-estimates-1"><i class="fa fa-check"></i><b>9.9.4</b> 4. Check the fit of the dispersion estimates:</a></li>
+<li class="chapter" data-level="9.9.5" data-path="codebook.html"><a href="codebook.html#create-contrasts-to-perform-wald-testing-on-the-shrunken-log2-foldchanges-between-specific-conditions-1"><i class="fa fa-check"></i><b>9.9.5</b> 5. Create contrasts to perform Wald testing on the shrunken log2 foldchanges between specific conditions:</a></li>
+<li class="chapter" data-level="9.9.6" data-path="codebook.html"><a href="codebook.html#output-significant-results-1"><i class="fa fa-check"></i><b>9.9.6</b> 6. Output significant results:</a></li>
+<li class="chapter" data-level="9.9.7" data-path="codebook.html"><a href="codebook.html#visualize-results-volcano-plots-heatmaps-normalized-counts-plots-of-top-genes-etc.-1"><i class="fa fa-check"></i><b>9.9.7</b> 7. Visualize results: volcano plots, heatmaps, normalized counts plots of top genes, etc.</a></li>
+<li class="chapter" data-level="9.9.8" data-path="codebook.html"><a href="codebook.html#make-sure-to-output-the-versions-of-all-tools-used-in-the-de-analysis-1"><i class="fa fa-check"></i><b>9.9.8</b> 8. Make sure to output the versions of all tools used in the DE analysis:</a></li>
+</ul></li>
+<li class="chapter" data-level="9.10" data-path="codebook.html"><a href="codebook.html#functional-analysis-of-rna-seq-data"><i class="fa fa-check"></i><b>9.10</b> Functional analysis of RNA-seq data</a>
+<ul>
+<li class="chapter" data-level="9.10.1" data-path="codebook.html"><a href="codebook.html#over-representation-analysis-ora-using-clusterprofiler-1"><i class="fa fa-check"></i><b>9.10.1</b> Over-representation Analysis (ORA) using <code>clusterProfiler</code></a></li>
+<li class="chapter" data-level="9.10.2" data-path="codebook.html"><a href="codebook.html#visualizing-enrichment-results-1"><i class="fa fa-check"></i><b>9.10.2</b> Visualizing Enrichment Results</a></li>
+<li class="chapter" data-level="9.10.3" data-path="codebook.html"><a href="codebook.html#gsea-using-clusterprofiler-and-fgsea-1"><i class="fa fa-check"></i><b>9.10.3</b> GSEA Using clusterProfiler and fgsea</a></li>
+<li class="chapter" data-level="9.10.4" data-path="codebook.html"><a href="codebook.html#visualizing-gsea-results-1"><i class="fa fa-check"></i><b>9.10.4</b> Visualizing GSEA Results</a></li>
+<li class="chapter" data-level="9.10.5" data-path="codebook.html"><a href="codebook.html#gsea-using-fgsea-1"><i class="fa fa-check"></i><b>9.10.5</b> GSEA using fgsea</a></li>
+<li class="chapter" data-level="9.10.6" data-path="codebook.html"><a href="codebook.html#goenrichment-package-analysis-1"><i class="fa fa-check"></i><b>9.10.6</b> <code>GOenrichment</code> Package Analysis</a></li>
+</ul></li>
+</ul></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">2024_RNA-seq-analysis</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="count-normalization" class="section level1 hasAnchor" number="2">
+<h1><span class="header-section-number">Chapter 2</span> Count normalization<a href="count-normalization.html#count-normalization" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<div id="normalization" class="section level2 hasAnchor" number="2.1">
+<h2><span class="header-section-number">2.1</span> Normalization<a href="count-normalization.html#normalization" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The first step in the DE analysis workflow is count normalization, which is necessary to make accurate comparisons of gene expression between samples.</p>
+<p><img src="img/deseq_workflow_normalization_2018.png" width="400" alt="Alt text" /></p>
+<p>The counts of mapped reads for each gene is proportional to the expression of RNA (“interesting”) in addition to many other factors (“uninteresting”). Normalization is the process of scaling raw count values to account for the “uninteresting” factors. In this way the expression levels are more comparable between and/or within samples.</p>
+<p>The main factors often considered during normalization are:</p>
+<ul>
+<li><strong>Sequencing depth:</strong></li>
+</ul>
+<p>Accounting for sequencing depth is necessary for comparison of gene expression between samples. In the example below, each gene appears to have doubled in expression in <em>Sample A</em> relative to <em>Sample B</em>, however this is a consequence of <em>Sample A</em> having double the sequencing depth.</p>
+<p><img src="img/normalization_methods_depth.png" width="400" alt="Alt text" /></p>
+<blockquote>
+<p><em><strong>NOTE:</strong> In the figure above, each pink and green rectangle represents a read aligned to a gene. Reads connected by dashed lines connect a read spanning an intron.</em></p>
+</blockquote>
+<ul>
+<li><strong>Gene length:</strong></li>
+</ul>
+<p>Accounting for gene length is necessary for comparing expression between different genes within the same sample. In the example, <em>Gene X</em> and <em>Gene Y</em> have similar levels of expression, but the number of reads mapped to <em>Gene X</em> would be many more than the number mapped to <em>Gene Y</em> because <em>Gene X</em> is longer.</p>
+<p><img src="img/normalization_methods_length.png" width="200" alt="Alt text" /></p>
+<ul>
+<li><strong>RNA composition:</strong></li>
+</ul>
+<p>RNA composition bias arises when a few highly expressed genes dominate the overall expression profile of a sample. Accounting for RNA composition is recommended for accurate comparison of expression between samples, and is particularly important when performing differential expression analyses [<a href="https://genomebiology.biomedcentral.com/articles/10.1186/gb-2010-11-10-r106">1</a>].</p>
+<p>In the example, if we were to divide each sample by the total number of counts to normalize, the counts would be greatly skewed by the DE gene, which takes up most of the counts for <em>Sample A</em>, but not <em>Sample B</em>. Most other genes for <em>Sample A</em> would be divided by the larger number of total counts and appear to be less expressed than those same genes in <em>Sample B</em>.</p>
+<p><img src="img/normalization_methods_composition.png" width="400" alt="Alt text" /></p>
+<p><strong><em>While normalization is essential for differential expression analyses, it is also necessary for exploratory data analysis, visualization of data, and whenever you are exploring or comparing counts between or within samples.</em></strong></p>
+<div id="common-normalization-methods" class="section level3 hasAnchor" number="2.1.1">
+<h3><span class="header-section-number">2.1.1</span> Common normalization methods<a href="count-normalization.html#common-normalization-methods" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Several common normalization methods exist to account for these differences:</p>
+<p>TPM is very similar to RPKM and FPKM. The only difference is the order of operations. Here’s how you calculate TPM:</p>
+<p>For example, here’s how you would calculate TPM for a gene in a sample:</p>
+<ol style="list-style-type: decimal">
+<li>Divide the read counts by the length of each gene in kilobases. This gives you reads per kilobase (RPK).</li>
+</ol>
+<p><span class="math display">\[
+RPK = \frac{reads}{gene length (kb)}
+\]</span></p>
+<ol start="2" style="list-style-type: decimal">
+<li>Count up all the RPK values in a sample and divide this number by 1,000,000. This is your “per million” scaling factor.</li>
+</ol>
+<p><span class="math display">\[
+\text{Per million scaling factor} = \frac{\sum RPK}{1,000,000}
+\]</span></p>
+<ol start="3" style="list-style-type: decimal">
+<li>Divide the RPK values by the “per million” scaling factor. This gives you TPM.</li>
+</ol>
+<p><span class="math display">\[
+TPM = \frac{RPK}{\text{Per million scaling factor}}
+\]</span></p>
+<p>The key idea here is that <strong>TPM</strong> normalizes for both <strong>gene length</strong> and <strong>sequencing depth</strong>, making it easier to compare the <strong>relative abundance</strong> of genes across different samples, regardless of how many total reads were generated.</p>
+<table>
+<colgroup>
+<col width="25%" />
+<col width="25%" />
+<col width="25%" />
+<col width="25%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Normalization method</th>
+<th>Description</th>
+<th>Accounted factors</th>
+<th>Recommendations for use</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><strong>TPM</strong> (transcripts per kilobase million)</td>
+<td>counts per length of transcript (kb) per million reads mapped</td>
+<td>sequencing depth and gene length</td>
+<td>gene count comparisons within a sample or between samples of the same sample group; <strong>NOT for DE analysis</strong></td>
+</tr>
+<tr class="even">
+<td><strong>RPKM/FPKM</strong> (reads/fragments per kilobase of exon per million reads/fragments mapped)</td>
+<td>similar to TPM</td>
+<td>sequencing depth and gene length</td>
+<td>gene count comparisons between genes within a sample; <strong>NOT for between sample comparisons or DE analysis</strong></td>
+</tr>
+<tr class="odd">
+<td>DESeq2’s <strong>median of ratios</strong> [<a href="https://genomebiology.biomedcentral.com/articles/10.1186/gb-2010-11-10-r106">1</a>]</td>
+<td>counts divided by sample-specific size factors determined by median ratio of gene counts relative to geometric mean per gene</td>
+<td>sequencing depth and RNA composition</td>
+<td>gene count comparisons between samples and for <strong>DE analysis</strong>; <strong>NOT for within sample comparisons</strong></td>
+</tr>
+<tr class="even">
+<td>EdgeR’s <strong>trimmed mean of M values (TMM)</strong> [<a href="https://genomebiology.biomedcentral.com/articles/10.1186/gb-2010-11-3-r25">2</a>]</td>
+<td>uses a weighted trimmed mean of the log expression ratios between samples</td>
+<td>sequencing depth, RNA composition</td>
+<td>gene count comparisons between samples and for <strong>DE analysis</strong>; <strong>NOT for within sample comparisons</strong></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="tpm-not-recommended" class="section level3 hasAnchor" number="2.1.2">
+<h3><span class="header-section-number">2.1.2</span> TPM (Not Recommended)<a href="count-normalization.html#tpm-not-recommended" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p><strong>Step 1: Calculate Reads Per Kilobase (RPK)</strong></p>
+<p>To calculate RPK for each gene in each sample, divide the read counts by the gene length in kilobases.</p>
+<div style="text-align:center">
+<table>
+<thead>
+<tr class="header">
+<th>Gene</th>
+<th align="center">Sample 1 (reads)</th>
+<th align="center">Sample 2 (reads</th>
+<th align="center">Length</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Gene A</td>
+<td align="center">300</td>
+<td align="center">600</td>
+<td align="center">1 kb</td>
+</tr>
+<tr class="even">
+<td>Gene B</td>
+<td align="center">500</td>
+<td align="center">400</td>
+<td align="center">2 kb</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Sample 1:</strong>
+- Gene A RPK = 300 reads / 1 kb = 300
+- Gene B RPK = 500 reads / 2 kb = 250</p>
+<p><strong>Sample 2:</strong>
+- Gene A RPK = 600 reads / 1 kb = 600
+- Gene B RPK = 400 reads / 2 kb = 200</p>
+<div style="text-align:center">
+<table>
+<thead>
+<tr class="header">
+<th>Gene</th>
+<th align="center">Sample 1 (RPK)</th>
+<th align="center">Sample 2 (RPK)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Gene A</td>
+<td align="center">300</td>
+<td align="center">600</td>
+</tr>
+<tr class="even">
+<td>Gene B</td>
+<td align="center">250</td>
+<td align="center">200</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Step 2: Calculate the Per-Million Scaling Factor</strong></p>
+<p>Sum the RPK values in each sample and divide by 1,000,000.</p>
+<p><strong>Sample 1:</strong>
+- Total RPK = 300 + 250 = 550
+- Scaling Factor = 550 / 1,000,000 = 0.00055</p>
+<p><strong>Sample 2:</strong>
+- Total RPK = 600 + 200 = 800
+- Scaling Factor = 800 / 1,000,000 = 0.0008</p>
+<p><strong>Step 3: Calculate TPM</strong></p>
+<p>Now, divide each gene’s RPK by the per-million scaling factor to get the TPM.</p>
+<p><strong>Sample 1:</strong>
+- Gene A TPM = 300 / 0.00055 = 545,455
+- Gene B TPM = 250 / 0.00055 = 454,545</p>
+<p><strong>Sample 2:</strong>
+- Gene A TPM = 600 / 0.0008 = 750,000
+- Gene B TPM = 200 / 0.0008 = 250,000</p>
+<div style="text-align:center">
+<table>
+<thead>
+<tr class="header">
+<th>Gene</th>
+<th align="center">Sample 1 (TPM)</th>
+<th align="center">Sample 2 (TPM)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Gene A</td>
+<td align="center">545,455</td>
+<td align="center">750,000</td>
+</tr>
+<tr class="even">
+<td>Gene B</td>
+<td align="center">454,545</td>
+<td align="center">250,000</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>TPM normalizes read counts by the total reads in a sample, allowing comparisons between genes while accounting for gene length. However, it does not account for the variability inherent in count data or overdispersion, making statistical testing on these values unreliable.</p>
+</div>
+<div id="rpkmfpkm-not-recommended" class="section level3 hasAnchor" number="2.1.3">
+<h3><span class="header-section-number">2.1.3</span> RPKM/FPKM (Not Recommended)<a href="count-normalization.html#rpkmfpkm-not-recommended" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Using RPKM/FPKM normalization means the total normalized counts will vary between samples, making direct comparisons between genes unreliable.</p>
+<div style="text-align:center">
+<table>
+<thead>
+<tr class="header">
+<th>Gene</th>
+<th align="center">Sample A</th>
+<th align="center">Sample B</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>XCR1</td>
+<td align="center">5.5</td>
+<td align="center">5.5</td>
+</tr>
+<tr class="even">
+<td>WASHC1</td>
+<td align="center">73.4</td>
+<td align="center">21.8</td>
+</tr>
+<tr class="odd">
+<td>…</td>
+<td align="center">…</td>
+<td align="center">…</td>
+</tr>
+<tr class="even">
+<td>Total RPKM</td>
+<td align="center">1,000,000</td>
+<td align="center">1,500,000</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>For example, even though both samples show XCR1 as 5.5, they cannot be directly compared because their total counts differ.</p>
+<p><strong>Conclusion:</strong>
+Tools like DESeq2 or edgeR are better suited for differential expression analysis, as they:</p>
+<ul>
+<li><p>Use raw counts for more accurate modeling.</p></li>
+<li><p>Apply statistical modeling (e.g., Negative Binomial) to account for variance across replicates.</p></li>
+</ul>
+</div>
+<div id="deseq2-normalization-median-of-ratios-method" class="section level3 hasAnchor" number="2.1.4">
+<h3><span class="header-section-number">2.1.4</span> DESeq2 Normalization: Median of Ratios Method<a href="count-normalization.html#deseq2-normalization-median-of-ratios-method" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>For differential expression analysis, gene length need not be factored in; however, <strong>sequencing depth</strong> and <strong>RNA composition</strong> must be considered. The median of ratios method neutralizes these differences.</p>
+<p>This method involves several steps, even though from the user-end it appears as a single function call in DESeq2.</p>
+<p><strong>Step 1: Create a Pseudo-reference Sample (Row-wise Geometric Mean)</strong></p>
+<p>The <strong>geometric mean</strong> of a set of <span class="math inline">\(n\)</span> positive numbers <span class="math inline">\(x_1, x_2, \dots, x_n\)</span> is defined as:</p>
+<p><span class="math display">\[
+\text{Geometric Mean} = \left( \prod_{i=1}^{n} x_i \right)^{\frac{1}{n}}
+\]</span></p>
+<p>For each gene, a pseudo-reference sample is created that is equal to the geometric mean across all samples, reducing the impact of extreme values.</p>
+<div style="text-align:center">
+<table>
+<thead>
+<tr class="header">
+<th>Gene</th>
+<th align="center">Sample A</th>
+<th align="center">Sample B</th>
+<th align="center">Pseudo-reference Sample</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>EF2A</td>
+<td align="center">1489</td>
+<td align="center">906</td>
+<td align="center">sqrt(1489 * 906) = <strong>1161.5</strong></td>
+</tr>
+<tr class="even">
+<td>ABCD1</td>
+<td align="center">22</td>
+<td align="center">13</td>
+<td align="center">sqrt(22 * 13) = <strong>17.7</strong></td>
+</tr>
+<tr class="odd">
+<td>…</td>
+<td align="center">…</td>
+<td align="center">…</td>
+<td align="center">…</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Step 2: Calculate the Ratio of Each Sample to the Reference</strong></p>
+<p>For every gene in a sample, calculate the ratio of the sample count to the reference (sample/ref). This is performed for each sample in the dataset, resulting in ratios for most genes that are similar, as depicted below:</p>
+<div style="text-align:center">
+<table style="width:100%;">
+<colgroup>
+<col width="7%" />
+<col width="9%" />
+<col width="11%" />
+<col width="24%" />
+<col width="23%" />
+<col width="22%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Gene</th>
+<th align="center">Sample A</th>
+<th align="center">Sample B</th>
+<th align="center">Pseudo-reference Sample</th>
+<th align="center">Ratio of Sample A/Ref</th>
+<th align="right">Ratio of Sample B/Ref</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>EF2A</td>
+<td align="center">1489</td>
+<td align="center">906</td>
+<td align="center">1161.5</td>
+<td align="center">1489/1161.5 = <strong>1.28</strong></td>
+<td align="right">906/1161.5 = <strong>0.78</strong></td>
+</tr>
+<tr class="even">
+<td>ABCD1</td>
+<td align="center">22</td>
+<td align="center">13</td>
+<td align="center">17.7</td>
+<td align="center">22/17.7 = <strong>1.24</strong></td>
+<td align="right">13/17.7 = <strong>0.73</strong></td>
+</tr>
+<tr class="odd">
+<td>MEFV</td>
+<td align="center">793</td>
+<td align="center">410</td>
+<td align="center">570.2</td>
+<td align="center">793/570.2 = <strong>1.39</strong></td>
+<td align="right">410/570.2 = <strong>0.72</strong></td>
+</tr>
+<tr class="even">
+<td>…</td>
+<td align="center">…</td>
+<td align="center">…</td>
+<td align="center">…</td>
+<td align="center">…</td>
+<td align="right">…</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Step 3: Calculate the Normalization Factor for Each Sample (Size Factor)</strong></p>
+<p>The median value of all ratios for a given sample is calculated as the normalization factor (size factor):</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="count-normalization.html#cb16-1" tabindex="-1"></a>normalization_factor_sampleA <span class="ot">&lt;-</span> <span class="fu">median</span>(<span class="fu">c</span>(<span class="fl">1.28</span>, <span class="fl">1.24</span>, <span class="fl">1.39</span>, <span class="fl">1.35</span>, <span class="fl">0.59</span>))</span>
+<span id="cb16-2"><a href="count-normalization.html#cb16-2" tabindex="-1"></a>normalization_factor_sampleB <span class="ot">&lt;-</span> <span class="fu">median</span>(<span class="fu">c</span>(<span class="fl">0.78</span>, <span class="fl">0.73</span>, <span class="fl">0.72</span>, <span class="fl">0.74</span>, <span class="fl">1.35</span>))</span></code></pre></div>
+<p>The figure below illustrates the distribution of values for the ratios across all genes in a single sample.</p>
+<p><img src="img/deseq_median_of_ratios.png" width="400" alt="Median of Ratios" /></p>
+<p>This method is robust as it assumes that not all genes are differentially expressed, allowing normalization factors to account for both sequencing depth and RNA composition efficiently.</p>
+<p><strong>Step 4: Calculate the Normalized Count Values Using the Normalization Factor</strong></p>
+<p>Each raw count value in a given sample is divided by that sample’s normalization factor to generate normalized count values across all genes:</p>
+<div style="text-align:center">
+<table>
+<thead>
+<tr class="header">
+<th>Gene</th>
+<th align="center">Sample A</th>
+<th align="center">Sample B</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>EF2A</td>
+<td align="center">1489 / 1.3 = <strong>1145.39</strong></td>
+<td align="center">906 / 0.77 = <strong>1176.62</strong></td>
+</tr>
+<tr class="even">
+<td>ABCD1</td>
+<td align="center">22 / 1.3 = <strong>16.92</strong></td>
+<td align="center">13 / 0.77 = <strong>16.88</strong></td>
+</tr>
+<tr class="odd">
+<td>…</td>
+<td align="center">…</td>
+<td align="center">…</td>
+</tr>
+</tbody>
+</table>
+</div>
+<blockquote>
+<p>Note that normalized count values may not always be whole numbers.</p>
+</blockquote>
+</div>
+<div id="summary-of-key-reasons-for-using-deseq2" class="section level3 hasAnchor" number="2.1.5">
+<h3><span class="header-section-number">2.1.5</span> Summary of Key Reasons for Using DESeq2<a href="count-normalization.html#summary-of-key-reasons-for-using-deseq2" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<ul>
+<li><p><strong>Median of Ratios</strong>: This method accounts for sequencing depth and RNA composition, making it more appropriate for RNA-Seq data analysis.</p></li>
+<li><p><strong>Geometric Mean</strong>: It creates a pseudo-reference that reduces sensitivity to extreme values, affording more stable estimates.</p></li>
+<li><p><strong>Normalization Procedures</strong>: It ensures reliable comparisons of gene expression across samples by mitigating bias from technical variations, leading to more accurate differential expression analysis.</p></li>
+</ul>
+<p>This combination of methodologies allows DESeq2 to provide robust results, enhancing the identification of differentially expressed genes in complex biological datasets.</p>
+<p><strong>Exercise</strong></p>
+<p>Determine the normalized counts for your gene of interest, PD1, given the raw counts and size factors below.</p>
+<p>NOTE: You will need to run the code below to generate the raw counts dataframe (PD1) and the size factor vector (size_factors), then use these objects to determine the normalized counts values:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="count-normalization.html#cb17-1" tabindex="-1"></a><span class="co"># Raw counts for PD1</span></span>
+<span id="cb17-2"><a href="count-normalization.html#cb17-2" tabindex="-1"></a>PD1 <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">21</span>, <span class="dv">58</span>, <span class="dv">17</span>, <span class="dv">97</span>, <span class="dv">83</span>, <span class="dv">10</span>)</span>
+<span id="cb17-3"><a href="count-normalization.html#cb17-3" tabindex="-1"></a><span class="fu">names</span>(PD1) <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">&quot;Sample&quot;</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>)</span>
+<span id="cb17-4"><a href="count-normalization.html#cb17-4" tabindex="-1"></a>PD1 <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(PD1)</span>
+<span id="cb17-5"><a href="count-normalization.html#cb17-5" tabindex="-1"></a>PD1 <span class="ot">&lt;-</span> <span class="fu">t</span>(PD1)</span>
+<span id="cb17-6"><a href="count-normalization.html#cb17-6" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="count-normalization.html#cb17-7" tabindex="-1"></a><span class="co"># Size factors for each sample</span></span>
+<span id="cb17-8"><a href="count-normalization.html#cb17-8" tabindex="-1"></a>size_factors <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="fl">1.32</span>, <span class="fl">0.70</span>, <span class="fl">1.04</span>, <span class="fl">1.27</span>, <span class="fl">1.11</span>, <span class="fl">0.85</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="count-normalization.html#cb18-1" tabindex="-1"></a><span class="co"># Your code here</span></span></code></pre></div>
+<hr />
+</div>
+</div>
+<div id="count-normalization-of-mov10" class="section level2 hasAnchor" number="2.2">
+<h2><span class="header-section-number">2.2</span> Count normalization of Mov10<a href="count-normalization.html#count-normalization-of-mov10" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Now that we know the theory of count normalization, we will normalize the counts for the Mov10 dataset using DESeq2. This requires a few steps:</p>
+<ol style="list-style-type: decimal">
+<li>Ensure the row names of the metadata dataframe are present and in the same order as the column names of the counts dataframe.</li>
+<li>Create a <code>DESeqDataSet</code> object</li>
+<li>Generate the normalized counts</li>
+</ol>
+<div id="match-the-metadata-and-counts-data" class="section level3 hasAnchor" number="2.2.1">
+<h3><span class="header-section-number">2.2.1</span> 1. Match the metadata and counts data<a href="count-normalization.html#match-the-metadata-and-counts-data" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>We should always make sure that we have sample names that match between the two files, and that the samples are in the right order. DESeq2 will output an error if this is not the case.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="count-normalization.html#cb19-1" tabindex="-1"></a><span class="do">### Check that sample names match in both files</span></span>
+<span id="cb19-2"><a href="count-normalization.html#cb19-2" tabindex="-1"></a><span class="fu">all</span>(<span class="fu">colnames</span>(data) <span class="sc">%in%</span> <span class="fu">rownames</span>(meta))</span></code></pre></div>
+<pre><code>## [1] TRUE</code></pre>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="count-normalization.html#cb21-1" tabindex="-1"></a><span class="fu">all</span>(<span class="fu">colnames</span>(data) <span class="sc">==</span> <span class="fu">rownames</span>(meta))</span></code></pre></div>
+<pre><code>## [1] FALSE</code></pre>
+<p>The colnames of our data don’t match the rownames of our metadata so we need to reorder them. We can use the <code>match</code> function:</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="count-normalization.html#cb23-1" tabindex="-1"></a>idx <span class="ot">&lt;-</span> <span class="fu">match</span>(<span class="fu">rownames</span>(meta),<span class="fu">colnames</span>(data))</span>
+<span id="cb23-2"><a href="count-normalization.html#cb23-2" tabindex="-1"></a>data <span class="ot">&lt;-</span> data[,idx]</span>
+<span id="cb23-3"><a href="count-normalization.html#cb23-3" tabindex="-1"></a></span>
+<span id="cb23-4"><a href="count-normalization.html#cb23-4" tabindex="-1"></a><span class="fu">all</span>(<span class="fu">colnames</span>(data) <span class="sc">==</span> <span class="fu">rownames</span>(meta))</span></code></pre></div>
+<pre><code>## [1] TRUE</code></pre>
+<p><strong>Exercise</strong> points = +2</p>
+<p>Suppose we had sample names matching in the counts matrix and metadata file, but they were out of order. Write the line(s) of code required to create a new matrix with columns ordered such that they were identical to the row names of the metadata.</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="count-normalization.html#cb25-1" tabindex="-1"></a><span class="co"># write the code to reorder the columns of the &#39;counts&#39; matrix to match the rownames of the metadata</span></span>
+<span id="cb25-2"><a href="count-normalization.html#cb25-2" tabindex="-1"></a></span>
+<span id="cb25-3"><a href="count-normalization.html#cb25-3" tabindex="-1"></a><span class="co"># check that the rownames of the metadata match the colnames of the &#39;counts&#39; matrix</span></span></code></pre></div>
+<hr />
+</div>
+<div id="create-deseq2-object" class="section level3 hasAnchor" number="2.2.2">
+<h3><span class="header-section-number">2.2.2</span> 2. Create DESEq2 object<a href="count-normalization.html#create-deseq2-object" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>Bioconductor software packages often define and use a custom class within R for storing data (input data, intermediate data and also result data). These custom data structures are similar to <code>lists</code> in that they can contain multiple different data types/structures within them. But, unlike lists they have pre-specified <code>data slots</code>, which hold specific types/classes of data. The data stored in these pre-specified slots can be accessed by using specific package-defined functions.</p>
+<p>Let’s start by creating the <code>DESeqDataSet</code> object and then we can talk a bit more about what is stored inside it. To create the object we will need the <strong>count matrix</strong> and the <strong>metadata</strong> table as input. We will also need to specify a <strong>design formula</strong>. The design formula specifies the column(s) in the metadata table and how they should be used in the analysis. For our dataset we only have one column we are interested in, that is <code>~sampletype</code>. This column has three factor levels, which tells DESeq2 that for each gene we want to evaluate gene expression change with respect to these different levels.</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="count-normalization.html#cb26-1" tabindex="-1"></a><span class="do">## Create DESeq2Dataset object</span></span>
+<span id="cb26-2"><a href="count-normalization.html#cb26-2" tabindex="-1"></a>dds <span class="ot">&lt;-</span> <span class="fu">DESeqDataSetFromMatrix</span>(<span class="at">countData =</span> data, <span class="at">colData =</span> meta, <span class="at">design =</span> <span class="sc">~</span> sampletype)</span></code></pre></div>
+<p><img src="img/deseq_obj1.png" alt="deseq1" /></p>
+<p>You can use DESeq-specific functions to access the different slots and retrieve information, if you wish. For example, suppose we wanted the original count matrix we would use <code>counts()</code>:</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="count-normalization.html#cb27-1" tabindex="-1"></a><span class="fu">head</span>(<span class="fu">counts</span>(dds[,<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]))</span></code></pre></div>
+<pre><code>##             Irrel_kd_1 Irrel_kd_2 Irrel_kd_3 Mov10_kd_2 Mov10_kd_3
+## 1/2-SBSRNA4         45         31         39         57         41
+## A1BG                77         58         40         71         40
+## A1BG-AS1           213        172        126        256        177
+## A1CF                 0          0          0          0          1
+## A2LD1               91         80         50        146         81
+## A2M                  9          8          4         10          9</code></pre>
+<p>As we go through the workflow we will use the relevant functions to check what information gets stored inside our object. We can also run:</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="count-normalization.html#cb29-1" tabindex="-1"></a><span class="fu">slotNames</span>(dds)</span></code></pre></div>
+<pre><code>## [1] &quot;design&quot;             &quot;dispersionFunction&quot; &quot;rowRanges&quot;         
+## [4] &quot;colData&quot;            &quot;assays&quot;             &quot;NAMES&quot;             
+## [7] &quot;elementMetadata&quot;    &quot;metadata&quot;</code></pre>
+</div>
+<div id="generate-the-mov10-normalized-counts" class="section level3 hasAnchor" number="2.2.3">
+<h3><span class="header-section-number">2.2.3</span> 3. Generate the Mov10 normalized counts<a href="count-normalization.html#generate-the-mov10-normalized-counts" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>The next step is to normalize the count data in order to be able to make fair gene comparisons between samples.</p>
+<p><img src="img/deseq_workflow_normalization_2018.png" width="400" alt="Alt text" /></p>
+<p>To perform the <strong>median of ratios method</strong> of normalization, DESeq2 has a single <code>estimateSizeFactors()</code> function that will generate size factors for us. We will use the function in the example below, but <strong>in a typical RNA-seq analysis this step is automatically performed by the <code>DESeq()</code> function</strong>, which we will see later.</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="count-normalization.html#cb31-1" tabindex="-1"></a>dds <span class="ot">&lt;-</span> <span class="fu">estimateSizeFactors</span>(dds)</span></code></pre></div>
+<p>By assigning the results back to the <code>dds</code> object we are filling in the slots of the <code>DESeqDataSet</code> object with the appropriate information. We can take a look at the normalization factor applied to each sample using:</p>
+<div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="count-normalization.html#cb32-1" tabindex="-1"></a><span class="fu">sizeFactors</span>(dds)</span></code></pre></div>
+<pre><code>## Irrel_kd_1 Irrel_kd_2 Irrel_kd_3 Mov10_kd_2 Mov10_kd_3 Mov10_oe_1 
+##  1.1224020  0.9625632  0.7477715  1.5646728  0.9351760  1.2016082 
+## Mov10_oe_2 Mov10_oe_3 
+##  1.1205912  0.6534987</code></pre>
+<p>Now, to retrieve the normalized counts matrix from <code>dds</code>, we use the <code>counts()</code> function and add the argument <code>normalized=TRUE</code>.</p>
+<div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="count-normalization.html#cb34-1" tabindex="-1"></a>normalized_counts <span class="ot">&lt;-</span> <span class="fu">counts</span>(dds, <span class="at">normalized=</span><span class="cn">TRUE</span>)</span></code></pre></div>
+<p>We can save this normalized data matrix to file for later use:</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="count-normalization.html#cb35-1" tabindex="-1"></a><span class="fu">write.table</span>(normalized_counts, <span class="at">file=</span><span class="st">&quot;data/normalized_counts.txt&quot;</span>, <span class="at">sep=</span><span class="st">&quot;</span><span class="sc">\t</span><span class="st">&quot;</span>, <span class="at">quote=</span>F, <span class="at">col.names=</span><span class="cn">NA</span>)</span></code></pre></div>
+
+</div>
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="differential-gene-expression-dge-analysis-overview.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="quality-control.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+"sharing": {
+"github": false,
+"facebook": true,
+"twitter": true,
+"linkedin": false,
+"weibo": false,
+"instapaper": false,
+"vk": false,
+"whatsapp": false,
+"all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+},
+"fontsettings": {
+"theme": "white",
+"family": "sans",
+"size": 2
+},
+"edit": {
+"link": null,
+"text": null
+},
+"history": {
+"link": null,
+"text": null
+},
+"view": {
+"link": null,
+"text": null
+},
+"download": ["2024_RNA-seq-analysis.pdf", "2024_RNA-seq-analysis.epub"],
+"search": {
+"engine": "fuse",
+"options": null
+},
+"toc": {
+"collapse": "section"
+}
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>
