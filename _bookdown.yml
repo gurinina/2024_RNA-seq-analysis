@@ -10,7 +10,6 @@ rmd_files:
   - lessons/06-DGE_visualizing_results.Rmd
   - lessons/07-DGE_summarizing_workflow.Rmd
   - lessons/08-GO_enrichment_analysis.Rmd
-  - lessons/09-DGE_codebook.Rmd
 delete_merged_file: no
 chapter_name: "Chapter "
 language:
