@@ -495,12 +495,14 @@ GOenrichment::runNetwork(vis$nodes, vis$edges, main = "MOV10 Overexpression GO E
 
 ```
 
-
 This network analysis is based on [Cytoscape](https://cytoscape.org/), an open source bioinformatics software platform for visualizing molecular interaction networks. out of all the GO packages.
 
 **Exercise** points = +4
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 969bfbd (GO ex)
 1. Perform a GO enrichment analysis using the `runGORESP` function from the `GOenrichment` package using the res_tableKD_tb$log2FoldChange and cbind to build an input matrix. Use a significance threshold of 0.58 and an FDR threshold of 0.2. Save the results in a variable called `kresp`.
 
 2. Visualize the enriched GO terms using the `runNetwork` function from the `GOenrichment` package. Save the results in a variable called `kvis`.
