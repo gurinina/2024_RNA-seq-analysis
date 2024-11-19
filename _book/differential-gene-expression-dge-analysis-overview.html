@@ -352,11 +352,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h3><span class="header-section-number">1.2.3</span> Viewing data<a href="differential-gene-expression-dge-analysis-overview.html#viewing-data" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>Make sure your datasets contain the expected samples / information before proceeding to perfom any type of analysis.</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="differential-gene-expression-dge-analysis-overview.html#cb7-1" tabindex="-1"></a><span class="fu">rownames</span>(meta)</span></code></pre></div>
-<pre><code>## [1] &quot;Irrel_kd_1&quot; &quot;Irrel_kd_2&quot; &quot;Irrel_kd_3&quot; &quot;Mov10_kd_2&quot; &quot;Mov10_kd_3&quot; &quot;Mov10_oe_1&quot; &quot;Mov10_oe_2&quot;
-## [8] &quot;Mov10_oe_3&quot;</code></pre>
+<pre><code>## [1] &quot;Irrel_kd_1&quot; &quot;Irrel_kd_2&quot; &quot;Irrel_kd_3&quot; &quot;Mov10_kd_2&quot; &quot;Mov10_kd_3&quot; &quot;Mov10_oe_1&quot;
+## [7] &quot;Mov10_oe_2&quot; &quot;Mov10_oe_3&quot;</code></pre>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="differential-gene-expression-dge-analysis-overview.html#cb9-1" tabindex="-1"></a><span class="fu">names</span>(data)</span></code></pre></div>
-<pre><code>## [1] &quot;Mov10_kd_2&quot; &quot;Mov10_kd_3&quot; &quot;Mov10_oe_1&quot; &quot;Mov10_oe_2&quot; &quot;Mov10_oe_3&quot; &quot;Irrel_kd_1&quot; &quot;Irrel_kd_2&quot;
-## [8] &quot;Irrel_kd_3&quot;</code></pre>
+<pre><code>## [1] &quot;Mov10_kd_2&quot; &quot;Mov10_kd_3&quot; &quot;Mov10_oe_1&quot; &quot;Mov10_oe_2&quot; &quot;Mov10_oe_3&quot; &quot;Irrel_kd_1&quot;
+## [7] &quot;Irrel_kd_2&quot; &quot;Irrel_kd_3&quot;</code></pre>
 <p>You’ll notice the colnames of the data are the sample names, and the rownames of the metadata are the sample names. This is important as we will be merging the metadata with the data based on the sample names.</p>
 </div>
 </div>

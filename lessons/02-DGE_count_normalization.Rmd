@@ -248,7 +248,7 @@ Each raw count value in a given sample is divided by that sample's normalization
 
 This combination of methodologies allows DESeq2 to provide robust results, enhancing the identification of differentially expressed genes in complex biological datasets.
 
-**Exercise**
+**Exercise** points = +1
 
 Determine the normalized counts for your gene of interest, PD1, given the raw counts and size factors below. 
 

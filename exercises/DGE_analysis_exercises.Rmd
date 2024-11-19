@@ -10,7 +10,7 @@ editor_options:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-total points = 30
+total points = 20
 
 # Using DESeq2 for gene-level differential expression analysis
 
@@ -36,7 +36,7 @@ total points = 30
 
 	**NOTE: This is an exercise in thinking about running DESeq2. You do not need to run any code in R/RStudio. Refer to the materials/lessons from class to answer the following questions.**
 
-	**a.** Reorder the columns of the `counts` dataset such that `rownames(meta) == colnames(counts)`. points = +2
+	**a.** Reorder the columns of the `counts` dataset such that `rownames(meta) == colnames(counts)`. points = +1
 	
 ```{r, eval = FALSE}
 # Your code here
@@ -60,7 +60,7 @@ total points = 30
 # Your code here
 ```
 	
-	**e.** Provide the line of code to return the results of a Wald test comparison for `Celltype` categories `typeA` versus `typeB` (i.e the fold changes reported should reflect gene expression changes relative to `typeB`). points = +2
+	**e.** Provide the line of code to return the results of a Wald test comparison for `Celltype` categories `typeA` versus `typeB` (i.e the fold changes reported should reflect gene expression changes relative to `typeB`). points = +1
 	 	
 ```{r, eval = FALSE}
 # Your code here
@@ -82,7 +82,7 @@ total points = 30
 
 ```
 	
-	**h.** Provide the line of code to subset the results to return those genes with adjusted p-value < 0.05 and logFold2Change > 1. points = +2
+	**h.** Provide the line of code to subset the results to return those genes with adjusted p-value < 0.05 and logFold2Change > 1. points = +1
 	
 ```{r, eval = FALSE}
 
@@ -118,7 +118,7 @@ res_tableOE <-  readRDS("data/res_tableOE.RDS")
 # Your code here
 ```
 	
-	**c.** Write the `sigOE_hw` vector of gene names to a file called `sigOE_hw.txt` using the `write()` function. Ensure the genes are listed in a single column. Write the code below. points = +2
+	**c.** Write the `sigOE_hw` vector of gene names to a file called `sigOE_hw.txt` using the `write()` function. Ensure the genes are listed in a single column. Write the code below. points = +1
 	
 ```{r}
 
@@ -132,7 +132,7 @@ res_tableOE <-  readRDS("data/res_tableOE.RDS")
 
 - For the genes that are differentially expressed in the knockdown versus control comparison (`sigKD`), plot an expression heatmap using normalized counts and `pheatmap()` following the instructions below. Write the code you would use to create the heatmap.
 
-	**a.** The heatmap should only include control and knockdown samples. points = +4
+	**a.** The heatmap should only include control and knockdown samples. points = +1
 	
 ```{r}
 normalized_counts <- read.delim("data/normalized_counts.txt",row.names = 1)
@@ -174,7 +174,7 @@ library(RColorBrewer)
 ```
 	
 	
-	**c.** Plot the heatmap and scale expression values by row. points = +2
+	**c.** Plot the heatmap and scale expression values by row. points = +1
 	
 ```{r}
 
@@ -211,13 +211,13 @@ library(pheatmap)
 	
 	**c.** Test for overlaps between the lists:
 	
-	- How many, and which genes in `up_OE` are also in `down_KD`? points = +2
+	- How many, and which genes in `up_OE` are also in `down_KD`? points = +1
 		
 ```{r}
 # Your code here
 ```
 
-	- How many, and which genes in `up_KD` are also in `down_OE`? points = +2
+	- How many, and which genes in `up_KD` are also in `down_OE`? points = +1
 		
 ```{r}
 

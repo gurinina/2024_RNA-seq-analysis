@@ -474,7 +474,8 @@ To generate the shrunken log2 fold change estimates, you have to run an addition
 <span id="cb74-9"><a href="negative-binomial-model-fitting.html#cb74-9" tabindex="-1"></a>                                  <span class="at">alpha =</span> <span class="fl">0.05</span>)</span>
 <span id="cb74-10"><a href="negative-binomial-model-fitting.html#cb74-10" tabindex="-1"></a></span>
 <span id="cb74-11"><a href="negative-binomial-model-fitting.html#cb74-11" tabindex="-1"></a><span class="fu">resultsNames</span>(dds)</span></code></pre></div>
-<pre><code>## [1] &quot;Intercept&quot;                                  &quot;sampletype_MOV10_knockdown_vs_control&quot;     
+<pre><code>## [1] &quot;Intercept&quot;                                 
+## [2] &quot;sampletype_MOV10_knockdown_vs_control&quot;     
 ## [3] &quot;sampletype_MOV10_overexpression_vs_control&quot;</code></pre>
 <div class="sourceCode" id="cb76"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb76-1"><a href="negative-binomial-model-fitting.html#cb76-1" tabindex="-1"></a><span class="co"># shrink log2 fold changes</span></span>
 <span id="cb76-2"><a href="negative-binomial-model-fitting.html#cb76-2" tabindex="-1"></a>res_tableOE <span class="ot">&lt;-</span> <span class="fu">lfcShrink</span>(<span class="at">dds =</span> dds, </span>
@@ -533,7 +534,8 @@ To generate the shrunken log2 fold change estimates, you have to run an addition
 ## A2LD1        89.617985     0.29007260  0.195380 0.0333343 0.0741149
 ## A2M           5.860084    -0.09623512  0.233587 0.1057823 0.1900466</code></pre>
 <div class="sourceCode" id="cb86"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb86-1"><a href="negative-binomial-model-fitting.html#cb86-1" tabindex="-1"></a><span class="fu">names</span>(res_tableOE)</span></code></pre></div>
-<pre><code>## [1] &quot;baseMean&quot;       &quot;log2FoldChange&quot; &quot;lfcSE&quot;          &quot;pvalue&quot;         &quot;padj&quot;</code></pre>
+<pre><code>## [1] &quot;baseMean&quot;       &quot;log2FoldChange&quot; &quot;lfcSE&quot;          &quot;pvalue&quot;        
+## [5] &quot;padj&quot;</code></pre>
 <p><strong>Interpreting p-values Set to NA</strong></p>
 <p>In some cases, p-values or adjusted p-values may be set to NA for a gene. This happens in three scenarios:</p>
 <ol style="list-style-type: decimal">
@@ -579,7 +581,8 @@ To generate the shrunken log2 fold change estimates, you have to run an addition
 <span id="cb88-9"><a href="negative-binomial-model-fitting.html#cb88-9" tabindex="-1"></a>                                  <span class="at">alpha =</span> <span class="fl">0.05</span>)</span>
 <span id="cb88-10"><a href="negative-binomial-model-fitting.html#cb88-10" tabindex="-1"></a></span>
 <span id="cb88-11"><a href="negative-binomial-model-fitting.html#cb88-11" tabindex="-1"></a><span class="fu">resultsNames</span>(dds)</span></code></pre></div>
-<pre><code>## [1] &quot;Intercept&quot;                                  &quot;sampletype_MOV10_knockdown_vs_control&quot;     
+<pre><code>## [1] &quot;Intercept&quot;                                 
+## [2] &quot;sampletype_MOV10_knockdown_vs_control&quot;     
 ## [3] &quot;sampletype_MOV10_overexpression_vs_control&quot;</code></pre>
 <div class="sourceCode" id="cb90"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb90-1"><a href="negative-binomial-model-fitting.html#cb90-1" tabindex="-1"></a><span class="co"># use the `coef` argument to specify the contrast directly</span></span>
 <span id="cb90-2"><a href="negative-binomial-model-fitting.html#cb90-2" tabindex="-1"></a>res_tableKD <span class="ot">&lt;-</span> <span class="fu">lfcShrink</span>(dds, <span class="at">coef =</span> <span class="dv">2</span>, </span>

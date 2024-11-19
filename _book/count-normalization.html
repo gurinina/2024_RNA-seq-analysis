@@ -674,7 +674,7 @@ Tools like DESeq2 or edgeR are better suited for differential expression analysi
 <li><p><strong>Normalization Procedures</strong>: It ensures reliable comparisons of gene expression across samples by mitigating bias from technical variations, leading to more accurate differential expression analysis.</p></li>
 </ul>
 <p>This combination of methodologies allows DESeq2 to provide robust results, enhancing the identification of differentially expressed genes in complex biological datasets.</p>
-<p><strong>Exercise</strong></p>
+<p><strong>Exercise</strong> points = +1</p>
 <p>Determine the normalized counts for your gene of interest, PD1, given the raw counts and size factors below.</p>
 <p>NOTE: You will need to run the code below to generate the raw counts dataframe (PD1) and the size factor vector (size_factors), then use these objects to determine the normalized counts values:</p>
 <div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="count-normalization.html#cb17-1" tabindex="-1"></a><span class="co"># Raw counts for PD1</span></span>
@@ -736,8 +736,9 @@ Tools like DESeq2 or edgeR are better suited for differential expression analysi
 ## A2M                  9          8          4         10          9</code></pre>
 <p>As we go through the workflow we will use the relevant functions to check what information gets stored inside our object. We can also run:</p>
 <div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="count-normalization.html#cb29-1" tabindex="-1"></a><span class="fu">slotNames</span>(dds)</span></code></pre></div>
-<pre><code>## [1] &quot;design&quot;             &quot;dispersionFunction&quot; &quot;rowRanges&quot;          &quot;colData&quot;           
-## [5] &quot;assays&quot;             &quot;NAMES&quot;              &quot;elementMetadata&quot;    &quot;metadata&quot;</code></pre>
+<pre><code>## [1] &quot;design&quot;             &quot;dispersionFunction&quot; &quot;rowRanges&quot;         
+## [4] &quot;colData&quot;            &quot;assays&quot;             &quot;NAMES&quot;             
+## [7] &quot;elementMetadata&quot;    &quot;metadata&quot;</code></pre>
 </div>
 <div id="generate-the-mov10-normalized-counts" class="section level3 hasAnchor" number="2.2.3">
 <h3><span class="header-section-number">2.2.3</span> 3. Generate the Mov10 normalized counts<a href="count-normalization.html#generate-the-mov10-normalized-counts" class="anchor-section" aria-label="Anchor link to header"></a></h3>
@@ -747,8 +748,10 @@ Tools like DESeq2 or edgeR are better suited for differential expression analysi
 <div class="sourceCode" id="cb31"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb31-1"><a href="count-normalization.html#cb31-1" tabindex="-1"></a>dds <span class="ot">&lt;-</span> <span class="fu">estimateSizeFactors</span>(dds)</span></code></pre></div>
 <p>By assigning the results back to the <code>dds</code> object we are filling in the slots of the <code>DESeqDataSet</code> object with the appropriate information. We can take a look at the normalization factor applied to each sample using:</p>
 <div class="sourceCode" id="cb32"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb32-1"><a href="count-normalization.html#cb32-1" tabindex="-1"></a><span class="fu">sizeFactors</span>(dds)</span></code></pre></div>
-<pre><code>## Irrel_kd_1 Irrel_kd_2 Irrel_kd_3 Mov10_kd_2 Mov10_kd_3 Mov10_oe_1 Mov10_oe_2 Mov10_oe_3 
-##  1.1224020  0.9625632  0.7477715  1.5646728  0.9351760  1.2016082  1.1205912  0.6534987</code></pre>
+<pre><code>## Irrel_kd_1 Irrel_kd_2 Irrel_kd_3 Mov10_kd_2 Mov10_kd_3 Mov10_oe_1 Mov10_oe_2 
+##  1.1224020  0.9625632  0.7477715  1.5646728  0.9351760  1.2016082  1.1205912 
+## Mov10_oe_3 
+##  0.6534987</code></pre>
 <p>Now, to retrieve the normalized counts matrix from <code>dds</code>, we use the <code>counts()</code> function and add the argument <code>normalized=TRUE</code>.</p>
 <div class="sourceCode" id="cb34"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb34-1"><a href="count-normalization.html#cb34-1" tabindex="-1"></a>normalized_counts <span class="ot">&lt;-</span> <span class="fu">counts</span>(dds, <span class="at">normalized=</span><span class="cn">TRUE</span>)</span></code></pre></div>
 <p>We can save this normalized data matrix to file for later use:</p>

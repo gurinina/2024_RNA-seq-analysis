@@ -465,13 +465,20 @@ With stabilization (e.g., rlog or vst): Variance across genes is more evenly dis
 <span id="cb39-2"><a href="quality-control.html#cb39-2" tabindex="-1"></a>rld_cor <span class="ot">&lt;-</span> <span class="fu">cor</span>(rld_mat) <span class="do">## cor() is a base R function</span></span>
 <span id="cb39-3"><a href="quality-control.html#cb39-3" tabindex="-1"></a></span>
 <span id="cb39-4"><a href="quality-control.html#cb39-4" tabindex="-1"></a><span class="fu">head</span>(rld_cor)   <span class="do">## check the output of cor(), make note of the rownames and colnames</span></span></code></pre></div>
-<pre><code>##            Irrel_kd_1 Irrel_kd_2 Irrel_kd_3 Mov10_kd_2 Mov10_kd_3 Mov10_oe_1 Mov10_oe_2 Mov10_oe_3
-## Irrel_kd_1  1.0000000  0.9999614  0.9999532  0.9997202  0.9997748  0.9996700  0.9996599  0.9995804
-## Irrel_kd_2  0.9999614  1.0000000  0.9999544  0.9996918  0.9997568  0.9996984  0.9996825  0.9996227
-## Irrel_kd_3  0.9999532  0.9999544  1.0000000  0.9996816  0.9997574  0.9997067  0.9997090  0.9996026
-## Mov10_kd_2  0.9997202  0.9996918  0.9996816  1.0000000  0.9999492  0.9994868  0.9994565  0.9993869
-## Mov10_kd_3  0.9997748  0.9997568  0.9997574  0.9999492  1.0000000  0.9996154  0.9995905  0.9995235
-## Mov10_oe_1  0.9996700  0.9996984  0.9997067  0.9994868  0.9996154  1.0000000  0.9999505  0.9999196</code></pre>
+<pre><code>##            Irrel_kd_1 Irrel_kd_2 Irrel_kd_3 Mov10_kd_2 Mov10_kd_3 Mov10_oe_1
+## Irrel_kd_1  1.0000000  0.9999614  0.9999532  0.9997202  0.9997748  0.9996700
+## Irrel_kd_2  0.9999614  1.0000000  0.9999544  0.9996918  0.9997568  0.9996984
+## Irrel_kd_3  0.9999532  0.9999544  1.0000000  0.9996816  0.9997574  0.9997067
+## Mov10_kd_2  0.9997202  0.9996918  0.9996816  1.0000000  0.9999492  0.9994868
+## Mov10_kd_3  0.9997748  0.9997568  0.9997574  0.9999492  1.0000000  0.9996154
+## Mov10_oe_1  0.9996700  0.9996984  0.9997067  0.9994868  0.9996154  1.0000000
+##            Mov10_oe_2 Mov10_oe_3
+## Irrel_kd_1  0.9996599  0.9995804
+## Irrel_kd_2  0.9996825  0.9996227
+## Irrel_kd_3  0.9997090  0.9996026
+## Mov10_kd_2  0.9994565  0.9993869
+## Mov10_kd_3  0.9995905  0.9995235
+## Mov10_oe_1  0.9999505  0.9999196</code></pre>
 <p>And now to plot the correlation values as a heatmap:</p>
 <div class="sourceCode" id="cb41"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb41-1"><a href="quality-control.html#cb41-1" tabindex="-1"></a><span class="do">### Plot heatmap</span></span>
 <span id="cb41-2"><a href="quality-control.html#cb41-2" tabindex="-1"></a><span class="fu">pheatmap</span>(rld_cor)</span></code></pre></div>

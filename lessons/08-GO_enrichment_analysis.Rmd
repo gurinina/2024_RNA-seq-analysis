@@ -62,7 +62,7 @@ Suppose:your background population has \( N = 20,000 \) genes (e.g., the entire 
 N <- 20000         # Total genes in the background (population)
 m <- 500           # Total genes associated with the GO term in the background
 k <- 1000          # Sample size (genes in your list)
-q <- 30            # Observed number of successes (overlap with GO term)
+q <- 50            # Observed number of successes (overlap with GO term)
 
 # Perform the hypergeometric test (upper-tail probability)
 p_value <- phyper(q - 1, m, N - m, k, lower.tail = FALSE)
@@ -488,16 +488,31 @@ The equivalent function in the `GOenrichment` package is `runNetwork`:
 
 We use the`visSetup` function to prepare the data for network visualization. We then run the `runNetwork` function to generate the interactive network plot.
 
-```{r, echo=FALSE, results='asis'}
+```{r, echo=TRUE, results='asis'}
 
 vis = visSetup(hresp$enrichInfo,hresp$edgeMat)
-GOenrichment::runNetwork(vis$nodes, vis$edges)
+GOenrichment::runNetwork(vis$nodes, vis$edges, main = "MOV10 Overexpression GO Enrichment")
 
 ```
 
 
 This network analysis is based on [Cytoscape](https://cytoscape.org/), an open source bioinformatics software platform for visualizing molecular interaction networks. out of all the GO packages.
 
+**Exercise** points = +4
+
+<<<<<<< HEAD
+=======
+**Exercise** points = +4
+
+>>>>>>> 194efbe (tweaks)
+1. Perform a GO enrichment analysis using the `runGORESP` function from the `GOenrichment` package using the res_tableKD_tb$log2FoldChange and cbind to build an input matrix. Use a significance threshold of 0.58 and an FDR threshold of 0.2. Save the results in a variable called `kresp`.
+
+2. Visualize the enriched GO terms using the `runNetwork` function from the `GOenrichment` package. Save the results in a variable called `kvis`.
+
+<<<<<<< HEAD
+=======
+
+>>>>>>> 194efbe (tweaks)
 ### Other tools and resources
 
 - [GeneMANIA](http://genemania.org/). GeneMANIA finds other genes that are related to a set of input genes, using a very large set of functional association data curated from the literature. 
